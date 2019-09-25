@@ -14,19 +14,28 @@ pip install git+https://github.com/epicsdeb/pypdb.git
 # install docs
 pip install sphinx recommonmark
 
+# Allow user to configure path for documentation drop site 
+DEFAULT_DOCS_PATH="docs/source"
+
+if [ -z $1 ]: then
+    DOCS_PATH=$DEFAULT_DOCS_PATH
+else
+    DOCS_PATH=$1
+fi
+
 # Execute linting script:
 find plc -name '*.tsproj' -print0 | 
     while IFS= read -r -d '' tsproj; do 
         pytmc pragmalint --verbose "$tsproj";
-        pytmc summary --all --code "$tsproj" > docs/source/$(basename $tsproj).md;
+        pytmc summary --all --code "$tsproj" > $DOCS_PATH/$(basename $tsproj).md;
     done
 
 
 find plc -name '*.tmc' -print0 |
     while IFS= read -r -d '' tmc; do
-        db_filename=docs/source/$(basename $tmc).db
+        db_filename=$DOCS_PATH/$(basename $tmc).db
         db_errors=$(( ( pytmc db --allow-errors "$tmc") 1>$db_filename) 2>&1)
-        md_filename=docs/source/$(basename $tmc).md
+        md_filename=$DOCS_PATH/$(basename $tmc).md
 
         (
             echo "$(basename $tmc)"

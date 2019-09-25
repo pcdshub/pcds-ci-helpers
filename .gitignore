@@ -1,0 +1,16 @@
+# TwinCAT3 items
+_Boot
+_Libraries
+_CompileInfo
+
+*.suo
+*~
+*.tpy
+*.bak
+*.~u
+
+# *nix dev items
+*.swp
+
+# sphinx-build docs
+docs/build

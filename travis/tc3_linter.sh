@@ -17,7 +17,7 @@ pip install sphinx recommonmark
 # Allow user to configure path for documentation drop site 
 DEFAULT_DOCS_PATH="docs/source"
 
-if [ -z $1 ]: then
+if [ -z $1 ]; then
     DOCS_PATH=$DEFAULT_DOCS_PATH
 else
     DOCS_PATH=$1

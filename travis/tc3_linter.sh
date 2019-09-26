@@ -35,6 +35,8 @@ pip install sphinx recommonmark
 # Allow user to configure path for documentation drop site 
 DEFAULT_DOCS_PATH="docs/source"
 
+pytmc --version
+
 if [ -z $1 ]; then
     DOCS_PATH=$DEFAULT_DOCS_PATH
 else

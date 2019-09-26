@@ -1,11 +1,6 @@
-# tc3linter.sh 
-#
-# Intended for :
-#
-#   language: python
-#   dist: xenial
-#   python: 3.7
+#!/bin/bash
 
+# tc3linter.sh 
 
 LINTER_PYTHON_VERSION=3.7
 

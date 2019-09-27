@@ -9,7 +9,7 @@ install:
   # Import the helper scripts
   - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
   # Call the script of your choice
-  - source pcds-ci-helpers/traivs/tc3_linter.sh
+  - bash pcds-ci-helpers/traivs/tc3_linter.sh
 ```
 
 Documentation
@@ -21,7 +21,7 @@ tc3_linter.sh examines TwinCAT3 and publishes a sphinx-compatible set of pages s
 
 ##### usage:
 ```sh
-> source pcds-ci-helpers/traivs/tc3_linter.sh [docs_deploy_path]
+> bash pcds-ci-helpers/traivs/tc3_linter.sh [docs_deploy_path]
 ```
 ##### arguments:
 ```bash

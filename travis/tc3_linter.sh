@@ -20,7 +20,7 @@ if [ -z $CONDA_DEFAULT_ENV]; then
     conda build  -q conda-recipe --python $LINTER_PYTHON_VERSION --output-folder bld-dir
     conda config --add channels "file://`pwd`/bld-dir"
     # Manage conda environment
-    conda create -n tc3_linter-env python=$LINTER_PYTHON_VERSION pytmc pip pyqt --file dev-requirements.txt
+    conda create -n tc3_linter-env python=$LINTER_PYTHON_VERSION pytmc pip
     source activate tc3_linter-env
 else
     # just install pytmc:
@@ -35,7 +35,8 @@ pip install sphinx recommonmark
 # Allow user to configure path for documentation drop site 
 DEFAULT_DOCS_PATH="docs/source"
 
-pytmc --version
+echo "PYTMC cersion:"
+echo $(pytmc --version)
 
 if [ -z $1 ]; then
     DOCS_PATH=$DEFAULT_DOCS_PATH

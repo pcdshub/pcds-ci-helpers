@@ -17,8 +17,6 @@ if [ -z $CONDA_DEFAULT_ENV]; then
     conda config --append channels conda-forge
     # Useful for debugging
     conda info -a
-    conda build  -q conda-recipe --python $LINTER_PYTHON_VERSION --output-folder bld-dir
-    conda config --add channels "file://`pwd`/bld-dir"
     # Manage conda environment
     conda create -n tc3_linter-env python=$LINTER_PYTHON_VERSION pytmc pip
     source activate tc3_linter-env

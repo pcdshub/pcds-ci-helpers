@@ -48,7 +48,7 @@ fi
    
 if [ ! -d $DOCS_SOURCE_PATH ]; then
     mkdir -p $DOCS_SOURCE_PATH
-    cp $SCRIPT_DIR/docs_template_files/* $DOCS_PATH/
+    cp -r $SCRIPT_DIR/docs_template_files/* $DOCS_PATH/
 fi
 
 # Execute linting script:

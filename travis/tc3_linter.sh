@@ -31,32 +31,38 @@ fi
 pip install sphinx recommonmark
 
 # Allow user to configure path for documentation drop site 
-DEFAULT_DOCS_PATH="docs/source"
+DEFAULT_DOCS_PATH="docs"
+DEFAULT_DOCS_SOURCE_PATH="docs/source"
 
 echo "PYTMC cersion:"
 echo $(pytmc --version)
 
 if [ -z $1 ]; then
+    DOCS_SOURCE_PATH=$DEFAULT_DOCS_SOURCE_PATH
     DOCS_PATH=$DEFAULT_DOCS_PATH
 else
-    DOCS_PATH=$1
+    DOCS_SOURCE_PATH=$1
+    DOCS_PATH=$2
 fi
+   
 
-mkdir -p ${DOCS_PATH}
+
+
+mkdir -p $DOCS_SOURCE_PATH
 
 # Execute linting script:
 find . -name '*.tsproj' -print0 | 
     while IFS= read -r -d '' tsproj; do 
         pytmc pragmalint --verbose "$tsproj";
-        pytmc summary --all --code "$tsproj" > $DOCS_PATH/$(basename $tsproj).md;
+        pytmc summary --all --code "$tsproj" > $DOCS_SOURCE_PATH/$(basename $tsproj).md;
     done
 
 
 find . -name '*.tmc' -print0 |
     while IFS= read -r -d '' tmc; do
-        db_filename=$DOCS_PATH/$(basename $tmc).db
+        db_filename=$DOCS_SOURCE_PATH/$(basename $tmc).db
         db_errors=$(( ( pytmc db --allow-errors "$tmc") 1>$db_filename) 2>&1)
-        md_filename=$DOCS_PATH/$(basename $tmc).md
+        md_filename=$DOCS_SOURCE_PATH/$(basename $tmc).md
 
         (
             echo "$(basename $tmc)"
@@ -87,7 +93,7 @@ find . -name '*.tmc' -print0 |
         ) > $md_filename
     done
 
-pushd ${DOCS_PATH}
+pushd $DOCS_PATH
 make html
 popd
 

@@ -33,6 +33,7 @@ pip install sphinx recommonmark
 # Allow user to configure path for documentation drop site 
 DEFAULT_DOCS_PATH="docs"
 DEFAULT_DOCS_SOURCE_PATH="docs/source"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" 
 
 echo "PYTMC cersion:"
 echo $(pytmc --version)
@@ -45,10 +46,10 @@ else
     DOCS_PATH=$2
 fi
    
-
-
-
-mkdir -p $DOCS_SOURCE_PATH
+if [ ! -d $DOCS_SOURCE_PATH ]; then
+    mkdir -p $DOCS_SOURCE_PATH
+    cp $SCRIPT_DIR/docs_template_files/* $DOCS_PATH/
+fi
 
 # Execute linting script:
 find . -name '*.tsproj' -print0 | 

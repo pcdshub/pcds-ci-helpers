@@ -43,14 +43,14 @@ else
 fi
 
 # Execute linting script:
-find plc -name '*.tsproj' -print0 | 
+find . -name '*.tsproj' -print0 | 
     while IFS= read -r -d '' tsproj; do 
         pytmc pragmalint --verbose "$tsproj";
         pytmc summary --all --code "$tsproj" > $DOCS_PATH/$(basename $tsproj).md;
     done
 
 
-find plc -name '*.tmc' -print0 |
+find . -name '*.tmc' -print0 |
     while IFS= read -r -d '' tmc; do
         db_filename=$DOCS_PATH/$(basename $tmc).db
         db_errors=$(( ( pytmc db --allow-errors "$tmc") 1>$db_filename) 2>&1)

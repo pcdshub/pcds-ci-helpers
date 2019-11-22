@@ -169,7 +169,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, f'{repo_nme}', f'{repo_name} Documentation',
+    (master_doc, f'{repo_name}', f'{repo_name} Documentation',
      author, f'{repo_name}', 'One line description of project.',
      'Miscellaneous'),
 ]

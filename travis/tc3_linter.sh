@@ -42,6 +42,8 @@ else
     DOCS_PATH=$1
 fi
 
+mkdir -p ${DOCS_PATH}
+
 # Execute linting script:
 find . -name '*.tsproj' -print0 | 
     while IFS= read -r -d '' tsproj; do 
@@ -85,7 +87,7 @@ find . -name '*.tmc' -print0 |
         ) > $md_filename
     done
 
-pushd docs
+pushd ${DOCS_PATH}
 make html
 popd
 

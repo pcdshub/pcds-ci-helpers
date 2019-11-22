@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = pytmc
+SPHINXPROJ    = $(TRAVIS_REPO_SLUG)
 SOURCEDIR     = .
 BUILDDIR      = _build
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# pytmc documentation build configuration file, created by
+# GENERIC idocumentation build configuration file, created by
 # sphinx-quickstart on Thu Dec  7 12:54:14 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -19,22 +19,8 @@
 #
 import os
 import sys
-module_path = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    os.pardir,
-    'pytmc'
-)
-sys.path.insert(0,module_path)
-'''
-module_path = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    os.pardir,
-    'pytmc',
 
-)
-sys.path.insert(0,module_path)
-'''
-import pytmc
+organization_name, repo_name = os.environ['TRAVIS_REPO_SLUG'].split('/')
 # sys.path.insert(0, os.path.abspath('.'))
 
 
@@ -63,15 +49,14 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
 
 # General information about the project.
-project = 'pytmc'
-copyright = '2017, SLAC National Accelerator Laboratory'
+project = repo_name
+copyright = '2019, SLAC National Accelerator Laboratory'
 author = 'SLAC National Accelerator Laboratory'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -136,7 +121,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pytmcdoc'
+htmlhelp_basename = f'{repo_name}doc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -163,7 +148,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'pytmc.tex', 'pytmc Documentation',
+    (master_doc, f'{repo_name}.tex', f'{repo_name} Documentation',
      'SLAC National Accelerator Laboratory', 'manual'),
 ]
 
@@ -184,8 +169,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'pytmc', 'pytmc Documentation',
-     author, 'pytmc', 'One line description of project.',
+    (master_doc, f'{repo_nme}', f'{repo_name} Documentation',
+     author, f'{repo_name}', 'One line description of project.',
      'Miscellaneous'),
 ]
 

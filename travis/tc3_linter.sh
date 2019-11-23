@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 # tc3linter.sh 
 
@@ -7,7 +7,7 @@ LINTER_PYTHON_VERSION=3.7
 # Install conda and configure an environemnt if one is not detected
 
 if [ -z $CONDA_DEFAULT_ENV]; then
-    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    wget -nv https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
     bash miniconda.sh -b -p $HOME/miniconda
     export PATH="$HOME/miniconda/bin:$PATH"
     conda config --set always_yes yes --set changeps1 no

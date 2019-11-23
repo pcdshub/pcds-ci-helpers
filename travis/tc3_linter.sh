@@ -23,7 +23,7 @@ if [ -z $CONDA_DEFAULT_ENV]; then
 else
     # just install pytmc:
     pip install Jinja2 lxml
-    pip install git+https://github.com/slaclab/pytmc.git@v2.1.0
+    pip install git+https://github.com/slaclab/pytmc.git@v2.3.1
     pip install git+https://github.com/epicsdeb/pypdb.git
 fi
 
@@ -54,7 +54,10 @@ fi
 # Execute linting script:
 find . -name '*.tsproj' -print0 | 
     while IFS= read -r -d '' tsproj; do 
-        pytmc pragmalint --verbose "$tsproj";
+        pytmc summary --all --code "$tsproj" > $DOCS_SOURCE_PATH/$(basename $tsproj).md;
+        echo "Pragma lint results" >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;
+        echo "-------------------" >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;
+        pytmc pragmalint --verbose "$tsproj" >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;
         pytmc summary --all --code "$tsproj" > $DOCS_SOURCE_PATH/$(basename $tsproj).md;
     done
 

@@ -54,11 +54,10 @@ fi
 # Execute linting script:
 find . -name '*.tsproj' -print0 | 
     while IFS= read -r -d '' tsproj; do 
-        pytmc summary --all --code "$tsproj" > $DOCS_SOURCE_PATH/$(basename $tsproj).md;
+        pytmc summary --all --code --markdown "$tsproj" > $DOCS_SOURCE_PATH/$(basename $tsproj).md;
         echo "Pragma lint results" >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;
         echo "-------------------" >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;
         pytmc pragmalint --verbose "$tsproj" >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;
-        pytmc summary --all --code "$tsproj" > $DOCS_SOURCE_PATH/$(basename $tsproj).md;
     done
 
 

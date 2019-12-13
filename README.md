@@ -9,7 +9,7 @@ install:
   # Import the helper scripts
   - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
   # Start the helper-script initialization
-  - source pcds-ci-helpers/init.sh
+  - source pcds-ci-helpers/travis/init.sh
   # Call the script of your choice
   - bash pcds-ci-helpers/travis/tc3_linter.sh
 ```
@@ -57,7 +57,7 @@ matrix:
 install:
   # Import the helper scripts
   - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
-  - source pcds-ci-helpers/init.sh
+  - source pcds-ci-helpers/travis/init.sh
 ```
 
 `LINT_PYTHON` could be set to directory names or include additional flake8

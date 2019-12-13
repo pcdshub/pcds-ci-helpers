@@ -8,6 +8,8 @@ You can use the tools in this script with the following commands:
 install:
   # Import the helper scripts
   - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
+  # Start the helper-script initialization
+  - source pcds-ci-helpers/init.sh
   # Call the script of your choice
   - bash pcds-ci-helpers/travis/tc3_linter.sh
 ```
@@ -15,6 +17,13 @@ install:
 Documentation
 -------------
 ### travis
+
+#### init.sh
+`init.sh` acts as a general-purpose initialization hook on Travis CI.  It
+allows for various tasks to be run during the `install` phase.
+
+Currently, it supports:
+* Python linting via flake8 (see `python_linter.sh`)
 
 #### tc3_linter.sh
 tc3_linter.sh examines TwinCAT3 and publishes a sphinx-compatible set of pages summarizing the TwinCAT3 project and the IOC it will generate. This is ideal for assessing [PYTMC](https://github.com/slaclab/pytmc) dependent TwinCAT3 projects. This script functions well in conjunction with [doctr](https://pypi.org/project/doctr/) for build reports. For usage with doctr, you will need to initialize doctr, provide a deployment key, and enable github pages independently.
@@ -28,6 +37,31 @@ tc3_linter.sh examines TwinCAT3 and publishes a sphinx-compatible set of pages s
 docs_deploy_path:
   The location where the build documentation will be placed. This defaults to 'docs/source'
 ```
+
+#### python_linter.sh
+`python_linter.sh` lints given Python package(s) with the provided flake8 arguments.
+
+##### usage:
+The suggested usage is with a separate lint-only step using `init.sh`.
+
+`.travis.yml`
+```yaml
+matrix:
+  include:
+    - name: flake8 linting
+      python: 3.6
+      env: LINT_PYTHON=.
+
+...
+
+install:
+  # Import the helper scripts
+  - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
+  - source pcds-ci-helpers/init.sh
+```
+
+`LINT_PYTHON` could be set to directory names or include additional flake8
+flags.
 
 References
 ----------

@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 TWINCAT_PROJECT_ROOT=${TWINCAT_PROJECT_ROOT:-$TRAVIS_BUILD_DIR}
 

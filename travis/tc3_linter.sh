@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 # tc3linter.sh 
 
@@ -26,7 +26,7 @@ fi
    
 if [ ! -d $DOCS_SOURCE_PATH ]; then
     mkdir -p $DOCS_SOURCE_PATH
-    cp -r $CI_HELPER_PATH/travis/docs_template_files/* $DOCS_PATH/
+    cp -r ${CI_HELPER_PATH}/travis/docs_template_files/* $DOCS_PATH/
 fi
 
 # Execute linting script:

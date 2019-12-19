@@ -4,8 +4,13 @@
 #   * source `python_linter.sh` on Travis CI
 
 pip install flake8
+
+LINT_PYTHON_PATH=${LINT_PYTHON_PATH:-$TRAVIS_BUILD_DIR}
+
+cd $LINT_PYTHON_PATH
+
 linter_header=$(cat <<EOF
-Working directory: $PWD
+LINT_PYTHON_PATH: $PWD
 
 =====================
 Python linter results

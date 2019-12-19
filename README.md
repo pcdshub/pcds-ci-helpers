@@ -24,6 +24,16 @@ allows for various tasks to be run during the `install` phase.
 
 Currently, it supports:
 * Python linting via flake8 (see `python_linter.sh`)
+* TwinCAT3 project summary + pytmc linting (see `tc3_summary.sh`)
+
+This script must be sourced for each of the above features:
+
+```
+install:
+  # Import the helper scripts
+  - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
+  - source pcds-ci-helpers/travis/init.sh
+```
 
 #### tc3_linter.sh
 tc3_linter.sh examines TwinCAT3 and publishes a sphinx-compatible set of pages summarizing the TwinCAT3 project and the IOC it will generate. This is ideal for assessing [PYTMC](https://github.com/slaclab/pytmc) dependent TwinCAT3 projects. This script functions well in conjunction with [doctr](https://pypi.org/project/doctr/) for build reports. For usage with doctr, you will need to initialize doctr, provide a deployment key, and enable github pages independently.
@@ -51,17 +61,27 @@ matrix:
     - name: flake8 linting
       python: 3.6
       env: LINT_PYTHON=.
-
-...
-
-install:
-  # Import the helper scripts
-  - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
-  - source pcds-ci-helpers/travis/init.sh
 ```
 
 `LINT_PYTHON` could be set to directory names or include additional flake8
 flags.
+
+#### tc3_summary.sh
+`tc3_summary.sh` provides a project summary for all TwinCAT3 projects.
+
+##### usage:
+The suggested usage is with a separate summary-only step using `init.sh`.
+
+`.travis.yml`
+```yaml
+matrix:
+  include:
+    - name: Project summary
+      python: 3.7
+      env: TWINCAT_SUMMARY=1
+```
+
+`TWINCAT_PROJECT_ROOT` may be specified here, defaulting to `$TRAVIS_BUILD_DIR`.
 
 References
 ----------

@@ -4,28 +4,7 @@
 
 LINTER_PYTHON_VERSION=3.7
 
-# Install conda and configure an environemnt if one is not detected
-
-if [ -z $CONDA_DEFAULT_ENV]; then
-    wget -nv https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-    bash miniconda.sh -b -p $HOME/miniconda
-    export PATH="$HOME/miniconda/bin:$PATH"
-    conda config --set always_yes yes --set changeps1 no
-    conda install conda-build anaconda-client
-    conda update -q conda conda-build
-    conda config --add channels pcds-tag
-    conda config --append channels conda-forge
-    # Useful for debugging
-    conda info -a
-    # Manage conda environment
-    conda create -n tc3_linter-env python=$LINTER_PYTHON_VERSION pytmc pip
-    source activate tc3_linter-env
-else
-    # just install pytmc:
-    pip install Jinja2 lxml
-    pip install git+https://github.com/slaclab/pytmc.git@v2.3.1
-    pip install git+https://github.com/epicsdeb/pypdb.git
-fi
+pip install git+https://github.com/slaclab/pytmc.git@v2.4.0
 
 # install docs
 pip install sphinx recommonmark
@@ -33,9 +12,8 @@ pip install sphinx recommonmark
 # Allow user to configure path for documentation drop site 
 DEFAULT_DOCS_PATH="docs"
 DEFAULT_DOCS_SOURCE_PATH="docs/source"
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" 
 
-echo "PYTMC cersion:"
+echo "PYTMC version:"
 echo $(pytmc --version)
 
 if [ -z $1 ]; then
@@ -48,7 +26,7 @@ fi
    
 if [ ! -d $DOCS_SOURCE_PATH ]; then
     mkdir -p $DOCS_SOURCE_PATH
-    cp -r $SCRIPT_DIR/docs_template_files/* $DOCS_PATH/
+    cp -r $CI_HELPER_PATH/travis/docs_template_files/* $DOCS_PATH/
 fi
 
 # Execute linting script:

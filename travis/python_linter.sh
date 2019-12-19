@@ -4,7 +4,9 @@
 #   * source `python_linter.sh` on Travis CI
 
 pip install flake8
-linter_header=$(cat <<'EOF'
+linter_header=$(cat <<EOF
+Working directory: $PWD
+
 =====================
 Python linter results
 =====================

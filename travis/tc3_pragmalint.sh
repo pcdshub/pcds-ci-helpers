@@ -6,12 +6,17 @@ cd $TWINCAT_PROJECT_ROOT
 
 pip install git+https://github.com/slaclab/pytmc.git@v2.4.0
 
+EXIT_CODE=0
+
 find . -name '*.tsproj' -print0 | 
     while IFS= read -r -d '' tsproj; do 
         echo "Pragma lint results"
         echo "-------------------"
         echo '```'
         pytmc pragmalint --verbose "$tsproj"
+        if [ $? -ne 0 ]; then
+            EXIT_CODE=1
+        fi
         echo '```'
     done
 
@@ -30,6 +35,10 @@ find . -name '*.tmc' -print0 |
             echo "$db_errors"
             echo '```'
             echo ""
+
+            if [ $? -ne 0 ]; then
+                EXIT_CODE=2
+            fi
         fi
 
         echo "Records"
@@ -46,4 +55,4 @@ find . -name '*.tmc' -print0 |
         echo '```'
     done
 
-exit 0
+exit $EXIT_CODE

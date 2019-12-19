@@ -14,5 +14,9 @@ if [[ ! -z "$TWINCAT_SUMMARY" ]]; then
     source tc3_summary.sh
 fi
 
+if [[ ! -z "$TWINCAT_PRAGMALINT" ]]; then
+    source tc3_pragmalint.sh
+fi
+
 popd
 popd

@@ -19,9 +19,7 @@ find . -name '*.tsproj' -print0 |
 
 find . -name '*.tmc' -print0 |
     while IFS= read -r -d '' tmc; do
-        db_filename=$DOCS_SOURCE_PATH/$(basename $tmc).db
-        db_errors=$(( ( pytmc db --allow-errors "$tmc") 1>$db_filename) 2>&1)
-        md_filename=$DOCS_SOURCE_PATH/$(basename $tmc).md
+        db_errors=$(( ( pytmc db --allow-errors "$tmc") 1>/dev/null) 2>&1)
 
         echo "$(basename $tmc)"
         echo "=================="
@@ -46,7 +44,7 @@ find . -name '*.tmc' -print0 |
         echo "EPICS database"
         echo "--------------"
         echo '```'
-        cat $db_filename
+        pytmc db --allow-errors "$tmc" 2> /dev/null
         echo '```'
     done
 

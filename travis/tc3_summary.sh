@@ -49,3 +49,5 @@ find . -name '*.tmc' -print0 |
         cat $db_filename
         echo '```'
     done
+
+exit 0

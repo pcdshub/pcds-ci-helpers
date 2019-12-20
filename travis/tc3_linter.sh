@@ -4,6 +4,8 @@
 
 LINTER_PYTHON_VERSION=3.7
 
+source settings.sh
+
 pip install git+https://github.com/slaclab/pytmc.git@v2.4.0
 
 # install docs

@@ -2,17 +2,45 @@ pcds-ci-helpers
 ===============
 This repository is a place to store complex scripts for continuous integration that may see common use.
 
-You can use the tools in this script with the following commands:
+For TwinCAT projects, you can use the tools in this script with the following commands:
 
 ```yaml
+matrix:
+  include:
+    - name: Project summary
+      python: 3.7
+      env: TWINCAT_SUMMARY=1
+    - name: Pragma linting
+      python: 3.7
+      env: TWINCAT_PRAGMALINT=1
+    - name: Documentation building
+      python: 3.7
+      env: TWINCAT_BUILD_DOCS=1
+
 install:
   # Import the helper scripts
   - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
-  # Start the helper-script initialization
+  # Start the helper-script initialization + run based on environment variables
   - source pcds-ci-helpers/travis/init.sh
-  # Call the script of your choice
-  - bash pcds-ci-helpers/travis/tc3_linter.sh
 ```
+
+
+For Python projects, you can use the tools in this script with the following commands:
+
+```yaml
+matrix:
+  include:
+    - name: Python linting
+      python: 3.7
+      env: LINT_PYTHON=pkg_name
+
+install:
+  # Import the helper scripts
+  - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
+  # Start the helper-script initialization + run based on environment variables
+  - source pcds-ci-helpers/travis/init.sh
+```
+
 
 Documentation
 -------------
@@ -24,7 +52,9 @@ allows for various tasks to be run during the `install` phase.
 
 Currently, it supports:
 * Python linting via flake8 (see `python_linter.sh`)
-* TwinCAT3 project summary + pytmc linting (see `tc3_summary.sh`)
+* TwinCAT3 project summary (see `tc3_summary.sh`)
+* TwinCAT3 project pytmc linting (see `tc3_pragmalint.sh`)
+* TwinCAT3 documentation building (see `tc3_linter.sh`)
 
 This script must be sourced for each of the above features:
 
@@ -79,6 +109,23 @@ matrix:
     - name: Project summary
       python: 3.7
       env: TWINCAT_SUMMARY=1
+```
+
+`TWINCAT_PROJECT_ROOT` may be specified here, defaulting to `$TRAVIS_BUILD_DIR`.
+
+#### tc3_pragmalint.sh
+`tc3_pragmalint.sh` performs pragma linting on all TwinCAT3 projects.
+
+##### usage:
+The suggested usage is with a separate summary-only step using `init.sh`.
+
+`.travis.yml`
+```yaml
+matrix:
+  include:
+    - name: Pragma lint
+      python: 3.7
+      env: TWINCAT_PRAGMALINT=1
 ```
 
 `TWINCAT_PROJECT_ROOT` may be specified here, defaulting to `$TRAVIS_BUILD_DIR`.

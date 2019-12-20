@@ -3,7 +3,7 @@
 source settings.sh
 cd $TWINCAT_PROJECT_ROOT
 
-pip install git+https://github.com/slaclab/pytmc.git@v2.4.0
+pip install pytmc
 
 # Execute linting script:
 find . -name '*.tsproj' -print0 | 

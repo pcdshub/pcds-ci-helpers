@@ -130,6 +130,11 @@ matrix:
 
 `TWINCAT_PROJECT_ROOT` may be specified here, defaulting to `$TRAVIS_BUILD_DIR`.
 
+Examples
+--------
+
+See `example_twincat_travis.yml` and `example_python_travis.yml`.
+
 References
 ----------
 The architecture of this repository is inspired by [astropy/ci-helpers](https://github.com/astropy/ci-helpers).

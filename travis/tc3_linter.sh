@@ -12,8 +12,8 @@ pip install git+https://github.com/slaclab/pytmc.git@v2.4.0
 pip install sphinx recommonmark
 
 # Allow user to configure path for documentation drop site 
-DEFAULT_DOCS_PATH="docs"
-DEFAULT_DOCS_SOURCE_PATH="docs/source"
+DEFAULT_DOCS_PATH="$TRAVIS_BUILD_DIR/docs"
+DEFAULT_DOCS_SOURCE_PATH="$TRAVIS_BUILD_DIR/docs/source"
 
 echo "PYTMC version:"
 echo $(pytmc --version)
@@ -32,7 +32,7 @@ if [ ! -d $DOCS_SOURCE_PATH ]; then
 fi
 
 # Execute linting script:
-find . -name '*.tsproj' -print0 | 
+find $TWINCAT_PROJECT_ROOT -name '*.tsproj' -print0 | 
     while IFS= read -r -d '' tsproj; do 
         pytmc summary --all --code --markdown "$tsproj" > $DOCS_SOURCE_PATH/$(basename $tsproj).md;
         echo "Pragma lint results" >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;
@@ -42,7 +42,7 @@ find . -name '*.tsproj' -print0 |
         echo '```' >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;
     done
 
-find . -name '*.tmc' -print0 |
+find $TWINCAT_PROJECT_ROOT -name '*.tmc' -print0 |
     while IFS= read -r -d '' tmc; do
         db_filename=$DOCS_SOURCE_PATH/$(basename $tmc).db
         db_errors=$(( ( pytmc db --allow-errors "$tmc") 1>$db_filename) 2>&1)

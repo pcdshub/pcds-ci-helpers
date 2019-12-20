@@ -16,5 +16,5 @@ matrix:
       env: TWINCAT_BUILD_DOCS=1
 
 install:
-  - git clone --depth 1 git@github.com:pcdshub/pcds-ci-helpers.git
+  - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
   - source pcds-ci-helpers/travis/init.sh

@@ -6,7 +6,7 @@ LINTER_PYTHON_VERSION=3.7
 
 source settings.sh
 
-pip install pytmc
+pip install pytmc doctr
 
 # install docs
 pip install sphinx recommonmark
@@ -82,5 +82,6 @@ make html
 popd
 
 # Deploy the latest version of the docs with doctr
-pip install doctr
-doctr deploy . --built-docs docs/build/html --deploy-branch-name gh-pages --command "touch .nojekyll; git add .nojekyll" --no-require-master
+pushd $TRAVIS_BUILD_DIR
+doctr deploy . --built-docs $DOCS_PATH/build/html --deploy-branch-name gh-pages --command "touch .nojekyll; git add .nojekyll" --no-require-master
+popd

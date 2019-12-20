@@ -1,0 +1,41 @@
+language: python
+sudo: false
+
+# If you need X11:
+services:
+    - xvfb
+
+addons:
+    apt:
+      packages:
+        - herbstluftwm
+        - libxkbcommon-x11-0
+
+env:
+  global:
+    - secure: "<docs build key>"
+
+matrix:
+  include:
+    - name: flake8 linting
+      python: 3.6
+      env: LINT_PYTHON=pytmc
+    - python: 3.6
+      env: BUILD_DOCS=1
+    - python: 3.7
+
+install:
+  - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
+  - source pcds-ci-helpers/travis/init.sh
+
+  - pip install -r requirements.txt
+  - pip install -r dev-requirements.txt
+ 
+before_script:
+  # Run the window manager
+  - "herbstluftwm &"
+  - sleep 1
+
+script:
+  - coverage run run_tests.py
+  - coverage report -m 

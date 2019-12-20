@@ -4,6 +4,8 @@ pushd pcds-ci-helpers
 
 export CI_HELPER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" 
 
+echo "** pcds-ci-helpers version: $(git describe --tags --always) **"
+
 pushd travis
 
 source settings.sh

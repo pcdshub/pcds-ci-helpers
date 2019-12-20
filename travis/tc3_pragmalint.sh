@@ -12,12 +12,11 @@ find . -name '*.tsproj' -print0 |
     while IFS= read -r -d '' tsproj; do 
         echo "Pragma lint results"
         echo "-------------------"
-        echo '```'
         pytmc pragmalint --verbose "$tsproj"
         if [ $? -ne 0 ]; then
             EXIT_CODE=1
         fi
-        echo '```'
+        echo ""
     done
 
 find . -name '*.tmc' -print0 |
@@ -31,9 +30,7 @@ find . -name '*.tmc' -print0 |
         if [ ! -z "$db_errors" ]; then
             echo "Errors"
             echo "------"
-            echo '```'
             echo "$db_errors"
-            echo '```'
             echo ""
 
             if [ $? -ne 0 ]; then
@@ -43,16 +40,12 @@ find . -name '*.tmc' -print0 |
 
         echo "Records"
         echo "-------"
-        echo '```'
-        grep "^record" $db_filename | sed -e 's/^record(\(.*\),\(.*\)).*$/\2 (\1)/' | sort
-        echo '```'
+        (pytmc db --allow-errors "$tmc" 2> /dev/null) | grep "^record" | sed -e 's/^record(\(.*\),\(.*\)).*$/\2 (\1)/' | sort
         echo ""
 
         echo "EPICS database"
         echo "--------------"
-        echo '```'
         pytmc db --allow-errors "$tmc" 2> /dev/null
-        echo '```'
     done
 
 exit $EXIT_CODE

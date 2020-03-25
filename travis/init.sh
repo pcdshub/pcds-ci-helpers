@@ -14,6 +14,10 @@ if [[ ! -z "$LINT_PYTHON" ]]; then
     source python_linter.sh
 fi
 
+if [[ ! -z "$UPLOAD_PYPI" ]]; then
+    source python_pypi_upload.sh
+fi
+
 if [[ ! -z "$TWINCAT_SUMMARY" ]]; then
     source tc3_summary.sh
 fi

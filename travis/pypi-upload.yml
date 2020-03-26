@@ -9,5 +9,4 @@ jobs:
         password: ${PYPI_TOKEN}
         distributions: "sdist"
         on:
-          fork: false
           tags: true

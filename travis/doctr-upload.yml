@@ -1,0 +1,23 @@
+jobs:
+  include:
+    - stage: deploy
+      name: "Docs Upload"
+      install:
+        - echo "Req File':' $DOCS_REQUIREMENTS"
+        - echo "Folder':' $DOCS_FOLDER"
+        - |
+          # Install docs requirements
+          if [[ -f "${DOCS_REQUIREMENTS}" ]]; then
+            pip install -Ur ${DOCS_REQUIREMENTS}
+          fi
+      before_script:
+        - |
+          # Create HTML documentation
+          set -e
+          pushd ${DOCS_FOLDER}
+          make html
+          popd
+      script:
+        - doctr deploy . --built-docs docs/build/html --build-tags --deploy-branch-name gh-pages --command "touch .nojekyll; git add .nojekyll"
+      after_script:
+        - set +e

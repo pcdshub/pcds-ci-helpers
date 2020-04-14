@@ -27,5 +27,14 @@ if [[ ! -z "$TWINCAT_BUILD_DOCS" ]]; then
     exit
 fi
 
+if [[ ! -z "$TWINCAT_STYLE" ]]; then
+    pushd tc3_style
+    bash check.sh; exit_code=$?
+    # Attempt parsing the code, but use the return code from the simple check
+    # script
+    bash parse.sh
+    exit $exit_code
+fi
+
 popd
 popd

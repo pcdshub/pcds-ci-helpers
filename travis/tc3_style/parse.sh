@@ -6,7 +6,7 @@ _header "Note: this is an experimental step and may report" \
         "errors where there are none. This will _not_ fail the" \
         "build."
 
-pip install blark
+pip install --quiet blark
 
 find $TWINCAT_PROJECT_ROOT -name '*.sln' -exec blark parse -vv {} \;
 

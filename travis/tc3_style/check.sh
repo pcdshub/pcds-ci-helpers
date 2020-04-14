@@ -7,7 +7,7 @@ if [ "${tab_lines}" -ne 0 ]; then
   exit_code=1
 fi
 
-bad_whitespace_lines=$(./files.sh | xargs egrep $' +$| +/r$' | wc -l)
+bad_whitespace_lines=$(./files.sh | xargs egrep $' +$| +\r$' | wc -l)
 if [ "${bad_whitespace_lines}" -ne 0 ]; then
   echo "Found ${bad_whitespace_lines} lines with trailing whitespace"
   exit_code=2

@@ -6,7 +6,7 @@ exit_code=0
 
 _header "Checking that source code files do not contain tabs..."
 
-tab_lines=$(style/files.sh | xargs egrep $'\t')
+tab_lines=$(./files.sh | xargs egrep $'\t')
 tab_count=$(echo "${tab_lines}" | wc -l)
 if [ "${tab_count}" -ne 0 ]; then
   echo "Found ${tab_count} lines with tabs"
@@ -16,7 +16,7 @@ fi
 
 _header "Checking for lines with trailing whitespace..."
 
-bad_whitespace_lines=$(style/files.sh | xargs egrep $' +$| +\r$')
+bad_whitespace_lines=$(./files.sh | xargs egrep $' +$| +\r$')
 bad_whitespace_count=$(echo "${bad_whitespace_lines}" | wc -l)
 if [ "${bad_whitespace_count}" -ne 0 ]; then
   echo "Found ${bad_whitespace_count} lines with trailing whitespace"

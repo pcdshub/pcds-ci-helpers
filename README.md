@@ -16,6 +16,9 @@ matrix:
     - name: Documentation building
       python: 3.7
       env: TWINCAT_BUILD_DOCS=1
+    - name: Twincat Style
+      python: 3.7
+      env: TWINCAT_STYLE=1
 
 install:
   # Import the helper scripts

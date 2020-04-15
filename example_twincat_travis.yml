@@ -14,6 +14,8 @@ matrix:
       env: TWINCAT_PRAGMALINT=1
     - name: Build documentation
       env: TWINCAT_BUILD_DOCS=1
+    - name: Twincat Style
+      env: TWINCAT_STYLE=1
 
 install:
   - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git

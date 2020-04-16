@@ -4,12 +4,12 @@ source $CI_HELPER_PATH/travis/settings.sh
 
 exit_code=0
 
-_header "Checking that source code files do not contain tabs..."
+_header "Checking that source code files do not contain leading tabs..."
 
-tab_lines=$(./files.sh | xargs egrep $'\t')
+tab_lines=$(./files.sh | xargs egrep $'^\s*\t')
 if [ -n "${tab_lines}" ]; then
   tab_count=$(echo "${tab_lines}" | wc -l)
-  echo "Found ${tab_count} lines with tabs"
+  echo "Found ${tab_count} lines with leading tabs"
   echo "${tab_lines}"
   exit_code=1
 else

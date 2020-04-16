@@ -6,7 +6,7 @@ exit_code=0
 
 _header "Checking that source code files do not contain leading tabs..."
 
-tab_lines=$(./files.sh | xargs egrep $'^\s*\t')
+tab_lines=$(./files.sh | xargs grep -En $'^\s*\t')
 if [ -n "${tab_lines}" ]; then
   tab_count=$(echo "${tab_lines}" | wc -l)
   echo "Found ${tab_count} lines with leading tabs"
@@ -18,7 +18,7 @@ fi
 
 _header "Checking for lines with trailing whitespace..."
 
-whitespace_lines=$(./files.sh | xargs egrep $' +$| +\r$')
+whitespace_lines=$(./files.sh | xargs grep -En $' +$| +\r$')
 if [ -n "${whitespace_lines}" ]; then
   whitespace_count=$(echo "${whitespace_lines}" | wc -l)
   echo "Found ${whitespace_count} lines with trailing whitespace"
@@ -30,7 +30,7 @@ fi
 
 _header "Checking for TwinCAT misconfiguration (Line IDs)..."
 
-lineid_lines=$(./files.sh | xargs grep 'LineId')
+lineid_lines=$(./files.sh | xargs grep -n 'LineId')
 if [ -n "${lineid_lines}" ]; then
   lineid_count=$(echo "${lineid_lines}" | wc -l)
   echo "Found ${lineid_count} lines with same-file debug line ids (fix your twincat config)"

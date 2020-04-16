@@ -12,6 +12,8 @@ if [ -n "${tab_lines}" ]; then
   echo "Found ${tab_count} lines with tabs"
   echo "${tab_lines}"
   exit_code=1
+else
+  echo "Found no lines with tabs!"
 fi
 
 _header "Checking for lines with trailing whitespace..."
@@ -22,6 +24,8 @@ if [ -n "${bad_whitespace_lines}" ]; then
   echo "Found ${bad_whitespace_count} lines with trailing whitespace"
   echo "${bad_whitespace_lines}"
   exit_code=2
+else
+  echo "Found no lines with trailing whitespace!"
 fi
 
 _header "Checking for TwinCAT misconfiguration (Line IDs)..."
@@ -32,6 +36,8 @@ if [ -n "${lineid_lines}" ]; then
   echo "Found ${lineid_count} lines with same-file debug line ids (fix your twincat config)"
   echo "${lineid_lines}"
   exit_code=3
+else
+  echo "Found no debug line ids!"
 fi
 
 _header "Style check exiting with code ${exit_code}"

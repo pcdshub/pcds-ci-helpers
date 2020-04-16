@@ -18,11 +18,11 @@ fi
 
 _header "Checking for lines with trailing whitespace..."
 
-bad_whitespace_lines=$(./files.sh | xargs egrep $' +$| +\r$')
-if [ -n "${bad_whitespace_lines}" ]; then
-  bad_whitespace_count=$(echo "${bad_whitespace_lines}" | wc -l)
-  echo "Found ${bad_whitespace_count} lines with trailing whitespace"
-  echo "${bad_whitespace_lines}"
+whitespace_lines=$(./files.sh | xargs egrep $' +$| +\r$')
+if [ -n "${whitespace_lines}" ]; then
+  whitespace_count=$(echo "${whitespace_lines}" | wc -l)
+  echo "Found ${whitespace_count} lines with trailing whitespace"
+  echo "${whitespace_lines}"
   exit_code=2
 else
   echo "Found no lines with trailing whitespace!"

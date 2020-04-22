@@ -36,5 +36,9 @@ if [[ ! -z "$TWINCAT_STYLE" ]]; then
     exit $exit_code
 fi
 
+if [[ ! -z "$PRE_COMMIT" ]]; then
+    source pre_commit.sh
+fi
+
 popd
 popd

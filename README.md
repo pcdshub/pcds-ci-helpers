@@ -19,6 +19,9 @@ matrix:
     - name: Twincat Style
       python: 3.7
       env: TWINCAT_STYLE=1
+    - name: Pre-commit Checks
+      python: 3.7
+      env: PRE_COMMIT=1
 
 install:
   # Import the helper scripts
@@ -36,6 +39,9 @@ matrix:
     - name: Python linting
       python: 3.7
       env: LINT_PYTHON=pkg_name
+    - name: Pre-commit Checks
+      python: 3.7
+      env: PRE_COMMIT=1
 
 install:
   # Import the helper scripts

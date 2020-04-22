@@ -7,8 +7,11 @@ echo "===================================================="
 
 pip install pre-commit
 pre-commit install
+
+pushd "${TRAVIS_BUILD_DIR}"
 pre-commit run --all-files
 PRE_COMMIT_EXIT_CODE=$?
+popd
 
 if [ $PRE_COMMIT_EXIT_CODE -ne 0 ]; then
     echo "====================================================================="

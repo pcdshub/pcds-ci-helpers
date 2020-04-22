@@ -33,7 +33,7 @@ install:
 
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
- 
+
 before_script:
   # Run the window manager
   - "herbstluftwm &"
@@ -41,4 +41,4 @@ before_script:
 
 script:
   - coverage run run_tests.py
-  - coverage report -m 
+  - coverage report -m

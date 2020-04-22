@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# tc3linter.sh 
+# tc3linter.sh
 
 LINTER_PYTHON_VERSION=3.7
 
@@ -11,7 +11,7 @@ pip install pytmc doctr
 # install docs
 pip install sphinx recommonmark
 
-# Allow user to configure path for documentation drop site 
+# Allow user to configure path for documentation drop site
 DEFAULT_DOCS_PATH="$TRAVIS_BUILD_DIR/docs"
 DEFAULT_DOCS_SOURCE_PATH="$TRAVIS_BUILD_DIR/docs/source"
 
@@ -25,15 +25,15 @@ else
     DOCS_SOURCE_PATH=$1
     DOCS_PATH=$2
 fi
-   
+
 if [ ! -d $DOCS_SOURCE_PATH ]; then
     mkdir -p $DOCS_SOURCE_PATH
     cp -r ${CI_HELPER_PATH}/travis/docs_template_files/* $DOCS_PATH/
 fi
 
 # Execute linting script:
-find $TWINCAT_PROJECT_ROOT -name '*.tsproj' -print0 | 
-    while IFS= read -r -d '' tsproj; do 
+find $TWINCAT_PROJECT_ROOT -name '*.tsproj' -print0 |
+    while IFS= read -r -d '' tsproj; do
         pytmc summary --all --code --markdown "$tsproj" > $DOCS_SOURCE_PATH/$(basename $tsproj).md;
         echo "Pragma lint results" >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;
         echo "-------------------" >> $DOCS_SOURCE_PATH/$(basename $tsproj).md;

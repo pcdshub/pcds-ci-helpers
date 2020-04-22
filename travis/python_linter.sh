@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: 
+# usage:
 #   * set LINT_PYTHON to be the arguments to flake8 (e.g., package name)
 #   * source `python_linter.sh` on Travis CI
 
@@ -29,7 +29,7 @@ echo "$ flake8 $LINT_PYTHON"
 flake8 $LINT_PYTHON; FLAKE8_EXIT_CODE=$?
 echo "$linter_footer"
 if [ $FLAKE8_EXIT_CODE -ne 0 ]; then
-    echo "Exit code: $FLAKE8_EXIT_CODE" 
+    echo "Exit code: $FLAKE8_EXIT_CODE"
 fi
 
 sleep 1.0

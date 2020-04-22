@@ -24,7 +24,6 @@ if [ $PRE_COMMIT_EXIT_CODE -ne 0 ]; then
     echo "manually:"
     echo "====================================================================="
     echo ""
-    echo "git diff:"
     git diff
 fi
 

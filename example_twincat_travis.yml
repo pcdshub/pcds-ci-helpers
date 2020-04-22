@@ -16,6 +16,8 @@ matrix:
       env: TWINCAT_BUILD_DOCS=1
     - name: Twincat Style
       env: TWINCAT_STYLE=1
+    - name: Pre-commit Checks
+      env: PRE_COMMIT=1
 
 install:
   - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git

@@ -8,7 +8,7 @@ pip install pytmc
 
 EXIT_CODE=0
 
-while IFS= read -r -d '' tsproj; do 
+while IFS= read -r -d '' tsproj; do
     echo "Pragma lint results"
     echo "-------------------"
     pytmc pragmalint --verbose "$tsproj"

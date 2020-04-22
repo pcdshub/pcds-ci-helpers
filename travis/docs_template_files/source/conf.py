@@ -16,7 +16,7 @@ import os
 
 
 # -- Project information -----------------------------------------------------
-repo_slug = os.environ.get("TRAVIS_REPO_SLUG") 
+repo_slug = os.environ.get("TRAVIS_REPO_SLUG")
 if repo_slug is not None:
     project = repo_slug
 else:

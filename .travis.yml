@@ -1,0 +1,11 @@
+language: python
+sudo: false
+
+matrix:
+  include:
+    - name: Pre-commit Checks
+      python: 3.7
+      env: PRE_COMMIT=1
+
+install:
+  - source ./travis/init.sh

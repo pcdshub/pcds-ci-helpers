@@ -13,7 +13,6 @@ pre-commit install
 pushd "${TRAVIS_BUILD_DIR}"
 pre-commit run --all-files
 PRE_COMMIT_EXIT_CODE=$?
-popd
 
 if [ $PRE_COMMIT_EXIT_CODE -ne 0 ]; then
     echo ""
@@ -29,4 +28,5 @@ if [ $PRE_COMMIT_EXIT_CODE -ne 0 ]; then
     git diff
 fi
 
+popd
 exit $PRE_COMMIT_EXIT_CODE

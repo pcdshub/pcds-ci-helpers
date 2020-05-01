@@ -1,0 +1,9 @@
+jobs:
+  include:
+    - stage: lint
+      name: "Python Lint"
+      install:
+        - pip install flake8
+      script:
+        - cd ${LINT_PYTHON_PATH:-$TRAVIS_BUILD_DIR}
+        - flake8

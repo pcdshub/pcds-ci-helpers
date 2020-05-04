@@ -4,6 +4,7 @@ jobs:
       name: "Python Lint"
       install:
         - pip install flake8
-      script:
+      before_script:
         - cd ${LINT_PYTHON_PATH:-$TRAVIS_BUILD_DIR}
+      script:
         - flake8

@@ -1,7 +1,7 @@
 jobs:
   include:
-    - stage: lint
-      name: "Python Lint"
+    - stage: test
+      name: "Python Linter"
       install:
         - pip install flake8
       before_script:

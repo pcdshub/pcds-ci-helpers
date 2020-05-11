@@ -3,6 +3,15 @@
 #   * set LINT_PYTHON to be the arguments to flake8 (e.g., package name)
 #   * source `python_linter.sh` on Travis CI
 
+if [ $TRAVIS ]; then
+    cat <<EOF 1>&2
+    WARNING: This script has been deprecated.
+    Please use the new shared configuration yamls instead.
+    Instructions for use can be found in the README.md at:
+    https://github.com/pcdshub/pcds-ci-helpers
+EOF
+fi
+
 pip install flake8
 
 LINT_PYTHON_PATH=${LINT_PYTHON_PATH:-$TRAVIS_BUILD_DIR}

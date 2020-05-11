@@ -9,6 +9,15 @@
 #   * set UPLOAD_ARGS to be the arguments to setup.py (e.g., sdist)
 #   * source `python_pypi_upload.sh` on Travis CI
 
+if [ $TRAVIS ]; then
+    cat <<EOF 1>&2
+    WARNING: This script has been deprecated.
+    Please use the new shared configuration yamls instead.
+    Instructions for use can be found in the README.md at:
+    https://github.com/pcdshub/pcds-ci-helpers
+EOF
+fi
+
 if [[ -z "$TRAVIS_TAG" ]]; then
   echo "Skipping PyPI upload as this is not a tag build."
   exit 0

@@ -5,6 +5,6 @@ jobs:
       install:
         - pip install flake8
       before_script:
-        - cd ${LINT_PYTHON_PATH:-$TRAVIS_BUILD_DIR}
+        - cd "$TRAVIS_BUILD_DIR"
       script:
-        - flake8
+        - flake8 $PYTHON_LINT_OPTIONS

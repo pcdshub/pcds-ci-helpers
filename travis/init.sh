@@ -10,7 +10,7 @@ pushd travis
 
 source settings.sh
 
-if [[ ! -z "$LINT_PYTHON" ]]; then
+if [[ ! -z "$PYTHON_LINT_OPTIONS" ]]; then
     source python_linter.sh
 fi
 

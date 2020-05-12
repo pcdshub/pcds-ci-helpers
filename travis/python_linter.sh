@@ -1,6 +1,6 @@
 #!/bin/bash
 # usage:
-#   * set LINT_PYTHON to be the arguments to flake8 (e.g., package name)
+#   * set PYTHON_LINT_OPTIONS to be the arguments to flake8 (e.g., package name)
 #   * source `python_linter.sh` on Travis CI
 
 if [ $TRAVIS ]; then
@@ -14,13 +14,9 @@ fi
 
 pip install flake8
 
-LINT_PYTHON_PATH=${LINT_PYTHON_PATH:-$TRAVIS_BUILD_DIR}
-
-cd $LINT_PYTHON_PATH
+cd "$TRAVIS_BUILD_DIR"
 
 linter_header=$(cat <<EOF
-LINT_PYTHON_PATH: $PWD
-
 =====================
 Python linter results
 =====================
@@ -34,8 +30,8 @@ EOF
 )
 
 echo "$linter_header"
-echo "$ flake8 $LINT_PYTHON"
-flake8 $LINT_PYTHON; FLAKE8_EXIT_CODE=$?
+echo "$ flake8 $PYTHON_LINT_OPTIONS"
+flake8 $PYTHON_LINT_OPTIONS; FLAKE8_EXIT_CODE=$?
 echo "$linter_footer"
 if [ $FLAKE8_EXIT_CODE -ne 0 ]; then
     echo "Exit code: $FLAKE8_EXIT_CODE"

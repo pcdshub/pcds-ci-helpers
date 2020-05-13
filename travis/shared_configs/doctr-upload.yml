@@ -2,6 +2,9 @@ jobs:
   include:
     - stage: deploy
       name: "Docs Upload"
+      if: |
+        type != pull_request AND \
+        (branch = master OR tag IS present)
       install:
         - echo "Docs Req File':' ${DOCS_REQUIREMENTS:=docs-requirements.txt}"
         - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"

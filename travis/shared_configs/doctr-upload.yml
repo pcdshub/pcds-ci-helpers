@@ -8,7 +8,7 @@ jobs:
         - |
           # Install docs requirements
           if [[ -f "${DOCS_REQUIREMENTS}" ]]; then
-            pip install -Ur ${DOCS_REQUIREMENTS}
+            pip install --upgrade --requirement "${DOCS_REQUIREMENTS}"
           fi
       before_script:
         - |

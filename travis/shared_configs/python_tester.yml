@@ -6,8 +6,8 @@ python:
 install:
   - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"
   - echo "Dev Req File':' ${DEV_REQUIREMENTS:=dev-requirements.txt}"
-  - pip install -r requirements.txt
-  - pip install -r dev-requirements.txt
+  - pip install --upgrade --requirement requirements.txt
+  - pip install --upgrade --requirement dev-requirements.txt
 
 script:
   - coverage run run_tests.py

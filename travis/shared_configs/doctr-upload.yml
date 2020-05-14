@@ -32,6 +32,8 @@ jobs:
               DEPLOY_DIR="$TRAVIS_TAG";
           fi
       script:
+        - echo "$ doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name
+          gh-pages $NO_JEKYLL_COMMAND $DOCTR_VERSIONS_COMMAND"
         - doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name gh-pages
           $NO_JEKYLL_COMMAND $DOCTR_VERSIONS_COMMAND
       after_script:

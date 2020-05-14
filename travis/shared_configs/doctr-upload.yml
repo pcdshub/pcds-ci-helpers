@@ -24,18 +24,14 @@ jobs:
           make html
           popd
         - |
-          if [[ ! -z "$NO_JEKYLL" ]]; then
-              NO_JEKYLL_COMMAND='--command "touch .nojekyll; git add .nojekyll"'
-          fi
-        - |
           if [[ ! -z "$DOCTR_VERSIONS_MENU" ]]; then
               DOCTR_VERSIONS_COMMAND='--command "doctr-versions-menu"'
           fi
         - DEPLOY_DIR="${TRAVIS_TAG:=master}"
       script:
         - echo "$ doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name
-          gh-pages $NO_JEKYLL_COMMAND $DOCTR_VERSIONS_COMMAND"
+          gh-pages $DOCTR_VERSIONS_COMMAND"
         - doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name gh-pages
-          $NO_JEKYLL_COMMAND $DOCTR_VERSIONS_COMMAND
+          $DOCTR_VERSIONS_COMMAND
       after_script:
         - set +e

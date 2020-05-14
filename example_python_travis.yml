@@ -23,10 +23,6 @@ env:
     - DOCS_FOLDER: docs
     # Assign this variable if you want a version menu in your docs
     - DOCTR_VERSIONS_MENU: 1
-    # Assign this variable to include folders that start with an underscore in
-    # your gh-pages site. This is already done when using DOCTR_VERSIONS_MENU
-    # so you don't need to set both.
-    - NO_JEKYLL: 1
     # Assign this variable to specify options for the python linter
     - PYTHON_LINT_OPTIONS="source --verbose"
 

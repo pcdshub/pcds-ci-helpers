@@ -24,5 +24,18 @@ install:
     fi
 
 script:
-  - coverage run run_tests.py
-  - coverage report -m
+  - |
+    if command -v coverage; then
+        if [ -f "run_tests.py" ]; then
+            coverage run --concurrency=thread --parallel-mode run_tests.py
+        else
+            coverage run --concurrency=thread --parallel-mode -m pytest
+        fi
+        (coverage combine && coverage report | grep -v -e ' 0%') || true
+    else
+        if [ -f "run_tests.py" ]; then
+            python run_tests.py
+        else
+            python -m pytest
+        fi
+    fi

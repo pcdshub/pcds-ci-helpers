@@ -6,8 +6,22 @@ python:
 install:
   - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"
   - echo "Dev Req File':' ${DEV_REQUIREMENTS:=dev-requirements.txt}"
-  - pip install --upgrade --requirement requirements.txt
-  - pip install --upgrade --requirement dev-requirements.txt
+  - |
+    # Install requirements
+    if [[ ! -f "${REQUIREMENTS}" ]]; then
+        echo "File not found: ${REQUIREMENTS}" 1>&2
+        travis_terminate 1
+    else
+        pip install --upgrade --requirement "${REQUIREMENTS}"
+    fi
+  - |
+    # Install development requirements
+    if [[ ! -f "${DEV_REQUIREMENTS}" ]]; then
+        echo "File not found: ${DEV_REQUIREMENTS}" 1>&2
+        travis_terminate 1
+    else
+        pip install --upgrade --requirement "${DEV_REQUIREMENTS}"
+    fi
 
 script:
   - coverage run run_tests.py

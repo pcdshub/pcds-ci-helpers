@@ -3,8 +3,8 @@ jobs:
     - stage: deploy
       name: "Docs Upload"
       install:
-        - echo "Req File':' $DOCS_REQUIREMENTS"
-        - echo "Folder':' $DOCS_FOLDER"
+        - echo "Docs Req File':' ${DOCS_REQUIREMENTS:=docs-requirements.txt}"
+        - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"
         - |
           # Install docs requirements
           if [[ -f "${DOCS_REQUIREMENTS}" ]]; then

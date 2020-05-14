@@ -4,6 +4,8 @@ python:
   - "3.8"
 
 install:
+  - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"
+  - echo "Dev Req File':' ${DEV_REQUIREMENTS:=dev-requirements.txt}"
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
 

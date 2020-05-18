@@ -139,7 +139,7 @@ the script from the command line. If you wish to specify linter options, set
 `PYTHON_LINT_OPTIONS` beforehand. If you wish to run a Python linter in Travis,
 it is recommended to instead use `shared_configs/python-linter.yml`.
 ``` bash
-PYTHON_LINT_OPTIONS="source --verbose"
+PYTHON_LINT_OPTIONS="path/to/source --verbose"
 ./python_linter.sh
 ```
 

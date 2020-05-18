@@ -1,0 +1,24 @@
+jobs:
+  include:
+    - stage: test
+      name: "Docs Build"
+      install:
+        - echo "Docs Req File':' ${DOCS_REQUIREMENTS:=docs-requirements.txt}"
+        - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"
+        - |
+          # Install docs requirements
+          if [[ ! -f "${DOCS_REQUIREMENTS}" ]]; then
+              echo "File not found: ${DOCS_REQUIREMENTS}" 1>&2
+              travis_terminate 1
+          else
+              pip install --upgrade --requirement "${DOCS_REQUIREMENTS}"
+          fi
+      script:
+        - |
+          # Create HTML documentation
+          set -e
+          pushd ${DOCS_FOLDER}
+          make html
+          popd
+      after_script:
+        - set +e

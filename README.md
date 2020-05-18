@@ -190,6 +190,30 @@ env:
     - DEV_REQUIREMENTS: dev-requirements.txt
 ```
 
+### shared_configs/doctr-upload.yml
+`docs-build.yml` runs through the build of the package's documentation to
+ensure it works properly.
+
+#### usage:
+This configuration can be added to the `test` stage of a Travis build by
+importing it in your `.travis.yml`:
+``` yaml
+import:
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/docs-build.yml
+```
+
+#### arguments:
+- A docs requirements file can be specified by assigning a value to
+  `DOCS_REQUIREMENTS`, which defaults to `docs-requirements.txt`.
+- The folder containing the documentation can be specified by assigning a value
+  to `DOCS_FOLDER`, which defaults to `docs`.
+``` yaml
+env:
+  global:
+    - DOCS_REQUIREMENTS: docs-requirements.txt
+    - DOCS_FOLDER: docs
+```
+
 ### shared_configs/anaconda-upload.yml
 `anaconda-upload.yml` builds the package according to the `conda-recipe` and
 uploads it to the `pcds-dev` channel on Anaconda Cloud. If the build was

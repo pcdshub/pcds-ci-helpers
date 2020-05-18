@@ -40,6 +40,7 @@ stages:
 import:
   - pcdshub/pcds-ci-helpers:travis/shared_configs/python-linter.yml
   - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester.yml
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/docs-build.yml
   - pcdshub/pcds-ci-helpers:travis/shared_configs/pypi-upload.yml
   - pcdshub/pcds-ci-helpers:travis/shared_configs/doctr-upload.yml
   - pcdshub/pcds-ci-helpers:travis/shared_configs/anaconda-upload.yml

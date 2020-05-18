@@ -10,8 +10,12 @@ pushd travis
 
 source settings.sh
 
-if [[ ! -z "$LINT_PYTHON" ]]; then
+if [[ ! -z "$PYTHON_LINT_OPTIONS" ]]; then
     source python_linter.sh
+fi
+
+if [[ ! -z "$UPLOAD_PYPI" ]]; then
+    source python_pypi_upload.sh
 fi
 
 if [[ ! -z "$TWINCAT_SUMMARY" ]]; then

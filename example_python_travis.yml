@@ -5,6 +5,7 @@ sudo: false
 services:
     - xvfb
 
+# This is for X11 too:
 addons:
     apt:
       packages:
@@ -13,32 +14,33 @@ addons:
 
 env:
   global:
+    # Doctr deploy key for <org>/<repo>
     - secure: "<docs build key>"
+    # You only need to specify these if they are different from these values
+    - REQUIREMENTS: requirements.txt
+    - DEV_REQUIREMENTS: dev-requirements.txt
+    - DOCS_REQUIREMENTS: docs-requirements.txt
+    - DOCS_FOLDER: docs
+    # Assign this variable if you want a version menu in your docs
+    - DOCTR_VERSIONS_MENU: 1
+    # Assign this variable to specify options for the python linter
+    - PYTHON_LINT_OPTIONS="path/to/source --verbose"
 
-matrix:
-  include:
-    - name: flake8 linting
-      python: 3.6
-      env: LINT_PYTHON=pytmc
-    - python: 3.6
-      env: BUILD_DOCS=1
-    - name: Pre-commit Checks
-      python: 3.7
-      env: PRE_COMMIT=1
-    - python: 3.7
-
-install:
-  - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
-  - source pcds-ci-helpers/travis/init.sh
-
-  - pip install -r requirements.txt
-  - pip install -r dev-requirements.txt
-
+# Also for X11:
 before_script:
   # Run the window manager
   - "herbstluftwm &"
   - sleep 1
 
-script:
-  - coverage run run_tests.py
-  - coverage report -m
+stages:
+  - test
+  - name: deploy
+    if: (branch = master OR tag IS present) AND type != pull_request
+
+import:
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-linter.yml
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester.yml
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/docs-build.yml
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/pypi-upload.yml
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/doctr-upload.yml
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/anaconda-upload.yml

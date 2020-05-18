@@ -1,0 +1,12 @@
+jobs:
+  include:
+    - stage: deploy
+      name: "PyPI Upload"
+      script: skip
+      deploy:
+        provider: pypi
+        username: __token__
+        password: ${PYPI_TOKEN}
+        distributions: "sdist"
+        on:
+          tags: true

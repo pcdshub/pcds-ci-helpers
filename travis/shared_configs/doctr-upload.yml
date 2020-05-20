@@ -21,6 +21,7 @@ jobs:
           if [[ ! -z "$DOCS_EXTRAS" ]]; then
               pip install --upgrade ${DOCS_EXTRAS}
           fi
+        - pip install .
       before_script:
         - |
           # Create HTML documentation

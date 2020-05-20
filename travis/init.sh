@@ -10,7 +10,14 @@ pushd travis
 
 source settings.sh
 
-if [[ ! -z "$PYTHON_LINT_OPTIONS" ]]; then
+if [[ ! -z "$LINT_PYTHON" ]]; then
+    cat <<EOF 1>&2
+    WARNING: The variable LINT_PYTHON has been deprecated.
+    Please instead use the new variable PYTHON_LINT_OPTIONS.
+EOF
+fi
+
+if [[ ! -z "${PYTHON_LINT_OPTIONS:=$LINT_PYTHON}" ]]; then
     source python_linter.sh
 fi
 

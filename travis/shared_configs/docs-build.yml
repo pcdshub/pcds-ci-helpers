@@ -13,6 +13,11 @@ jobs:
           else
               pip install --upgrade --requirement "${DOCS_REQUIREMENTS}"
           fi
+        - |
+          # Install extra packages
+          if [[ ! -z "$DOCS_EXTRAS" ]]; then
+              pip install --upgrade ${DOCS_EXTRAS}
+          fi
       script:
         - |
           # Create HTML documentation

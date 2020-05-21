@@ -3,13 +3,36 @@ python:
   - "3.7.3"
   - "3.8"
 
-import:
-  - hhslepicka/pcds-ci-helpers:travis/shared_configs/conda-utils.yml@adjustments
+_conda_install_config: &_conda_install_config
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda install conda-build anaconda-client
+  - conda update -q conda conda-build
+  - conda config --remove channels defaults
+  - conda config --add channels conda-forge
+  # Useful for debugging
+  - conda info -a
+
+_conda_build_recipe: &_conda_build_recipe
+  - echo "Conda Recipe Folder':' ${$CONDA_RECIPE_FOLDER:=conda-recipe}"
+  - conda build -q $CONDA_RECIPE_FOLDER --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
+  - conda config --add channels "file://`pwd`/bld-dir"
+
+_conda_create: &_conda_create
+  - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
+  - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
+  # Manage conda environment
+  - conda create -n ${CONDA_ENV_NAME} python=$TRAVIS_PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
+  - source activate ${CONDA_ENV_NAME}
+  # Useful for debugging
+  - conda list
 
 install:
-  - <<: *_conda_install_config
-  - <<: *_conda_build_recipe
-  - <<: *_conda_create
+  *_conda_install_config
+  *_conda_build_recipe
+  *_conda_create
 
 script:
   - |

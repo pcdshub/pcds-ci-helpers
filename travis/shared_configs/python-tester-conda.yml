@@ -1,0 +1,29 @@
+python:
+  - "3.6"
+#  - "3.7.3"
+#  - "3.8"
+
+import:
+  - conda-utils.yml
+
+install:
+  - <<: *_conda_install_config
+  - <<: *_conda_build_recipe
+  - <<: *_conda_create
+
+script:
+  - |
+    if command -v coverage; then
+        if [ -f "run_tests.py" ]; then
+            coverage run --concurrency=thread --parallel-mode run_tests.py
+        else
+            coverage run --concurrency=thread --parallel-mode -m pytest
+        fi
+        (coverage combine && coverage report | grep -v -e ' 0%') || true
+    else
+        if [ -f "run_tests.py" ]; then
+            python run_tests.py
+        else
+            python -m pytest
+        fi
+    fi

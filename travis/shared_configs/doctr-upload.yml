@@ -1,6 +1,9 @@
 jobs:
   include:
     - stage: deploy
+      env:
+        - CONDA_PACKAGE: ""
+        - CONDA_RECIPE_FOLDER: ""
       name: "Docs Upload"
       if: |
         type != pull_request AND \
@@ -10,18 +13,15 @@ jobs:
         - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"
         - |
           # Install docs requirements
-          if [[ ! -f "${DOCS_REQUIREMENTS}" ]]; then
-              echo "File not found: ${DOCS_REQUIREMENTS}" 1>&2
-              travis_terminate 1
-          else
-              pip install --upgrade --requirement "${DOCS_REQUIREMENTS}"
-          fi
-        - |
-          # Install extra packages
-          if [[ ! -z "$DOCS_EXTRAS" ]]; then
-              pip install --upgrade ${DOCS_EXTRAS}
-          fi
-        - pip install .
+          for req in ${DOCS_REQUIREMENTS};
+          do
+            if [[ ! -f "${req}" ]]; then
+                echo "File not found: ${req}" 1>&2
+                travis_terminate 1
+            else
+                pip install --upgrade --requirement "${req}"
+            fi
+          done
       before_script:
         - |
           # Create HTML documentation
@@ -41,3 +41,13 @@ jobs:
           $DOCTR_VERSIONS_COMMAND
       after_script:
         - set +e
+
+import:
+  # Order is important here as this is parsed depth-first so it should be
+  # the opposite of what makes sense.
+  - source: travis/shared_configs/utils-conda-install-config.yml
+    mode: deep_merge_prepend
+  - source: travis/shared_configs/utils-conda-build.yml
+    mode: deep_merge_prepend
+  - source: travis/shared_configs/utils-conda-create.yml
+    mode: deep_merge_prepend

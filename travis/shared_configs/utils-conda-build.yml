@@ -1,4 +1,4 @@
-install:
+before_install:
   - echo "Conda Recipe Folder':' ${CONDA_RECIPE_FOLDER}"
   - |
     if [[ ! -z "${CONDA_RECIPE_FOLDER}" ]]; then

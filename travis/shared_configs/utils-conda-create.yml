@@ -1,4 +1,4 @@
-install:
+before_install:
   - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
   - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
   # Manage conda environment

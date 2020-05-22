@@ -3,6 +3,8 @@ jobs:
     - stage: deploy
       name: "PyPI Upload"
       script: skip
+      before_install: skip
+      install: skip
       deploy:
         provider: pypi
         username: __token__

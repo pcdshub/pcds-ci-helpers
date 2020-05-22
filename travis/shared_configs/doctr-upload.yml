@@ -34,20 +34,16 @@ jobs:
               DOCTR_VERSIONS_COMMAND='--command "doctr-versions-menu"'
           fi
         - DEPLOY_DIR="${TRAVIS_TAG:=master}"
-      deploy:
+      after_script:
         - echo "$ doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name
           gh-pages $DOCTR_VERSIONS_COMMAND"
         - doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name gh-pages
           $DOCTR_VERSIONS_COMMAND
-      after_deploy:
         - set +e
 
 import:
   # Order is important here as this is parsed depth-first so it should be
   # the opposite of what makes sense.
-  - source: travis/shared_configs/utils-conda-install-config.yml
-    mode: deep_merge_prepend
-  - source: travis/shared_configs/utils-conda-build.yml
-    mode: deep_merge_prepend
-  - source: travis/shared_configs/utils-conda-create.yml
-    mode: deep_merge_prepend
+  - travis/shared_configs/utils-conda-install-config.yml
+  - travis/shared_configs/utils-conda-build.yml
+  - travis/shared_configs/utils-conda-create.yml

@@ -3,6 +3,8 @@ python:
   - "3.7.3"
   - "3.8"
 
+before_install: skip
+
 install:
   - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"
   - echo "Dev Req File':' ${DEV_REQUIREMENTS:=dev-requirements.txt}"

@@ -8,7 +8,6 @@ jobs:
         (branch = master OR \
         (branch = tag AND env(CONDA_UPLOAD_TOKEN_TAG) IS present))
       python: 3.7
-      install: skip
       script:
         - |
           if [[ $TRAVIS_BRANCH == $TRAVIS_TAG ]]; then

@@ -1,0 +1,14 @@
+# If you need X11:
+services:
+    - xvfb
+
+addons:
+    apt:
+      packages:
+        - herbstluftwm
+        - libxkbcommon-x11-0
+
+before_script:
+  # Run the window manager
+  - "herbstluftwm &"
+  - sleep 2

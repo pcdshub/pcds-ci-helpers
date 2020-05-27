@@ -11,4 +11,4 @@ addons:
 before_script:
   # Run the window manager
   - "herbstluftwm &"
-  - sleep 2
+  - sleep 1

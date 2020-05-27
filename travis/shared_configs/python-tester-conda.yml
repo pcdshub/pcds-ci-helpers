@@ -1,32 +1,35 @@
 version: ~> 1.0
 
-python:
-  - "3.6"
-  - "3.7.3"
-  - "3.8"
 
-install: skip
-
-script:
-  - |
-    if command -v coverage; then
-        if [ -f "run_tests.py" ]; then
-            coverage run --concurrency=thread --parallel-mode run_tests.py
-        else
-            coverage run --concurrency=thread --parallel-mode -m pytest
-        fi
-        (coverage combine && coverage report | grep -v -e ' 0%') || true
-    else
-        if [ -f "run_tests.py" ]; then
-            python run_tests.py
-        else
-            python -m pytest
-        fi
-    fi
+jobs:
+  include:
+    - &testpythonconda
+      stage: test
+      name: "Python 3.6"
+      python: 3.6
+      install: skip
+      script:
+        - |
+          if command -v coverage; then
+              if [ -f "run_tests.py" ]; then
+                  coverage run --concurrency=thread --parallel-mode run_tests.py
+              else
+                  coverage run --concurrency=thread --parallel-mode -m pytest
+              fi
+              (coverage combine && coverage report | grep -v -e ' 0%') || true
+          else
+              if [ -f "run_tests.py" ]; then
+                  python run_tests.py
+              else
+                  python -m pytest
+              fi
+          fi
+    - <<: *testpythonconda
+      name: "Python 3.7"
+      python: 3.7.3
+    - <<: *testpythonconda
+      name: "Python 3.8"
+      python: 3.8
 
 import:
-  # Order is important here as this is parsed depth-first so it should be
-  # the opposite of what makes sense.
-  - travis/shared_configs/utils-conda-install-config.yml
-  - travis/shared_configs/utils-conda-build.yml
-  - travis/shared_configs/utils-conda-create.yml
+  - travis/shared_configs/utils-conda.yml

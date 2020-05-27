@@ -19,7 +19,4 @@ jobs:
         - export ANACONDA_API_TOKEN=$CONDA_UPLOAD_TOKEN_DEV
         - anaconda upload bld-dir/noarch/*.tar.bz2
 import:
-  # Order is important here as this is parsed depth-first so it should be
-  # the opposite of what makes sense.
-  - travis/shared_configs/utils-conda-build.yml
-  - travis/shared_configs/utils-conda-install-config.yml
+  - travis/shared_configs/utils-conda.yml

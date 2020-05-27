@@ -1,7 +1,0 @@
-before_install:
-  - echo "Conda Recipe Folder':' ${CONDA_RECIPE_FOLDER}"
-  - |
-    if [[ ! -z "${CONDA_RECIPE_FOLDER}" ]]; then
-      conda build -q $CONDA_RECIPE_FOLDER --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
-      conda config --add channels "file://`pwd`/bld-dir"
-    fi

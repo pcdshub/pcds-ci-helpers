@@ -4,6 +4,8 @@ jobs:
       stage: test
       name: "Python 3.6"
       python: 3.6
+      env:
+        - SKIP_CONDA: 1
       install:
         - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"
         - echo "Dev Req File':' ${DEV_REQUIREMENTS:=dev-requirements.txt}"

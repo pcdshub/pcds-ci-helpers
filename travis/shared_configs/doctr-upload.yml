@@ -1,10 +1,10 @@
 jobs:
   include:
     - stage: deploy
+      name: "Docs Upload"
       env:
         - CONDA_PACKAGE: ""
         - CONDA_RECIPE_FOLDER: ""
-      name: "Docs Upload"
       if: |
         type != pull_request AND \
         (branch = master OR tag IS present)
@@ -41,9 +41,9 @@ jobs:
           $DOCTR_VERSIONS_COMMAND
         - set +e
 
-import:
-  # Order is important here as this is parsed depth-first so it should be
-  # the opposite of what makes sense.
-  - travis/shared_configs/utils-conda-install-config.yml
-  - travis/shared_configs/utils-conda-build.yml
-  - travis/shared_configs/utils-conda-create.yml
+      import:
+        # Order is important here as this is parsed depth-first so it should be
+        # the opposite of what makes sense.
+        - travis/shared_configs/utils-conda-install-config.yml
+        - travis/shared_configs/utils-conda-build.yml
+        - travis/shared_configs/utils-conda-create.yml

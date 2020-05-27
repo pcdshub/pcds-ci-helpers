@@ -8,6 +8,7 @@ jobs:
       if: |
         type != pull_request AND \
         (branch = master OR tag IS present)
+      install: skip
       before_script:
         - echo "Docs Req File':' ${DOCS_REQUIREMENTS:=docs-requirements.txt}"
         - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"

@@ -5,6 +5,7 @@ jobs:
         - CONDA_PACKAGE: ""
         - CONDA_RECIPE_FOLDER: ""
       name: "Docs Build"
+      install: skip
       before_script:
         - echo "Docs Req File':' ${DOCS_REQUIREMENTS:=docs-requirements.txt}"
         - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"

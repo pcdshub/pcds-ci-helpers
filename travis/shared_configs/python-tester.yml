@@ -1,6 +1,7 @@
 jobs:
   include:
     - &testpython
+      stage: test
       name: "Python 3.6"
       python: 3.6
       install:
@@ -22,7 +23,6 @@ jobs:
           else
               pip install --upgrade --requirement "${DEV_REQUIREMENTS}"
           fi
-
       script:
         - |
           if command -v coverage; then
@@ -39,9 +39,9 @@ jobs:
                   python -m pytest
               fi
           fi
-    <<: *testpython
+    - <<: *testpython
       name: "Python 3.7"
       python: 3.7.3
-    <<: *testpython
+    - <<: *testpython
       name: "Python 3.8"
       python: 3.8

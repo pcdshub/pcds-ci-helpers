@@ -1,6 +1,4 @@
-jobs:
-  include:
-    - &testpython
+lcls_test_python: &lcls_test_python
       stage: test
       name: "Python 3.6"
       python: 3.6
@@ -41,6 +39,13 @@ jobs:
                   python -m pytest
               fi
           fi
+
+jobs:
+  include:
+    - <<: *lcls_test_python
+    - <<: *lcls_test_python
+      name: "Python 3.7"
+
 #    - <<: *testpython
 #      name: "Python 3.7"
 #      python: 3.7.3

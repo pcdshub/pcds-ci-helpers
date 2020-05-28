@@ -12,6 +12,12 @@ before_install:
       # Useful for debugging
       conda info -a
 
+      echo "Conda Recipe Folder':' ${CONDA_RECIPE_FOLDER}"
+      if [[ ! -z "${CONDA_RECIPE_FOLDER}" ]]; then
+        conda build -q $CONDA_RECIPE_FOLDER --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
+        conda config --add channels "file://`pwd`/bld-dir"
+      fi
+
       echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
       echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
       # Manage conda environment
@@ -19,9 +25,5 @@ before_install:
       source activate ${CONDA_ENV_NAME}
       # Useful for debugging
       conda list
-      echo "Conda Recipe Folder':' ${CONDA_RECIPE_FOLDER}"
-      if [[ ! -z "${CONDA_RECIPE_FOLDER}" ]]; then
-        conda build -q $CONDA_RECIPE_FOLDER --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
-        conda config --add channels "file://`pwd`/bld-dir"
-      fi
+
     fi

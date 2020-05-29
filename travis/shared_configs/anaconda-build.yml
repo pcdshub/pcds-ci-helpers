@@ -1,0 +1,15 @@
+version: ~> 1.0
+
+jobs:
+  include:
+      stage: build
+      name: "Anaconda Build"
+      python: 3.6
+      workspaces:
+        create:
+          name: conda
+          paths:
+            - bld-dir
+
+import:
+  - travis/shared_configs/utils-conda.yml

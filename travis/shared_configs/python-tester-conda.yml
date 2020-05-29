@@ -7,6 +7,10 @@ jobs:
       stage: test
       name: "Python 3.6"
       python: 3.6
+      env:
+        - CONDA_RECIPE_FOLDER:
+      workspaces:
+        use: conda
       install: skip
       script:
         - |

@@ -1,11 +1,13 @@
 jobs:
   include:
     - stage: test
-      env:
-        - CONDA_PACKAGE: ""
-        - CONDA_RECIPE_FOLDER: ""
       name: "Docs Build"
-      install: skip
+      workspaces:
+        create:
+          name: docs
+          paths:
+            - docs/build/
+        use: conda
       before_script:
         - echo "Docs Req File':' ${DOCS_REQUIREMENTS:=docs-requirements.txt}"
         - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"
@@ -29,4 +31,3 @@ jobs:
           popd
       after_script:
         - set +e
-

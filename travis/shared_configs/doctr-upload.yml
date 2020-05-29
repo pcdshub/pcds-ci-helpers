@@ -2,34 +2,15 @@ jobs:
   include:
     - stage: deploy
       name: "Docs Upload"
-      env:
-        - CONDA_PACKAGE: ""
-        - CONDA_RECIPE_FOLDER: ""
+      python: 3.6
+      workspaces:
+        use: docs
       if: |
         type != pull_request AND \
         (branch = master OR tag IS present)
-      install: skip
-      before_script:
-        - echo "Docs Req File':' ${DOCS_REQUIREMENTS:=docs-requirements.txt}"
-        - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"
-        - |
-          # Install docs requirements
-          for req in ${DOCS_REQUIREMENTS};
-          do
-            if [[ ! -f "${req}" ]]; then
-                echo "File not found: ${req}" 1>&2
-                travis_terminate 1
-            else
-                pip install --upgrade --requirement "${req}"
-            fi
-          done
+      install:
+        pip install doctr doctr-versions-menu
       script:
-        - |
-          # Create HTML documentation
-          set -e
-          pushd ${DOCS_FOLDER}
-          make html
-          popd
         - |
           if [[ ! -z "$DOCTR_VERSIONS_MENU" ]]; then
               DOCTR_VERSIONS_COMMAND='--command "doctr-versions-menu"'
@@ -41,6 +22,3 @@ jobs:
         - doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name gh-pages
           $DOCTR_VERSIONS_COMMAND
         - set +e
-
-import:
-  - travis/shared_configs/utils-conda.yml

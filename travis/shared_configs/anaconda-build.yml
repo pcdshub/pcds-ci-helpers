@@ -4,7 +4,6 @@ jobs:
   include:
       - stage: build
         name: "Anaconda Build"
-        python: 3.6
         workspaces:
           create:
             name: conda
@@ -16,12 +15,15 @@ jobs:
           - bash miniconda.sh -b -p $HOME/miniconda
           - export PATH="$HOME/miniconda/bin:$PATH"
           - conda config --set always_yes yes --set changeps1 no
-          - conda install conda-build anaconda-client
-          - conda update -q conda conda-build
           - conda config --remove channels defaults
           - conda config --add channels conda-forge
+
+          - conda install conda-build anaconda-client
+          - conda update -q conda conda-build
           # Useful for debugging
           - conda info -a
 
           - echo "Conda Recipe Folder':' ${CONDA_RECIPE_FOLDER}"
-          - conda build -q $CONDA_RECIPE_FOLDER --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
+          - echo "DEBUG RECIPE:"
+          - cat ${CONDA_RECIPE_FOLDER}/meta.yaml
+          - conda build -q $CONDA_RECIPE_FOLDER --output-folder bld-dir --no-anaconda-upload

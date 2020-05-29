@@ -8,7 +8,24 @@ jobs:
           paths:
             - docs/build/
         use: conda
+
       before_script:
+        - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        - bash miniconda.sh -b -p $HOME/miniconda
+        - export PATH="$HOME/miniconda/bin:$PATH"
+        - conda config --set always_yes yes --set changeps1 no
+        - conda config --remove channels defaults
+        - conda config --add channels conda-forge
+        - conda config --add channels "file://`pwd`/bld-dir"
+        # Useful for debugging
+        - conda info -a
+        - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
+        # Manage conda environment
+        - conda create -n ${CONDA_ENV_NAME} python=$PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS}
+        - source activate ${CONDA_ENV_NAME}
+        # Useful for debugging
+        - conda list
+
         - echo "Docs Req File':' ${DOCS_REQUIREMENTS:=docs-requirements.txt}"
         - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"
         - |

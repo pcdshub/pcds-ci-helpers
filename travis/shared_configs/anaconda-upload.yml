@@ -15,21 +15,7 @@ jobs:
         - bash miniconda.sh -b -p $HOME/miniconda
         - export PATH="$HOME/miniconda/bin:$PATH"
         - conda config --set always_yes yes --set changeps1 no
-        - conda install conda-build anaconda-client
-        - conda update -q conda conda-build
-        - conda config --remove channels defaults
-        - conda config --add channels conda-forge
-
-        # Useful for debugging
-        - conda info -a
-        - conda config --add channels "file://`pwd`/bld-dir"
-        - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
-        - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
-        # Manage conda environment
-        - conda create -n ${CONDA_ENV_NAME} python=$TRAVIS_PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
-        - source activate ${CONDA_ENV_NAME}
-        # Useful for debugging
-        - conda list
+        - conda install anaconda-client
 
       script:
         - |

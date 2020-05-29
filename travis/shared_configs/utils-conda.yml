@@ -19,5 +19,4 @@ before_install:
       source activate ${CONDA_ENV_NAME}
       # Useful for debugging
       conda list
-
     fi

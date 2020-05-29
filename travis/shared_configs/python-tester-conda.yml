@@ -7,8 +7,6 @@ jobs:
       stage: test
       name: "Python 3.6"
       python: 3.6
-      env:
-        - CONDA_RECIPE_FOLDER=""
       workspaces:
         use: conda
       install: skip
@@ -19,17 +17,17 @@ jobs:
         - conda config --set always_yes yes --set changeps1 no
         - conda config --remove channels defaults
         - conda config --add channels conda-forge
+        - conda config --add channels "file://`pwd`/bld-dir"
         # Useful for debugging
         - conda info -a
-        - conda config --add channels "file://`pwd`/bld-dir"
         - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
         - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
+        - ls -lahtr bld-dir/noarch/
         # Manage conda environment
         - conda create -n ${CONDA_ENV_NAME} python=$TRAVIS_PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
         - source activate ${CONDA_ENV_NAME}
         # Useful for debugging
         - conda list
-
       script:
         - |
           if command -v coverage; then

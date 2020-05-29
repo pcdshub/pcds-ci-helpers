@@ -30,5 +30,3 @@ jobs:
       after_script:
         - set +e
 
-import:
-  - travis/shared_configs/utils-conda.yml

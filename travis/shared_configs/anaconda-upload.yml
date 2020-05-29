@@ -2,12 +2,35 @@ jobs:
   include:
     - stage: deploy
       name: "Anaconda Upload"
+      workspaces:
+        use: conda
       if: |
         type != pull_request AND \
         env(CONDA_UPLOAD_TOKEN_DEV) IS present AND \
         (branch = master OR \
         (branch = tag AND env(CONDA_UPLOAD_TOKEN_TAG) IS present))
       python: 3.7
+      before_script:
+        - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        - bash miniconda.sh -b -p $HOME/miniconda
+        - export PATH="$HOME/miniconda/bin:$PATH"
+        - conda config --set always_yes yes --set changeps1 no
+        - conda install conda-build anaconda-client
+        - conda update -q conda conda-build
+        - conda config --remove channels defaults
+        - conda config --add channels conda-forge
+
+        # Useful for debugging
+        - conda info -a
+        - conda config --add channels "file://`pwd`/bld-dir"
+        - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
+        - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
+        # Manage conda environment
+        - conda create -n ${CONDA_ENV_NAME} python=$TRAVIS_PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
+        - source activate ${CONDA_ENV_NAME}
+        # Useful for debugging
+        - conda list
+
       script:
         - |
           if [[ $TRAVIS_BRANCH == $TRAVIS_TAG ]]; then
@@ -18,5 +41,3 @@ jobs:
         - echo "Uploading to pcds-dev channel"
         - export ANACONDA_API_TOKEN=$CONDA_UPLOAD_TOKEN_DEV
         - anaconda upload bld-dir/noarch/*.tar.bz2
-import:
-  - travis/shared_configs/utils-conda.yml

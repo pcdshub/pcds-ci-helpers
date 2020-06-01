@@ -22,6 +22,12 @@ jobs:
           else
               pip install --upgrade --requirement "${DEV_REQUIREMENTS}"
           fi
+        - |
+          # Install Extras such as PyQt5
+          if [[ ! -z "${PIP_EXTRAS}" ]]; then
+              echo "Installing extra pip dependencies."
+              pip install ${PIP_EXTRAS}
+          fi
       script:
         - |
           if command -v coverage; then

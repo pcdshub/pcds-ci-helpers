@@ -1,6 +1,7 @@
-lcls_test_python: &lcls_test_python
-      stage: test
-      name: "Python 3.6"
+jobs:
+  include:
+    - stage: test
+      name: "Python 3.6 - PIP"
       python: 3.6
       install:
         - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"
@@ -37,16 +38,3 @@ lcls_test_python: &lcls_test_python
                   python -m pytest
               fi
           fi
-
-jobs:
-  include:
-    - <<: *lcls_test_python
-    - <<: *lcls_test_python
-      name: "Python 3.7"
-
-#    - <<: *testpython
-#      name: "Python 3.7"
-#      python: 3.7.3
-#    - <<: *testpython
-#      name: "Python 3.8"
-#      python: 3.8

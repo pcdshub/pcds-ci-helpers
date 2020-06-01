@@ -4,6 +4,7 @@ jobs:
       name: "Python 3.6 - PIP"
       python: 3.6
       install:
+        - pip install --upgrade pip
         - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"
         - echo "Dev Req File':' ${DEV_REQUIREMENTS:=dev-requirements.txt}"
         - |

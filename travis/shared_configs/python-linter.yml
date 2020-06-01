@@ -7,5 +7,4 @@ jobs:
       before_script:
         - cd "$TRAVIS_BUILD_DIR"
       script:
-        - echo "$ flake8 $PYTHON_LINT_OPTIONS"
         - flake8 $PYTHON_LINT_OPTIONS

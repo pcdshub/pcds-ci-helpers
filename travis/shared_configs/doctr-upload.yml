@@ -18,9 +18,6 @@ jobs:
               DOCTR_VERSIONS_COMMAND='--command "doctr-versions-menu"'
           fi
         - DEPLOY_DIR="${TRAVIS_TAG:=master}"
-      after_script:
-        - echo "$ doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name
-          gh-pages $DOCTR_VERSIONS_COMMAND"
         - doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name gh-pages
           $DOCTR_VERSIONS_COMMAND
         - set +e

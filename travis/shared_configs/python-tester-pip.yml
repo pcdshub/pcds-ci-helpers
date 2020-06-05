@@ -1,0 +1,48 @@
+jobs:
+  include:
+    - stage: test
+      name: "Python 3.6 - PIP"
+      python: 3.6
+      install:
+        - pip install --upgrade pip
+        - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"
+        - echo "Dev Req File':' ${DEV_REQUIREMENTS:=dev-requirements.txt}"
+        - |
+          # Install requirements
+          if [[ ! -f "${REQUIREMENTS}" ]]; then
+              echo "File not found: ${REQUIREMENTS}" 1>&2
+              travis_terminate 1
+          else
+              pip install --upgrade --requirement "${REQUIREMENTS}"
+          fi
+        - |
+          # Install development requirements
+          if [[ ! -f "${DEV_REQUIREMENTS}" ]]; then
+              echo "File not found: ${DEV_REQUIREMENTS}" 1>&2
+              travis_terminate 1
+          else
+              pip install --upgrade --requirement "${DEV_REQUIREMENTS}"
+          fi
+        - |
+          # Install Extras such as PyQt5
+          if [[ ! -z "${PIP_EXTRAS}" ]]; then
+              echo "Installing extra pip dependencies."
+              pip install ${PIP_EXTRAS}
+          fi
+      script:
+        - |
+          set -e
+          if command -v coverage; then
+              if [ -f "run_tests.py" ]; then
+                  coverage run --concurrency=thread --parallel-mode run_tests.py
+              else
+                  coverage run --concurrency=thread --parallel-mode -m pytest
+              fi
+              (coverage combine && coverage report | grep -v -e ' 0%') || true
+          else
+              if [ -f "run_tests.py" ]; then
+                  python run_tests.py
+              else
+                  python -m pytest
+              fi
+          fi

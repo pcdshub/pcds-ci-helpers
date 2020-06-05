@@ -1,37 +1,23 @@
+version: ~> 1.0
+
 jobs:
   include:
     - stage: deploy
       name: "Docs Upload"
+      python: 3.6
+      workspaces:
+        use: docs
       if: |
         type != pull_request AND \
         (branch = master OR tag IS present)
       install:
-        - echo "Docs Req File':' ${DOCS_REQUIREMENTS:=docs-requirements.txt}"
-        - echo "Docs Folder':' ${DOCS_FOLDER:=docs}"
-        - |
-          # Install docs requirements
-          if [[ ! -f "${DOCS_REQUIREMENTS}" ]]; then
-              echo "File not found: ${DOCS_REQUIREMENTS}" 1>&2
-              travis_terminate 1
-          else
-              pip install --upgrade --requirement "${DOCS_REQUIREMENTS}"
-          fi
-      before_script:
-        - |
-          # Create HTML documentation
-          set -e
-          pushd ${DOCS_FOLDER}
-          make html
-          popd
+        pip install doctr doctr-versions-menu
+      script:
         - |
           if [[ ! -z "$DOCTR_VERSIONS_MENU" ]]; then
               DOCTR_VERSIONS_COMMAND='--command "doctr-versions-menu"'
           fi
         - DEPLOY_DIR="${TRAVIS_TAG:=master}"
-      script:
-        - echo "$ doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name
-          gh-pages $DOCTR_VERSIONS_COMMAND"
         - doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name gh-pages
           $DOCTR_VERSIONS_COMMAND
-      after_script:
         - set +e

@@ -1,0 +1,31 @@
+version: ~> 1.0
+
+jobs:
+  include:
+      - stage: build
+        name: "Anaconda Build"
+        workspaces:
+          create:
+            name: conda
+            paths:
+              - bld-dir
+        install:
+          - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+          - bash miniconda.sh -b -p $HOME/miniconda
+          - export PATH="$HOME/miniconda/bin:$PATH"
+          - conda config --set always_yes yes --set changeps1 no
+          - conda config --add channels pcds-tag
+          - conda config --add channels conda-forge
+          - conda config --remove channels defaults
+
+          - conda install conda-build anaconda-client
+          - conda update -q conda conda-build
+          # Useful for debugging
+          - conda info -a
+
+
+        script:
+          - echo "Conda Recipe Folder':' ${CONDA_RECIPE_FOLDER}"
+          - echo "DEBUG RECIPE:"
+          - cat ${CONDA_RECIPE_FOLDER}/meta.yaml
+          - conda build -q $CONDA_RECIPE_FOLDER --output-folder bld-dir --no-anaconda-upload

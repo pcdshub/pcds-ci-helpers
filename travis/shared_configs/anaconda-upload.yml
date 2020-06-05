@@ -1,28 +1,24 @@
+version: ~> 1.0
+
 jobs:
   include:
     - stage: deploy
       name: "Anaconda Upload"
+      workspaces:
+        use: conda
       if: |
         type != pull_request AND \
         env(CONDA_UPLOAD_TOKEN_DEV) IS present AND \
         (branch = master OR \
         (branch = tag AND env(CONDA_UPLOAD_TOKEN_TAG) IS present))
       python: 3.7
-      before_install:
+      before_script:
         - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
         - bash miniconda.sh -b -p $HOME/miniconda
-        - source $HOME/miniconda/etc/profile.d/conda.sh
-        - conda activate base
-        - hash -r
+        - export PATH="$HOME/miniconda/bin:$PATH"
         - conda config --set always_yes yes --set changeps1 no
-      install:
-        - conda install python=$TRAVIS_PYTHON_VERSION conda-build=3.12.0
-        - conda config --add channels pcds-tag
-        - conda config --append channels conda-forge
-        - conda config --remove channels defaults
-        - conda build -q conda-recipe --python=$TRAVIS_PYTHON_VERSION --output-folder bld-dir
-        - echo "Installing anaconda-client"
         - conda install anaconda-client
+
       script:
         - |
           if [[ $TRAVIS_BRANCH == $TRAVIS_TAG ]]; then

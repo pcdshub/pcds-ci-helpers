@@ -1,0 +1,47 @@
+version: ~> 1.0
+
+jobs:
+  include:
+      - stage: test
+        name: "Benchmark"
+        env:
+          - PYTHON_VERSION: ${BENCHMARK_PYTHON:=3.6}
+        workspaces:
+          use: conda
+        install: skip
+        before_script:
+          - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+          - bash miniconda.sh -b -p $HOME/miniconda
+          - export PATH="$HOME/miniconda/bin:$PATH"
+          - conda config --set always_yes yes --set changeps1 no
+          - conda config --add channels pcds-tag
+          - conda config --add channels conda-forge
+          - conda config --remove channels defaults
+          - conda config --add channels "file://`pwd`/bld-dir"
+          # Useful for debugging
+          - conda info -a
+          - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
+          - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
+
+          # Manage conda environment
+          - conda create -n ${CONDA_ENV_NAME} python=$PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
+          - source activate ${CONDA_ENV_NAME}
+          # Useful for debugging
+          - conda list
+        script:
+          - |
+            set -e
+            if command -v coverage; then
+                if [ -f "run_tests.py" ]; then
+                    coverage run --concurrency=thread --parallel-mode run_tests.py ${BENCHMARK_COMMAND}
+                else
+                    coverage run --concurrency=thread --parallel-mode -m pytest ${BENCHMARK_COMMAND}
+                fi
+                (coverage combine && coverage report | grep -v -e ' 0%') || true
+            else
+                if [ -f "run_tests.py" ]; then
+                    python run_tests.py ${BENCHMARK_COMMAND}
+                else
+                    python -m pytest ${BENCHMARK_COMMAND}
+                fi
+            fi

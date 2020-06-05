@@ -57,7 +57,7 @@ env:
     # The folder containing the conda recipe (meta.yaml)
     - CONDA_RECIPE_FOLDER="conda-recipe"
     # Extra dependencies needed to run the tests which are not included
-    # at the recipe and dev-requirements.txt. E.g. PyQt
+    # in the recipe or CONDA_REQUIREMENTS. E.g. PyQt
     - CONDA_EXTRAS="pip pyqt=5 happi"
     # Requirements file with contents for tests dependencies
     - CONDA_REQUIREMENTS="dev-requirements.txt"

@@ -57,7 +57,7 @@ env:
     # The folder containing the conda recipe (meta.yaml)
     - CONDA_RECIPE_FOLDER="conda-recipe"
     # Extra dependencies needed to run the tests which are not included
-    # at the recipe and dev-requirements.txt. E.g. PyQt
+    # in the recipe or CONDA_REQUIREMENTS. E.g. PyQt
     - CONDA_EXTRAS="pip pyqt=5 happi"
     # Requirements file with contents for tests dependencies
     - CONDA_REQUIREMENTS="dev-requirements.txt"
@@ -278,7 +278,7 @@ env:
 `python-tester-conda.yml` runs any pytest tests it finds after installing the
 specified requirements via conda.
 The current test matrix includes Python 3.6, 3.7 and 3.8.
-This job uses the `worspaces` named `conda` for the `noarch` package built
+This job uses the workspaces named `conda` for the `noarch` package built
 before by the `anaconda-build.yml`.
 
 ##### usage:

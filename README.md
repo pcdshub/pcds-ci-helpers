@@ -402,7 +402,7 @@ env:
 ### Deploy Jobs
 
 #### shared_configs/anaconda-upload.yml
-`anaconda-upload.yml` uses the `workspaces` named `conda` to leverage the
+`anaconda-upload.yml` uses the workspace named `conda` to leverage the
 pre-built package and speed up the upload task.
 This task uploads the package to the `pcds-dev` channel on Anaconda Cloud.
 If the build was triggered by a tag, the package will additionally be uploaded

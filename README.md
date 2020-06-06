@@ -305,8 +305,9 @@ env:
 `python-tester-conda.yml` runs any pytest tests it finds after installing the
 specified requirements via conda.
 The current test matrix includes Python 3.6, 3.7 and 3.8.
-This job uses the workspaces named `conda` for the `noarch` package built
-before by the `anaconda-build.yml`.
+This job uses the workspace named `conda` for access to the `noarch`
+package previously built by the `anaconda-build.yml`, and thus must be
+used in conjuction with `anaconda-build.yml`.
 
 ##### usage:
 This configuration can be added to the `test` stage of a Travis build by

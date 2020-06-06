@@ -318,7 +318,7 @@ import:
 ```
 ##### arguments:
 Test requirements files can be specified by assigning values to
-`CONDA_REQUIREMENTS`. `CONDA_REQUIREMENTS` defaults to `dev-requirements.txt`.
+`CONDA_REQUIREMENTS`, which defaults to `dev-requirements.txt`.
 If no requirements are necessary, the file can be blank.
 Additional test dependencies can be specified via the `CONDA_EXTRAS` variable.
 The package name must be informed via the `CONDA_PACKAGE` variable.

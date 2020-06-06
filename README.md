@@ -355,7 +355,7 @@ import:
 Requirements files can be specified by assigning values to `REQUIREMENTS` and
 `DEV_REQUIREMENTS`. `REQUIREMENTS` defaults to `requirements.txt` and
 `DEV_REQUIREMENTS` defaults to `dev-requirements.txt`. If no requirements are
-necessary, the file can be blank.
+necessary, these files can be blank.
 
 Additional dependencies not specified at the requirements files above can be
 passed to the install process via the `PIP_EXTRAS` variable.

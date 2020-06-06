@@ -371,7 +371,7 @@ env:
 #### shared_configs/docs-build.yml
 `docs-build.yml` runs through the build of the package's documentation to
 ensure it works properly.
-After building the documentation it is available via the `workspaces` named
+After building the documentation it is available via the workspace named
 `docs` which is used by the `doctr-upload.yml` later on for upload.
 As of now, the docs build task uses a conda environment since not all of our
 dependencies are available through PIP. This can be revisited in the future

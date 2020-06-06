@@ -1,0 +1,12 @@
+jobs:
+  include:
+    - stage: test
+      name: "Package Linter"
+      python: 3.6
+      install:
+        - pip install --upgrade pip
+        - pip install pcdsutils
+      before_script:
+        - cd "$TRAVIS_BUILD_DIR"
+      script:
+        - requirements-compare --ignore-docs .

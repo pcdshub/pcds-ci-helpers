@@ -323,7 +323,7 @@ If no requirements are necessary, the file can be blank.
 Additional test dependencies can be specified via the `CONDA_EXTRAS` variable.
 The package name must be defined using the `CONDA_PACKAGE` variable.
 
-Additional dependencies not specified at the requirements files above can be
+Additional dependencies not specified in the requirements files can be
 passed to the install process via the `PIP_EXTRAS` variable.
 
 ``` yaml

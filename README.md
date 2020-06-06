@@ -279,6 +279,34 @@ import:
   - pcdshub/pcds-ci-helpers:travis/shared_config/anaconda-build.yml
 ```
 
+#### shared_configs/python-tester-pip.yml
+`python-tester-pip.yml` runs any pytest tests it finds after installing the
+specified requirements via PIP using Python 3.6.
+
+##### usage:
+This configuration can be added to the `test` stage of a Travis build by
+importing it in your `.travis.yml`:
+``` yaml
+import:
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester-pip.yml
+```
+##### arguments:
+Requirements files can be specified by assigning values to `REQUIREMENTS` and
+`DEV_REQUIREMENTS`. `REQUIREMENTS` defaults to `requirements.txt` and
+`DEV_REQUIREMENTS` defaults to `dev-requirements.txt`. If no requirements are
+necessary, these files can be blank.
+
+Additional dependencies not specified at the requirements files above can be
+passed to the install process via the `PIP_EXTRAS` variable.
+
+``` yaml
+env:
+  global:
+    - REQUIREMENTS: requirements.txt
+    - DEV_REQUIREMENTS: dev-requirements.txt
+    - PIP_EXTRAS="PyQt5 happi"
+```
+
 ### Test Jobs
 
 #### shared_configs/python-linter.yml
@@ -338,34 +366,6 @@ env:
     - CONDA_EXTRAS="pip pyqt=5 happi"
     # Requirements file with contents for tests dependencies
     - CONDA_REQUIREMENTS="dev-requirements.txt"
-```
-
-#### shared_configs/python-tester-pip.yml
-`python-tester-pip.yml` runs any pytest tests it finds after installing the
-specified requirements via PIP using Python 3.6.
-
-##### usage:
-This configuration can be added to the `test` stage of a Travis build by
-importing it in your `.travis.yml`:
-``` yaml
-import:
-  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester-pip.yml
-```
-##### arguments:
-Requirements files can be specified by assigning values to `REQUIREMENTS` and
-`DEV_REQUIREMENTS`. `REQUIREMENTS` defaults to `requirements.txt` and
-`DEV_REQUIREMENTS` defaults to `dev-requirements.txt`. If no requirements are
-necessary, these files can be blank.
-
-Additional dependencies not specified at the requirements files above can be
-passed to the install process via the `PIP_EXTRAS` variable.
-
-``` yaml
-env:
-  global:
-    - REQUIREMENTS: requirements.txt
-    - DEV_REQUIREMENTS: dev-requirements.txt
-    - PIP_EXTRAS="PyQt5 happi"
 ```
 
 #### shared_configs/docs-build.yml

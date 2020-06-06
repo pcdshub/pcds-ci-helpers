@@ -1,6 +1,6 @@
 jobs:
   include:
-    - stage: test
+    - stage: build
       name: "Python 3.6 - PIP"
       python: 3.6
       install:

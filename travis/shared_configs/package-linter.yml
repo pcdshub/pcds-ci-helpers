@@ -5,7 +5,9 @@ jobs:
       python: 3.6
       install:
         - pip install --upgrade pip
-        - pip install pcdsutils
+        #- pip install pcdsutils
+        # Temporarily install from my fork so we can test
+        - pip install git+https://github.com/hhslepicka/pcdsutils.git@requirements_enh
       before_script:
         - cd "$TRAVIS_BUILD_DIR"
       script:

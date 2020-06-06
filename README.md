@@ -284,7 +284,7 @@ import:
 specified requirements via PIP using Python 3.6.
 
 ##### usage:
-This configuration can be added to the `test` stage of a Travis build by
+This configuration can be added to the `build` stage of a Travis build by
 importing it in your `.travis.yml`:
 ``` yaml
 import:

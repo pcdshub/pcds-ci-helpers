@@ -425,7 +425,9 @@ To upload to `pcds-tag`, the same must be done with `CONDA_UPLOAD_TOKEN_TAG`.
 
 #### shared_configs/doctr-upload.yml
 `doctr-upload.yml` uploads the package documentation to GitHub Pages using
-`Doctr`.
+`Doctr`. This uses the docs built by `docs-build.yml` and shared through the
+`docs` workspace and thus, requires that `docs-build.yml` is also used in
+your Travis configuration.
 
 ##### usage:
 This configuration can be added to the `deploy` stage of a Travis build by

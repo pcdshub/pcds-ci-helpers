@@ -340,7 +340,7 @@ env:
 ```
 
 #### shared_configs/python-tester-pip.yml
-`python-tester.yml` runs any pytest tests it finds after installing the
+`python-tester-pip.yml` runs any pytest tests it finds after installing the
 specified requirements via PIP using Python 3.6.
 
 ##### usage:

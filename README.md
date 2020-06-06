@@ -37,17 +37,85 @@ For Python projects, you can use the tools in this script with the following
 commands:
 
 ```yaml
-stages:
-  - test
-  - name: deploy
-    if: (branch = master OR tag IS present) AND type != pull_request
+version: ~> 1.0
+
+env:
+  global:
+    # doctr generated secure variable for documentation upload
+    - secure: "<your secure here>"
+    # enable the usage of versions menu which allow versioning of the docs
+    # pages and not only the master branch
+    - DOCTR_VERSIONS_MENU="1"
+    # Dependency files used to build the documentation (space separated)
+    - DOCS_REQUIREMENTS="dev-requirements.txt requirements.txt"
+    # Options to be passed to flake8 for package linting. Usually this is just
+    # the package name but you can enable other flake8 options via this config
+    - PYTHON_LINT_OPTIONS="my_package"
+
+    # The name of the conda package
+    - CONDA_PACKAGE="my_package"
+    # The folder containing the conda recipe (meta.yaml)
+    - CONDA_RECIPE_FOLDER="conda-recipe"
+    # Extra dependencies needed to run the tests which are not included
+    # in the recipe or CONDA_REQUIREMENTS. E.g. PyQt
+    - CONDA_EXTRAS="pip pyqt=5 happi"
+    # Requirements file with contents for tests dependencies
+    - CONDA_REQUIREMENTS="dev-requirements.txt"
+
+    # Extra dependencies needed to run the test with Pip (similar to
+    # CONDA_EXTRAS) but for pip
+    - PIP_EXTRAS="PyQt5 happi"
+
+jobs:
+  allow_failures:
+    # This makes the PIP based Python 3.6 optional for passing.
+    # Remove this block if passing tests with PIP is mandatory for your
+    # package
+    - name: "Python 3.6 - PIP"
 
 import:
-  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-linter.yml
-  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester.yml
-  - pcdshub/pcds-ci-helpers:travis/shared_configs/pypi-upload.yml
-  - pcdshub/pcds-ci-helpers:travis/shared_configs/doctr-upload.yml
-  - pcdshub/pcds-ci-helpers:travis/shared_configs/anaconda-upload.yml
+  # If your project requires X11 leave the following import
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/setup-env-ui.yml
+  # This import enables a set of standard python jobs including:
+  # - Build
+  #   - Anaconda Package Build
+  # - Tests
+  #   - Linter
+  #   - Documentation
+  #   - Python 3.6 - PIP based
+  #   - Python 3.6, 3.7 & 3.8 - Conda base
+  # - Deploy
+  #   - Documentation using doctr
+  #   - Conda Package - uploaded to pcds-dev and pcds-tag
+  #   - PyPI
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/standard-python-conda.yml
+
+# If not using the standard-python-conda above please uncomment the required
+# (language, os, dist and stages) and optional (import statements) entries from
+# the blocks below.
+#
+#language: python
+#os: linux
+#dist: xenial
+#
+#stages:
+#  - build
+#  - test
+#  - name: deploy
+#    if: (branch = master OR tag IS present) AND type != pull_request
+#
+#import:
+#  # Build Stage
+#  - pcdshub/pcds-ci-helpers:travis/shared_configs/anaconda-build.yml
+#  # Tests Stage
+#  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester-pip.yml
+#  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester-conda.yml
+#  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-linter.yml
+#  - pcdshub/pcds-ci-helpers:travis/shared_configs/docs-build.yml
+#  # Deploy Stage
+#  - pcdshub/pcds-ci-helpers:travis/shared_configs/pypi-upload.yml
+#  - pcdshub/pcds-ci-helpers:travis/shared_configs/doctr-upload.yml
+#  - pcdshub/pcds-ci-helpers:travis/shared_configs/anaconda-upload.yml
 ```
 
 
@@ -147,17 +215,83 @@ PYTHON_LINT_OPTIONS="path/to/source --verbose"
 command line options. Any directory names will be relative to the repository's
 root directory.
 
-### shared_configs/python-linter.yml
-`python-linter.yml` examines Python code using flake8.
+
+# Travis-CI Shared Configurations
+
+## Standard Configurations
+The standard configurations below were created to provide uniformity and make
+it easier to use with the PCDS projects.
+
+### shared_configs/standard-python-conda.yml
+This import enables a set of standard python jobs including:
+- Build Stage
+   - Anaconda Package Build
+- Tests Stage
+  - Linter
+   - Documentation
+   - Python 3.6 - PIP based
+   - Python 3.6, 3.7 & 3.8 - Conda base
+ - Deploy Stage
+   - Documentation using doctr
+   - Conda Package - uploaded to pcds-dev and pcds-tag
+   - PyPI
 
 #### usage:
+```yaml
+import:
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/standard-python-conda.yml
+```
+
+### shared_configs/setup-env-ui.yml
+This configuration installs `xvfb` and `herbstluftwm` so UI tests can have the
+proper behavior.
+
+#### usage:
+```yaml
+import:
+  # If your project requires X11 leave the following import
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/setup-env-ui.yml
+```
+
+## Building Blocks
+
+If the standard configuration above does not meet your requirements you can
+build your own by using a combination of the following pieces below.
+
+### Build Jobs
+
+#### shared_configs/anaconda-build.yml
+`anaconda-build.yml` builds a conda package and provides a `workspace` called
+`conda` which contains the output of the build process.
+
+##### arguments:
+`CONDA_RECIPE_FOLDER` must be set to the folder containing the `meta.yaml` file
+of this package recipe.
+
+##### usage:
+This configuration can be added by importing it in your `.travis.yml`:
+```yaml
+  global:
+    # The folder containing the conda recipe (meta.yaml)
+    - CONDA_RECIPE_FOLDER="conda-recipe"
+
+import:
+  - pcdshub/pcds-ci-helpers:travis/shared_config/anaconda-build.yml
+```
+
+### Test Jobs
+
+#### shared_configs/python-linter.yml
+`python-linter.yml` examines Python code using flake8.
+
+##### usage:
 This configuration can be added to the `test` stage of a Travis build by
 importing it in your `.travis.yml`:
 ``` yaml
 import:
   - pcdshub/pcds-ci-helpers:travis/shared_configs/python-linter.yml
 ```
-#### arguments:
+##### arguments:
 `PYTHON_LINT_OPTIONS` can be set to include directory names and/or other flake8
 command line options. Any directory names will be relative to the repository's
 root directory. For example:
@@ -167,34 +301,83 @@ env:
     - PYTHON_LINT_OPTIONS="source --verbose"
 ```
 
-### shared_configs/python-tester.yml
-`python-tester.yml` runs any pytest tests it finds after installing the
-specified requirements.
+#### shared_configs/python-tester-conda.yml
+`python-tester-conda.yml` runs any pytest tests it finds after installing the
+specified requirements via conda.
+The current test matrix includes Python 3.6, 3.7 and 3.8.
+This job uses the workspace named `conda` for access to the `noarch`
+package previously built by the `anaconda-build.yml`, and thus must be
+used in conjuction with `anaconda-build.yml`.
 
-#### usage:
+##### usage:
 This configuration can be added to the `test` stage of a Travis build by
 importing it in your `.travis.yml`:
 ``` yaml
 import:
-  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester.yml
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester-conda.yml
 ```
-#### arguments:
+##### arguments:
+Test requirements files can be specified by assigning values to
+`CONDA_REQUIREMENTS`, which defaults to `dev-requirements.txt`.
+If no requirements are necessary, the file can be blank.
+Additional test dependencies can be specified via the `CONDA_EXTRAS` variable.
+The package name must be defined using the `CONDA_PACKAGE` variable.
+
+Additional dependencies not specified in the requirements files can be
+passed to the install process via the `PIP_EXTRAS` variable.
+
+``` yaml
+env:
+  global:
+    # The name of the conda package
+    - CONDA_PACKAGE="my_package"
+    # The folder containing the conda recipe (meta.yaml)
+    - CONDA_RECIPE_FOLDER="conda-recipe"
+    # Extra dependencies needed to run the tests which are not included
+    # at the recipe and dev-requirements.txt. E.g. PyQt
+    - CONDA_EXTRAS="pip pyqt=5 happi"
+    # Requirements file with contents for tests dependencies
+    - CONDA_REQUIREMENTS="dev-requirements.txt"
+```
+
+#### shared_configs/python-tester-pip.yml
+`python-tester-pip.yml` runs any pytest tests it finds after installing the
+specified requirements via PIP using Python 3.6.
+
+##### usage:
+This configuration can be added to the `test` stage of a Travis build by
+importing it in your `.travis.yml`:
+``` yaml
+import:
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester-pip.yml
+```
+##### arguments:
 Requirements files can be specified by assigning values to `REQUIREMENTS` and
 `DEV_REQUIREMENTS`. `REQUIREMENTS` defaults to `requirements.txt` and
 `DEV_REQUIREMENTS` defaults to `dev-requirements.txt`. If no requirements are
-necessary, the file can be blank.
+necessary, these files can be blank.
+
+Additional dependencies not specified at the requirements files above can be
+passed to the install process via the `PIP_EXTRAS` variable.
+
 ``` yaml
 env:
   global:
     - REQUIREMENTS: requirements.txt
     - DEV_REQUIREMENTS: dev-requirements.txt
+    - PIP_EXTRAS="PyQt5 happi"
 ```
 
-### shared_configs/doctr-upload.yml
+#### shared_configs/docs-build.yml
 `docs-build.yml` runs through the build of the package's documentation to
 ensure it works properly.
+After building the documentation it is available via the workspace named
+`docs` which is used by the `doctr-upload.yml` later on for upload.
+As of now, the docs build task uses a conda environment since not all of our
+dependencies are available through PIP. This can be revisited in the future
+once the packages are correctly available.
 
-#### usage:
+##### usage:
 This configuration can be added to the `test` stage of a Travis build by
 importing it in your `.travis.yml`:
 ``` yaml
@@ -202,54 +385,59 @@ import:
   - pcdshub/pcds-ci-helpers:travis/shared_configs/docs-build.yml
 ```
 
-#### arguments:
-- A docs requirements file can be specified by assigning a value to
+##### arguments:
+- One or more docs requirements file can be specified by assigning a value to
   `DOCS_REQUIREMENTS`, which defaults to `docs-requirements.txt`.
 - The folder containing the documentation can be specified by assigning a value
   to `DOCS_FOLDER`, which defaults to `docs`.
 ``` yaml
 env:
   global:
-    - DOCS_REQUIREMENTS: docs-requirements.txt
+    - DOCS_REQUIREMENTS="dev-requirements.txt requirements.txt"
     - DOCS_FOLDER: docs
+    - CONDA_EXTRAS="pip pyqt=5 happi"
 ```
 
-### shared_configs/anaconda-upload.yml
-`anaconda-upload.yml` builds the package according to the `conda-recipe` and
-uploads it to the `pcds-dev` channel on Anaconda Cloud. If the build was
-triggered by a tag, the package will additionally be uploaded to the `pcds-tag`
-channel.
 
-#### usage:
+### Deploy Jobs
+
+#### shared_configs/anaconda-upload.yml
+`anaconda-upload.yml` uses the workspace named `conda` to leverage the
+pre-built package and speed up the upload task. Thus, this script must be
+used in conjunction with `python-tester-conda.yml`
+This task uploads the package to the `pcds-dev` channel on Anaconda Cloud.
+If the build was triggered by a tag, the package will additionally be uploaded
+to the `pcds-tag` channel.
+
+##### usage:
 This configuration can be added to the `deploy` stage of a Travis build by
 importing it in your `.travis.yml`:
 ``` yaml
 import:
   - pcdshub/pcds-ci-helpers:travis/shared_configs/anaconda-upload.yml
 ```
-#### arguments:
+##### arguments:
 This configuration will only run if `CONDA_UPLOAD_TOKEN_DEV` is defined. This
 token can be obtained from anaconda.org by anyone with write permissions to
 the `pcds-dev` organization. It should then be added to the Travis build from
 the Environment Variables section of the repository's setting on travis-ci.org.
 To upload to `pcds-tag`, the same must be done with `CONDA_UPLOAD_TOKEN_TAG`.
 
-### shared_configs/doctr-upload.yml
-`doctr-upload.yml` builds the package's documentation and uploads it to GitHub
-Pages using `Doctr`.
+#### shared_configs/doctr-upload.yml
+`doctr-upload.yml` uploads the package documentation to GitHub Pages using
+`Doctr`. This uses the docs built by `docs-build.yml` and shared through the
+`docs` workspace and thus, requires that `docs-build.yml` is also used in
+your Travis configuration.
 
-#### usage:
+##### usage:
 This configuration can be added to the `deploy` stage of a Travis build by
 importing it in your `.travis.yml`:
 ``` yaml
 import:
   - pcdshub/pcds-ci-helpers:travis/shared_configs/doctr-upload.yml
 ```
-#### arguments:
-- A docs requirements file can be specified by assigning a value to
-  `DOCS_REQUIREMENTS`, which defaults to `docs-requirements.txt`.
-- The folder containing the documentation can be specified by assigning a value
-  to `DOCS_FOLDER`, which defaults to `docs`.
+
+##### arguments:
 - If you want a version menu to be included in your documentation, assign a `1`
   to `DOCTR_VERSIONS_MENU`.
 - To successfully upload the documentation, doctr is going to need a deploy
@@ -262,23 +450,21 @@ env:
   global:
     # Doctr deploy key for <org>/<repo>
     - secure: "<docs build key>"
-    - DOCS_REQUIREMENTS: docs-requirements.txt
-    - DOCS_FOLDER: docs
     - DOCTR_VERSIONS_MENU: 1
 ```
 
-### shared_configs/pypi-upload.yml
+#### shared_configs/pypi-upload.yml
 `pypi-upload.yml` builds the package according to the `setup.py` file and
 uploads it to the PyPI. This is only performed on tagged builds.
 
-#### usage:
+##### usage:
 This configuration can be added to the `deploy` stage of a Travis build by
 importing it in your `.travis.yml`:
 ``` yaml
 import:
   - pcdshub/pcds-ci-helpers:travis/shared_configs/pypi-upload.yml
 ```
-#### arguments:
+##### arguments:
 The upload will only succeed if `PYPI_TOKEN` is defined. This token can be
 obtained from pypi.org by anyone with Maintainer or Owner permissions. It
 should then be added to the Travis build from the Environment Variables section

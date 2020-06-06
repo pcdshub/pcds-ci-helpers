@@ -321,7 +321,7 @@ Test requirements files can be specified by assigning values to
 `CONDA_REQUIREMENTS`, which defaults to `dev-requirements.txt`.
 If no requirements are necessary, the file can be blank.
 Additional test dependencies can be specified via the `CONDA_EXTRAS` variable.
-The package name must be informed via the `CONDA_PACKAGE` variable.
+The package name must be defined using the `CONDA_PACKAGE` variable.
 
 Additional dependencies not specified at the requirements files above can be
 passed to the install process via the `PIP_EXTRAS` variable.

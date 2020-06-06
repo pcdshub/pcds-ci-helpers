@@ -227,7 +227,8 @@ This import enables a set of standard python jobs including:
 - Build Stage
    - Anaconda Package Build
 - Tests Stage
-  - Linter
+   - Python Linter
+   - Package Linter
    - Documentation
    - Python 3.6 - PIP based
    - Python 3.6, 3.7 & 3.8 - Conda base
@@ -300,6 +301,19 @@ env:
   global:
     - PYTHON_LINT_OPTIONS="source --verbose"
 ```
+
+#### shared_configs/package-linter.yml
+`package-linter.yml` examines inconsistencies between conda meta.yaml and
+requirements.txt files.
+
+##### usage:
+This configuration can be added to the `test` stage of a Travis build by
+importing it in your `.travis.yml`:
+``` yaml
+import:
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/package-linter.yml
+```
+
 
 #### shared_configs/python-tester-conda.yml
 `python-tester-conda.yml` runs any pytest tests it finds after installing the

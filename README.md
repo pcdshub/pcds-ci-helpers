@@ -403,7 +403,8 @@ env:
 
 #### shared_configs/anaconda-upload.yml
 `anaconda-upload.yml` uses the workspace named `conda` to leverage the
-pre-built package and speed up the upload task.
+pre-built package and speed up the upload task. Thus, this script must be
+used in conjunction with `python-tester-conda.yml`
 This task uploads the package to the `pcds-dev` channel on Anaconda Cloud.
 If the build was triggered by a tag, the package will additionally be uploaded
 to the `pcds-tag` channel.

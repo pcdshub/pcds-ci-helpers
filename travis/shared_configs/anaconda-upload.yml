@@ -12,6 +12,7 @@ jobs:
         (branch = master OR \
         (branch = tag AND env(CONDA_UPLOAD_TOKEN_TAG) IS present))
       python: 3.7
+      install: skip
       before_script:
         - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
         - bash miniconda.sh -b -p $HOME/miniconda

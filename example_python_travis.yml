@@ -70,8 +70,8 @@ import:
 #import:
 #  # Build Stage
 #  - pcdshub/pcds-ci-helpers:travis/shared_configs/anaconda-build.yml
-#  # Tests Stage
 #  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester-pip.yml
+#  # Tests Stage
 #  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester-conda.yml
 #  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-linter.yml
 #  - pcdshub/pcds-ci-helpers:travis/shared_configs/docs-build.yml

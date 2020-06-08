@@ -14,6 +14,7 @@ import:
   - travis/shared_configs/anaconda-build.yml
   - travis/shared_configs/python-tester-pip.yml
   - travis/shared_configs/python-tester-conda.yml
+  - travis/shared_configs/package-linter.yml
   - travis/shared_configs/python-linter.yml
   - travis/shared_configs/docs-build.yml
   - travis/shared_configs/pypi-upload.yml

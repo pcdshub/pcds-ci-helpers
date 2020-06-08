@@ -43,7 +43,8 @@ import:
   # - Build
   #   - Anaconda Package Build
   # - Tests
-  #   - Linter
+  #   - Python Linter
+  #   - Package Linter
   #   - Documentation
   #   - Python 3.6 - PIP based
   #   - Python 3.6, 3.7 & 3.8 - Conda base
@@ -74,6 +75,7 @@ import:
 #  # Tests Stage
 #  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-tester-conda.yml
 #  - pcdshub/pcds-ci-helpers:travis/shared_configs/python-linter.yml
+#  - pcdshub/pcds-ci-helpers:travis/shared_configs/package-linter.yml
 #  - pcdshub/pcds-ci-helpers:travis/shared_configs/docs-build.yml
 #  # Deploy Stage
 #  - pcdshub/pcds-ci-helpers:travis/shared_configs/pypi-upload.yml

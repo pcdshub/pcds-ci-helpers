@@ -10,6 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import datetime
 import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
@@ -22,7 +23,7 @@ if repo_slug is not None:
 else:
     project = os.environ.get("PROJECT_NAME", os.path.split(os.path.abspath('../../'))[-1])
 
-copyright = '2019, SLAC National Accelerator Laboratory'
+copyright = f'{datetime.datetime.now().year}, SLAC National Accelerator Laboratory'
 author = 'SLAC National Accelerator Laboratory'
 
 

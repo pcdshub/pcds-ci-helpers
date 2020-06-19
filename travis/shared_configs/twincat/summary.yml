@@ -1,0 +1,19 @@
+jobs:
+  include:
+    - stage: test
+      name: "Project Summary"
+      workspaces:
+        use: conda
+      install:
+        - source $HOME/env_config.sh
+        - pytmc --help
+        - ads-deploy --help
+
+      script:
+        - set +e
+        - |
+            while IFS= read -r -d '' tsproj; do
+                echo "Project: $tsproj"
+                pytmc summary --all --code --markdown "$tsproj"
+                echo "(Summary exited with code $?)"
+            done < <(find . -name '*.tsproj' -print0)

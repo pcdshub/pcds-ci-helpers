@@ -1,0 +1,32 @@
+jobs:
+  include:
+    - stage: test
+      name: "Pragma and Database Lint"
+      workspaces:
+        use: conda
+      install:
+        - source $HOME/env_config.sh
+        - echo $CI_HELPER_PATH
+
+      script:
+        - EXIT_CODE=0
+        - |
+            while IFS= read -r -d '' tsproj; do
+                echo "Pragma lint results"
+                echo "-------------------"
+                pytmc pragmalint --verbose "$tsproj"
+                if [ $? -ne 0 ]; then
+                    EXIT_CODE=1
+                fi
+                echo ""
+            done < <(find . -name '*.tsproj' -print0)
+
+        - |
+            while IFS= read -r -d '' tmc; do
+                echo "DBD lint results"
+                echo "----------------"
+                pytmc db "$tmc" --dbd ${CI_HELPER_PATH}/travis/tc3_style/adsIoc.dbd --allow-errors > /dev/null
+                echo ""
+            done < <(find . -name '*.tmc' -print0)
+
+        - exit $EXIT_CODE

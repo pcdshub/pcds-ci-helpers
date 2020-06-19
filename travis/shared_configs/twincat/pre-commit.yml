@@ -1,0 +1,14 @@
+version: ~> 1.0
+
+jobs:
+  include:
+    - stage: test
+      name: "Pre-commit Checks"
+      workspaces:
+        use: conda
+
+      install:
+        - source $HOME/env_config.sh
+
+      script:
+        - bash $CI_HELPER_PATH/travis/pre_commit.sh

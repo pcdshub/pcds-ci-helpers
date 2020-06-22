@@ -1,0 +1,22 @@
+version: ~> 1.0
+
+jobs:
+  include:
+    - stage: deploy
+      name: "Docs Upload"
+      python: 3.6
+      workspaces:
+        use:
+          - docs
+          - conda
+      if: |
+        type != pull_request AND \
+        (branch = master OR tag IS present)
+
+      install:
+        - source $HOME/env_config.sh
+
+      script:
+        - DEPLOY_DIR="${TRAVIS_TAG:=master}"
+        - doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name gh-pages --command=doctr-versions-menu --built-docs $HOME/docs/build/html
+        - set +e

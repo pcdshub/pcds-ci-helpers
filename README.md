@@ -6,32 +6,7 @@ that may see common use.
 For TwinCAT projects, you can use the tools in this script with the following
 commands:
 
-```yaml
-matrix:
-  include:
-    - name: Project summary
-      python: 3.7
-      env: TWINCAT_SUMMARY=1
-    - name: Pragma linting
-      python: 3.7
-      env: TWINCAT_PRAGMALINT=1
-    - name: Documentation building
-      python: 3.7
-      env: TWINCAT_BUILD_DOCS=1
-    - name: Twincat Style
-      python: 3.7
-      env: TWINCAT_STYLE=1
-    - name: Pre-commit Checks
-      python: 3.7
-      env: PRE_COMMIT=1
-
-install:
-  # Import the helper scripts
-  - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
-  # Start the helper-script initialization + run based on environment variables
-  - source pcds-ci-helpers/travis/init.sh
-```
-
+[example_twincat_travis.yml](example_twincat_travis.yml)
 
 For Python projects, you can use the tools in this script with the following
 commands:

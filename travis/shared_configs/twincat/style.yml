@@ -1,0 +1,18 @@
+version: ~> 1.0
+
+jobs:
+  include:
+    - stage: test
+      name: "Style Check"
+      workspaces:
+        use: conda
+      install:
+        - source $HOME/env_config.sh
+
+      script:
+        - pushd $CI_HELPER_PATH/travis/tc3_style
+        - bash check.sh; exit_code=$?
+        # Attempt parsing the code, but use the return code from the simple
+        # check script
+        - bash parse.sh
+        - exit $exit_code

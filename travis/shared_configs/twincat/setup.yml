@@ -1,0 +1,48 @@
+version: ~> 1.0
+
+jobs:
+  include:
+      - stage: build
+        name: "Environment setup"
+        workspaces:
+          create:
+            name: conda
+            paths:
+              - $HOME/miniconda
+              - $HOME/.bash_profile
+              - $HOME/env_config.sh
+              - $HOME/pcds-ci-helpers
+
+        install:
+          - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+          - bash miniconda.sh -b -p $HOME/miniconda
+          - export PATH="$HOME/miniconda/bin:$PATH"
+          - conda init bash
+          - conda config --set always_yes yes --set changeps1 no
+          - conda config --add channels pcds-tag
+          - conda config --add channels conda-forge
+          - conda config --remove channels defaults
+
+          - pip install --upgrade pip
+          - pip install git+https://github.com/pcdshub/ads-deploy/
+          - pip install doctr sphinx recommonmark doctr-versions-menu pre-commit
+
+          # Useful for debugging
+          - conda info -a
+
+          - export CI_HELPER_PATH="$HOME/pcds-ci-helpers"
+          - export CI_HELPER_URL="${CI_HELPER_URL:-https://github.com/pcdshub/pcds-ci-helpers}"
+          - export CI_HELPER_BRANCH="${CI_HELPER_BRANCH:-master}"
+
+          - echo "Cloning CI helper tools from ${CI_HELPER_URL} @ ${CI_HELPER_BRANCH}..."
+          - git clone --single-branch --branch ${CI_HELPER_BRANCH} --depth 1 "${CI_HELPER_URL}" $CI_HELPER_PATH
+
+          - echo "export CI_HELPER_PATH=${CI_HELPER_PATH}" > $HOME/env_config.sh
+          - echo 'export TWINCAT_PROJECT_ROOT=${TWINCAT_PROJECT_ROOT:-$TRAVIS_BUILD_DIR}' >> $HOME/env_config.sh
+          - echo 'export PATH="$HOME/miniconda/bin:$PATH"' >> $HOME/env_config.sh
+          - echo 'conda init bash && source $HOME/.bash_profile && conda activate' >> $HOME/env_config.sh
+
+          - cat $HOME/env_config.sh
+
+        script:
+          - ads-deploy --help

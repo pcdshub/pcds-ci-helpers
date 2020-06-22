@@ -1,0 +1,36 @@
+version: ~> 1.0
+
+jobs:
+  include:
+    - stage: test
+      name: "Docs Build"
+      workspaces:
+        use: conda
+        create:
+          name: docs
+          paths:
+            - $HOME/docs
+
+      install:
+        - source $HOME/env_config.sh
+
+      before_script:
+        - export DOCS_FOLDER=$HOME/docs
+        - export DOCS_TEMPLATE_URL="${DOCS_TEMPLATE_URL:-https://github.com/pcdshub/twincat-docs-template}"
+        - export DOCS_TEMPLATE_BRANCH="${DOCS_TEMPLATE_BRANCH:-master}"
+
+        - echo "Cloning docs template from ${DOCS_TEMPLATE_URL} @ ${DOCS_TEMPLATE_BRANCH}..."
+        - git clone --single-branch --branch ${DOCS_TEMPLATE_BRANCH} --depth 1 "${DOCS_TEMPLATE_URL}" ${DOCS_FOLDER}
+
+      script:
+        - export SOLUTION="$(find . -iname '*.sln')"
+        - env |grep SOLUTION
+        - ads-deploy docs --output "${DOCS_FOLDER}/source" "${SOLUTION}"
+        - |
+          set -e
+          pushd ${DOCS_FOLDER}
+          make html
+          popd
+
+      after_script:
+        - set +e

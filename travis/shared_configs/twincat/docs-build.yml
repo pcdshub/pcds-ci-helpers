@@ -21,6 +21,10 @@ jobs:
 
         - echo "Cloning docs template from ${DOCS_TEMPLATE_URL} @ ${DOCS_TEMPLATE_BRANCH}..."
         - git clone --single-branch --branch ${DOCS_TEMPLATE_BRANCH} --depth 1 "${DOCS_TEMPLATE_URL}" ${DOCS_FOLDER}
+        - |
+          if [ -f "${DOCS_FOLDER}/requirements.txt" ]; then
+            pip install --requirement "${DOCS_FOLDER}/requirements.txt"
+          fi
 
       script:
         - export SOLUTION="$(find . -iname '*.sln')"

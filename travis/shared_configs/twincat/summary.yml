@@ -17,3 +17,6 @@ jobs:
                 pytmc summary --all --code --markdown "$tsproj"
                 echo "(Summary exited with code $?)"
             done < <(find . -name '*.tsproj' -print0)
+
+      after_script:
+        - travis_wait 5

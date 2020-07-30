@@ -12,6 +12,7 @@ jobs:
         (branch = master OR tag IS present)
       install:
         pip install doctr doctr-versions-menu
+        pip install pyparsing --upgrade
       script:
         - |
           if [[ ! -z "$DOCTR_VERSIONS_MENU" ]]; then

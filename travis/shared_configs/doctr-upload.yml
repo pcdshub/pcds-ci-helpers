@@ -20,5 +20,6 @@ jobs:
           fi
         - DEPLOY_DIR="${TRAVIS_TAG:=master}"
         - doctr deploy --build-tags $DEPLOY_DIR --deploy-branch-name gh-pages
-          $DOCTR_VERSIONS_COMMAND
+          $DOCTR_VERSIONS_COMMAND 2>&1 > /tmp/doctr_deploy.txt
+        - tail -n 10000 /tmp/doctr_deploy.txt
         - set +e

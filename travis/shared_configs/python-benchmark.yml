@@ -21,6 +21,7 @@ jobs:
           - conda config --add channels "file://`pwd`/bld-dir"
           # Useful for debugging
           - conda info -a
+          - conda config --show
           - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
           - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
 

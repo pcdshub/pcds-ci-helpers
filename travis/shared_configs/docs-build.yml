@@ -23,6 +23,7 @@ jobs:
         - conda config --add channels "file://`pwd`/bld-dir"
         # Useful for debugging
         - conda info -a
+        - conda config --show
         - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
         # Manage conda environment
         - conda create -n ${CONDA_ENV_NAME} python=$PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS}

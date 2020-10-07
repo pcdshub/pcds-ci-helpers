@@ -23,6 +23,7 @@ jobs:
           - conda update -q conda conda-build
           # Useful for debugging
           - conda info -a
+          - conda config --show
 
 
         script:

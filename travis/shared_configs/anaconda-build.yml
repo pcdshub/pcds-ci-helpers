@@ -14,9 +14,11 @@ jobs:
           - bash miniconda.sh -b -p $HOME/miniconda
           - export PATH="$HOME/miniconda/bin:$PATH"
           - conda config --set always_yes yes --set changeps1 no
+          - conda config --set channel_priority strict
           - conda config --add channels pcds-tag
           - conda config --add channels conda-forge
           - conda config --remove channels defaults
+          - conda config --show
 
           - conda install conda-build anaconda-client
           - conda update -q conda conda-build

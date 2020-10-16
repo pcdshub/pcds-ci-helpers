@@ -34,15 +34,15 @@ jobs:
           set -e
           if command -v coverage; then
               if [ -f "run_tests.py" ]; then
-                  coverage run --concurrency=thread --parallel-mode run_tests.py
+                  coverage run --concurrency=thread --parallel-mode run_tests.py ${PYTHON_TEST_OPTIONS}
               else
-                  coverage run --concurrency=thread --parallel-mode -m pytest
+                  coverage run --concurrency=thread --parallel-mode -m pytest ${PYTHON_TEST_OPTIONS}
               fi
               (coverage combine && coverage report | grep -v -e ' 0%') || true
           else
               if [ -f "run_tests.py" ]; then
-                  python run_tests.py
+                  python run_tests.py ${PYTHON_TEST_OPTIONS}
               else
-                  python -m pytest
+                  python -m pytest ${PYTHON_TEST_OPTIONS}
               fi
           fi

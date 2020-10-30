@@ -29,7 +29,7 @@ env:
     - PYTHON_LINT_OPTIONS="my_package"
     # Options to be passed to pytest for package test. Often, this will be left
     # blank but can be used to enable custom pytest features
-    - PYTHON_TEST_OPTIONS="-W"
+    - PYTEST_ADDOPTS="-W"
 
     # The name of the conda package
     - CONDA_PACKAGE="my_package"
@@ -360,7 +360,7 @@ env:
     # Requirements file with contents for tests dependencies
     - CONDA_REQUIREMENTS="dev-requirements.txt"
     # Options to be passed to pytest for package test.
-    - PYTHON_TEST_OPTIONS="-W"
+    - PYTEST_ADDOPTS="-W"
 ```
 
 #### shared_configs/docs-build.yml

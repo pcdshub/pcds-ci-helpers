@@ -23,9 +23,13 @@ env:
     - DOCTR_VERSIONS_MENU="1"
     # Dependency files used to build the documentation (space separated)
     - DOCS_REQUIREMENTS="dev-requirements.txt requirements.txt"
+
     # Options to be passed to flake8 for package linting. Usually this is just
     # the package name but you can enable other flake8 options via this config
     - PYTHON_LINT_OPTIONS="my_package"
+    # Options to be passed to pytest for package test. Often, this will be left
+    # blank but can be used to enable custom pytest features
+    - PYTEST_ADDOPTS=""
 
     # The name of the conda package
     - CONDA_PACKAGE="my_package"
@@ -355,6 +359,8 @@ env:
     - CONDA_EXTRAS="pip pyqt=5 happi"
     # Requirements file with contents for tests dependencies
     - CONDA_REQUIREMENTS="dev-requirements.txt"
+    # Options to be passed to pytest for package test.
+    - PYTEST_ADDOPTS=""
 ```
 
 #### shared_configs/docs-build.yml

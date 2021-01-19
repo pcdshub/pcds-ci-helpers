@@ -43,7 +43,7 @@ jobs:
                 echo "File not found: ${req}" 1>&2
                 travis_terminate 1
             else
-                pip install --upgrade --requirement "${req}"
+                pip install --requirement "${req}"
             fi
           done
       script:

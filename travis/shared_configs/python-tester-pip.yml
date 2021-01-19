@@ -13,7 +13,7 @@ jobs:
               echo "File not found: ${REQUIREMENTS}" 1>&2
               travis_terminate 1
           else
-              pip install --upgrade --requirement "${REQUIREMENTS}"
+              pip install --requirement "${REQUIREMENTS}"
           fi
         - |
           # Install development requirements
@@ -21,7 +21,7 @@ jobs:
               echo "File not found: ${DEV_REQUIREMENTS}" 1>&2
               travis_terminate 1
           else
-              pip install --upgrade --requirement "${DEV_REQUIREMENTS}"
+              pip install --requirement "${DEV_REQUIREMENTS}"
           fi
         - |
           # Install Extras such as PyQt5

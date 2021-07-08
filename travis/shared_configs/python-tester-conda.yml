@@ -6,7 +6,7 @@ jobs:
       stage: test
       name: "Python 3.7"
       env:
-        - PYTHON_VERSION: 3.7.3
+        - PYTHON_VERSION: 3.7
       workspaces:
         use: conda
       install: skip

@@ -4,7 +4,7 @@ jobs:
   include:
     - stage: deploy
       name: "Docs Upload"
-      python: 3.6
+      python: 3.8
       workspaces:
         use: docs
       if: |

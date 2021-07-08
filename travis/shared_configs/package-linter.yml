@@ -2,7 +2,7 @@ jobs:
   include:
     - stage: test
       name: "Package Linter"
-      python: 3.6
+      python: 3.8
       install:
         - pip install --upgrade pip
         #- pip install pcdsutils

@@ -1,8 +1,8 @@
 jobs:
   include:
     - stage: build
-      name: "Python 3.6 - PIP"
-      python: 3.6
+      name: "Python 3.8 - PIP"
+      python: 3.8
       install:
         - pip install --upgrade pip
         - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"

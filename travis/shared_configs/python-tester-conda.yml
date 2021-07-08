@@ -4,9 +4,9 @@ jobs:
   include:
     - &testpythonconda
       stage: test
-      name: "Python 3.6"
+      name: "Python 3.7"
       env:
-        - PYTHON_VERSION: 3.6
+        - PYTHON_VERSION: 3.7
       workspaces:
         use: conda
       install: skip
@@ -49,10 +49,10 @@ jobs:
               fi
           fi
     - <<: *testpythonconda
-      name: "Python 3.7"
-      env:
-        - PYTHON_VERSION: 3.7.3
-    - <<: *testpythonconda
       name: "Python 3.8"
       env:
         - PYTHON_VERSION: 3.8
+    - <<: *testpythonconda
+      name: "Python 3.9"
+      env:
+        - PYTHON_VERSION: 3.9

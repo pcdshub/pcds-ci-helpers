@@ -5,7 +5,7 @@ jobs:
       - stage: test
         name: "Benchmark"
         env:
-          - PYTHON_VERSION: ${BENCHMARK_PYTHON:=3.6}
+          - PYTHON_VERSION: ${BENCHMARK_PYTHON:=3.8}
         workspaces:
           use: conda
         install: skip

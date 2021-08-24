@@ -1,0 +1,21 @@
+version: ~> 1.0
+
+language: python
+os: linux
+dist: xenial
+
+stages:
+  - build
+  - test
+  - name: deploy
+    if: (branch = master OR tag IS present) AND type != pull_request
+
+import:
+  - travis/shared_configs/anaconda-build.yml
+  - travis/shared_configs/python-tester-pip.yml
+  - travis/shared_configs/python-tester-conda-latest.yml
+  - travis/shared_configs/python-linter.yml
+  - travis/shared_configs/docs-build.yml
+  - travis/shared_configs/pypi-upload.yml
+  - travis/shared_configs/doctr-upload.yml
+  - travis/shared_configs/anaconda-upload.yml

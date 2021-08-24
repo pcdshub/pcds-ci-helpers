@@ -47,10 +47,10 @@ env:
 
 jobs:
   allow_failures:
-    # This makes the PIP based Python 3.6 optional for passing.
+    # This makes the PIP based tests optional for passing.
     # Remove this block if passing tests with PIP is mandatory for your
     # package
-    - name: "Python 3.6 - PIP"
+    - name: "Python - PIP"
 
 import:
   # If your project requires X11 leave the following import
@@ -209,8 +209,8 @@ This import enables a set of standard python jobs including:
    - Python Linter
    - Package Linter
    - Documentation
-   - Python 3.6 - PIP based
-   - Python 3.6, 3.7 & 3.8 - Conda base
+   - Python 3.9 - PIP based
+   - Python 3.7, 3.8 & 3.9 - Conda base
  - Deploy Stage
    - Documentation using doctr
    - Conda Package - uploaded to pcds-dev and pcds-tag

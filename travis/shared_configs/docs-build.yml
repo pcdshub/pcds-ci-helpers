@@ -3,9 +3,9 @@ version: ~> 1.0
 jobs:
   include:
     - stage: test
-      name: "Docs Build (Python 3.8)"
+      name: "Docs Build"
       env:
-        - PYTHON_VERSION: 3.8
+        - PYTHON_VERSION: 3.9
       workspaces:
         create:
           name: docs

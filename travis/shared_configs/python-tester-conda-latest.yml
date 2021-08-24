@@ -1,7 +1,5 @@
 version: ~> 1.0
-
 # Run conda tests on the prod pcds python version and later
-
 jobs:
   include:
     - stage: test

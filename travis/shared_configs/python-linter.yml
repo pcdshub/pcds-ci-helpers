@@ -2,6 +2,7 @@ jobs:
   include:
     - stage: test
       name: "Python Linter"
+      python: 3.9
       install:
         - pip install flake8
       before_script:

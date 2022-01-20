@@ -11,6 +11,7 @@ stages:
     if: (branch = master OR tag IS present) AND type != pull_request
 
 import:
+  - travis/shared_configs/setup-env-ui.yml
   - travis/shared_configs/anaconda-build.yml
   - travis/shared_configs/python-tester-pip.yml
   - travis/shared_configs/python-tester-conda-latest.yml

@@ -3,6 +3,7 @@ jobs:
     - stage: build
       name: "Python - PIP"
       python: 3.9
+      env: MPLBACKEND=agg
       install:
         - pip install --upgrade pip
         - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"

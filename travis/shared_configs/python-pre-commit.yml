@@ -1,0 +1,9 @@
+version: ~> 1.0
+
+jobs:
+  include:
+    - stage: test
+      name: "Pre-commit Checks"
+      python: 3.9
+      script:
+        - bash $CI_HELPER_PATH/travis/pre_commit.sh

@@ -5,5 +5,12 @@ jobs:
     - stage: test
       name: "Pre-commit Checks"
       python: 3.9
+      install:
+        - export CI_HELPER_PATH="$HOME/pcds-ci-helpers"
+        - export CI_HELPER_URL="${CI_HELPER_URL:-https://github.com/pcdshub/pcds-ci-helpers}"
+        - export CI_HELPER_BRANCH="${CI_HELPER_BRANCH:-master}"
+
+        - echo "Cloning CI helper tools from ${CI_HELPER_URL} @ ${CI_HELPER_BRANCH}..."
+        - git clone --single-branch --branch ${CI_HELPER_BRANCH} --depth 1 "${CI_HELPER_URL}" $CI_HELPER_PATH
       script:
         - bash $CI_HELPER_PATH/travis/pre_commit.sh

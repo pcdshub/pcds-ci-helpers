@@ -10,9 +10,9 @@ jobs:
             paths:
               - bld-dir
         install:
-          - curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj micromamba
-          - ./micromamba shell init -s bash -p ~/conda
-          - ./micromamba activate
+          - curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+          - ./bin/micromamba shell init -s bash -p ~/conda
+          - ./bin/micromamba activate
           - mamba config --set always_yes yes
           - mamba config --set changeps1 no
           - mamba config --set channel_priority strict

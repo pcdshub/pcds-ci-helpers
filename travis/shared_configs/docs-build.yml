@@ -24,6 +24,7 @@ jobs:
         - micromamba config remove channels defaults
         - micromamba config prepend channels pcds-tag
         - micromamba config prepend channels conda-forge
+        - micromamba config prepend channels "file://`pwd`/bld-dir"
         # Useful for debugging
         - micromamba info
         - micromamba config list

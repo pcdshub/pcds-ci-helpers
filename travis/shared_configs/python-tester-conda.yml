@@ -12,25 +12,26 @@ jobs:
       install: skip
       before_script:
         - curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
-        - ./bin/micromamba shell init -s bash -p ~/conda
-        - ./bin/micromamba activate
-        - mamba config --set always_yes yes
-        - mamba config --set changeps1 no
-        - mamba config --set channel_priority strict
-        - mamba config --remove channels defaults
-        - mamba config --add channels pcds-tag
-        - mamba config --add channels conda-forge
+        - ./bin/micromamba shell hook --shell=bash
+        - mkdir ~/micromamba
+        - micromamba activate
+        - micromamba config --set always_yes yes
+        - micromamba config --set changeps1 no
+        - micromamba config --set channel_priority strict
+        - micromamba config --remove channels defaults
+        - micromamba config --add channels pcds-tag
+        - micromamba config --add channels conda-forge
         # Useful for debugging
-        - mamba info -a
-        - mamba config --show
+        - micromamba info
+        - micromamba config list
         - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
         - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
 
         # Manage conda environment
-        - mamba create -n ${CONDA_ENV_NAME} python=$PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
-        - ./bin/micromamba activate ${CONDA_ENV_NAME}
+        - micromamba create -n ${CONDA_ENV_NAME} python=$PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
+        - micromamba activate ${CONDA_ENV_NAME}
         # Useful for debugging
-        - mamba list
+        - micromamba list
       script:
         - |
           set -e

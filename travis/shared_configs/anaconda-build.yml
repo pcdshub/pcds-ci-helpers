@@ -11,18 +11,19 @@ jobs:
               - bld-dir
         install:
           - curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
-          - ./bin/micromamba shell init -s bash -p ~/conda
-          - ./bin/micromamba activate
-          - mamba config --set always_yes yes
-          - mamba config --set changeps1 no
-          - mamba config --set channel_priority strict
-          - mamba config --remove channels defaults
-          - mamba config --add channels pcds-tag
-          - mamba config --add channels conda-forge
+          - ./bin/micromamba shell hook --shell=bash
+          - mkdir ~/micromamba
+          - micromamba activate
+          - micromamba config --set always_yes yes
+          - micromamba config --set changeps1 no
+          - micromamba config --set channel_priority strict
+          - micromamba config --remove channels defaults
+          - micromamba config --add channels pcds-tag
+          - micromamba config --add channels conda-forge
           # Useful for debugging
-          - mamba info -a
-          - mamba config --show
-          - mamba install boa
+          - micromamba info
+          - micromamba config list
+          - micromamba install boa
 
         script:
           - echo "Conda Recipe Folder':' ${CONDA_RECIPE_FOLDER}"

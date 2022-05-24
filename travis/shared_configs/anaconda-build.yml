@@ -10,24 +10,22 @@ jobs:
             paths:
               - bld-dir
         install:
-          - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-          - bash miniconda.sh -b -p $HOME/miniconda
-          - export PATH="$HOME/miniconda/bin:$PATH"
-          - conda config --set always_yes yes --set changeps1 no
-          - conda config --set channel_priority strict
-          - conda config --add channels pcds-tag
-          - conda config --add channels conda-forge
-          - conda config --remove channels defaults
-
-          - conda install conda-build anaconda-client
-          - conda update -q conda conda-build
+          - curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj micromamba
+          - ./micromamba shell init -s bash -p ~/conda
+          - ./micromamba activate
+          - mamba config --set always_yes yes
+          - mamba config --set changeps1 no
+          - mamba config --set channel_priority strict
+          - mamba config --remove channels defaults
+          - mamba config --add channels pcds-tag
+          - mamba config --add channels conda-forge
           # Useful for debugging
-          - conda info -a
-          - conda config --show
-
+          - mamba info -a
+          - mamba config --show
+          - mamba install boa
 
         script:
           - echo "Conda Recipe Folder':' ${CONDA_RECIPE_FOLDER}"
           - echo "DEBUG RECIPE:"
           - cat ${CONDA_RECIPE_FOLDER}/meta.yaml
-          - conda build -q $CONDA_RECIPE_FOLDER --output-folder bld-dir --no-anaconda-upload
+          - conda mambabuild -q $CONDA_RECIPE_FOLDER --output-folder bld-dir --no-anaconda-upload

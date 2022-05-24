@@ -14,12 +14,12 @@ jobs:
           - eval "$(./bin/micromamba shell hook --shell=bash)"
           - mkdir ~/micromamba
           - micromamba activate
-          - micromamba config --set always_yes yes
-          - micromamba config --set changeps1 no
-          - micromamba config --set channel_priority strict
-          - micromamba config --remove channels defaults
-          - micromamba config --add channels pcds-tag
-          - micromamba config --add channels conda-forge
+          - micromamba config set always_yes yes
+          - micromamba config set changeps1 no
+          - micromamba config set channel_priority strict
+          - micromamba config remove channels defaults
+          - micromamba config prepend channels pcds-tag
+          - micromamba config prepend channels conda-forge
           # Useful for debugging
           - micromamba info
           - micromamba config list

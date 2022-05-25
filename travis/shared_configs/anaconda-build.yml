@@ -10,9 +10,13 @@ jobs:
             paths:
               - bld-dir
         install:
+          # Download micromamba
           - curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+          # Set up the shell for micromamba: adds some wrapper bash functions to the env
           - eval "$(./bin/micromamba shell hook --shell=bash)"
+          # Create the directory where our environments are stored, equivalent to miniconda's ~/miniconda3
           - mkdir ~/micromamba
+          # Activate our empty env and set up channel config
           - micromamba activate
           - micromamba config set always_yes yes
           - micromamba config set changeps1 no
@@ -23,6 +27,7 @@ jobs:
           # Useful for debugging
           - micromamba info
           - micromamba config list
+          # boa is the mamba equivalent of conda-build and provides the conda mambabuild command
           - micromamba install boa
 
         script:

@@ -10,9 +10,13 @@ jobs:
         use: conda
       install: skip
       before_script:
+        # Download micromamba
         - curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+        # Set up the shell for micromamba: adds some wrapper bash functions to the env
         - eval "$(./bin/micromamba shell hook --shell=bash)"
+        # Create the directory where our environments are stored, equivalent to miniconda's ~/miniconda3
         - mkdir ~/micromamba
+        # Activate our empty env and set up channel config
         - micromamba activate
         - micromamba config set always_yes yes
         - micromamba config set changeps1 no

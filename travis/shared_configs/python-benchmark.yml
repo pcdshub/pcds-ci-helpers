@@ -10,26 +10,32 @@ jobs:
           use: conda
         install: skip
         before_script:
-          - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-          - bash miniconda.sh -b -p $HOME/miniconda
-          - export PATH="$HOME/miniconda/bin:$PATH"
-          - conda config --set always_yes yes --set changeps1 no
-          - conda config --set channel_priority strict
-          - conda config --add channels pcds-tag
-          - conda config --add channels conda-forge
-          - conda config --remove channels defaults
-          - conda config --add channels "file://`pwd`/bld-dir"
+          # Download micromamba
+          - curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+          # Set up the shell for micromamba: adds some wrapper bash functions to the env
+          - eval "$(./bin/micromamba shell hook --shell=bash)"
+          # Create the directory where our environments are stored, equivalent to miniconda's ~/miniconda3
+          - mkdir ~/micromamba
+          # Activate our empty env and set up channel config
+          - micromamba activate
+          - micromamba config set always_yes yes
+          - micromamba config set changeps1 no
+          - micromamba config set channel_priority strict
+          - micromamba config remove channels defaults
+          - micromamba config prepend channels pcds-tag
+          - micromamba config prepend channels conda-forge
+          - micromamba config prepend channels "file://`pwd`/bld-dir"
           # Useful for debugging
-          - conda info -a
-          - conda config --show
+          - micromamba info
+          - micromamba config list
           - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
           - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
 
           # Manage conda environment
-          - conda create -n ${CONDA_ENV_NAME} python=$PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
-          - source activate ${CONDA_ENV_NAME}
+          - micromamba create -n ${CONDA_ENV_NAME} python=$PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
+          - micromamba activate ${CONDA_ENV_NAME}
           # Useful for debugging
-          - conda list
+          - micromamba list
         script:
           - |
             set -e

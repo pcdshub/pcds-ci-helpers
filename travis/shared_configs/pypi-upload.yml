@@ -2,6 +2,7 @@ jobs:
   include:
     - stage: deploy
       name: "PyPI Upload"
+      python: 3.9
       script: skip
       before_install: skip
       install: skip

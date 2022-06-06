@@ -54,7 +54,13 @@ jobs:
               fi
           fi
       after_failure:
-        - cat logs/run_tests_log.txt
+        - LOGFILE="${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}"
+        - |
+          if [ -f "${LOGFILE}" ]; then
+            cat "${LOGFILE}"
+          else
+            echo "Logfile ${LOGFILE} not found"
+          fi
     - <<: *testpythonconda
       name: "Python 3.8"
       env:

@@ -32,7 +32,6 @@ jobs:
           fi
       script:
         - |
-          set -e
           if command -v coverage; then
               if [ -f "run_tests.py" ]; then
                   coverage run --concurrency=thread --parallel-mode run_tests.py
@@ -46,4 +45,12 @@ jobs:
               else
                   python -m pytest
               fi
+          fi
+      after_failure:
+        - LOGFILE="${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}"
+        - |
+          if [ -f "${LOGFILE}" ]; then
+            cat "${LOGFILE}"
+          else
+            echo "Logfile ${LOGFILE} not found"
           fi

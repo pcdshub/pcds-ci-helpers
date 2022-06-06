@@ -39,7 +39,6 @@ jobs:
         - micromamba list
       script:
         - |
-          set -e
           if command -v coverage; then
               if [ -f "run_tests.py" ]; then
                   coverage run --concurrency=thread --parallel-mode run_tests.py

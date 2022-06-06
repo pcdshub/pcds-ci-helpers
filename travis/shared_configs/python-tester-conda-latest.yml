@@ -53,3 +53,5 @@ jobs:
                   python -m pytest
               fi
           fi
+      after_failure:
+        - cat logs/run_tests_log.txt

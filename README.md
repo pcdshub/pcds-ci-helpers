@@ -61,8 +61,8 @@ import:
   # - Tests
   #   - Linter
   #   - Documentation
-  #   - Python 3.6 - PIP based
-  #   - Python 3.6, 3.7 & 3.8 - Conda base
+  #   - Python 3.9 - PIP based
+  #   - Python 3.8 & 3.9 - Conda based
   # - Deploy
   #   - Documentation using doctr
   #   - Conda Package - uploaded to pcds-dev and pcds-tag
@@ -210,7 +210,7 @@ This import enables a set of standard python jobs including:
    - Package Linter
    - Documentation
    - Python 3.9 - PIP based
-   - Python 3.7, 3.8 & 3.9 - Conda base
+   - Python 3.8 & 3.9 - Conda base
  - Deploy Stage
    - Documentation using doctr
    - Conda Package - uploaded to pcds-dev and pcds-tag
@@ -261,7 +261,7 @@ import:
 
 #### shared_configs/python-tester-pip.yml
 `python-tester-pip.yml` runs any pytest tests it finds after installing the
-specified requirements via PIP using Python 3.6.
+specified requirements via PIP.
 
 ##### usage:
 This configuration can be added to the `build` stage of a Travis build by
@@ -325,7 +325,7 @@ import:
 #### shared_configs/python-tester-conda.yml
 `python-tester-conda.yml` runs any pytest tests it finds after installing the
 specified requirements via conda.
-The current test matrix includes Python 3.6, 3.7 and 3.8.
+The current test matrix includes Python 3.8 and 3.9.
 This job uses the workspace named `conda` for access to the `noarch`
 package previously built by the `anaconda-build.yml`, and thus must be
 used in conjuction with `anaconda-build.yml`.

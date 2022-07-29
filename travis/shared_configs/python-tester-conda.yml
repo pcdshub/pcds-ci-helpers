@@ -4,9 +4,9 @@ jobs:
   include:
     - &testpythonconda
       stage: test
-      name: "Python 3.7"
+      name: "Python 3.8"
       env:
-        - PYTHON_VERSION: 3.7
+        - PYTHON_VERSION: 3.8
       workspaces:
         use: conda
       install: skip
@@ -61,10 +61,6 @@ jobs:
           else
             echo "Logfile ${LOGFILE} not found"
           fi
-    - <<: *testpythonconda
-      name: "Python 3.8"
-      env:
-        - PYTHON_VERSION: 3.8
     - <<: *testpythonconda
       name: "Python 3.9"
       env:

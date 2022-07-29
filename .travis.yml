@@ -5,7 +5,7 @@ dist: xenial
 jobs:
   include:
     - name: Pre-commit Checks
-      python: 3.7
+      python: 3.9
       env: PRE_COMMIT=1
 
 install:

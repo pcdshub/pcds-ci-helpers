@@ -8,6 +8,7 @@ jobs:
         - pip install --upgrade pip
         - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"
         - echo "Dev Req File':' ${DEV_REQUIREMENTS:=dev-requirements.txt}"
+        - echo "Pip packages installed for CI':' ${PIP_CI_PACKAGES:=pytest-cov}"
         - |
           # Install requirements
           if [[ ! -f "${REQUIREMENTS}" ]]; then
@@ -30,22 +31,14 @@ jobs:
               echo "Installing extra pip dependencies."
               pip install ${PIP_EXTRAS}
           fi
-      script:
         - |
-          if command -v coverage; then
-              if [ -f "run_tests.py" ]; then
-                  coverage run --concurrency=thread --parallel-mode run_tests.py
-              else
-                  coverage run --concurrency=thread --parallel-mode -m pytest
-              fi
-              (coverage combine && coverage report | grep -v -e ' 0%') || true
-          else
-              if [ -f "run_tests.py" ]; then
-                  python run_tests.py
-              else
-                  python -m pytest
-              fi
+          # Install Extras such as PyQt5
+          if [[ ! -z "${PIP_CI_PACKAGES}" ]]; then
+              echo "Installing pip dependencies for CI."
+              pip install ${PIP_CI_PACKAGES}
           fi
+      script:
+        - python -m pytest --cov=.
       after_failure:
         - LOGFILE="${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}"
         - |

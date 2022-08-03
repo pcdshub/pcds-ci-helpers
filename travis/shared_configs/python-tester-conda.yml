@@ -31,6 +31,7 @@ jobs:
         - micromamba config list
         - echo "Conda Environment Name':' ${CONDA_ENV_NAME:=testenv}"
         - echo "Conda Requirements':' ${CONDA_REQUIREMENTS:=dev-requirements.txt}"
+        - echo "Conda packages installed for CI':' ${CONDA_CI_PACKAGES:=pytest-cov}"
 
         # Manage conda environment
         - micromamba create -n ${CONDA_ENV_NAME} python=$PYTHON_VERSION ${CONDA_PACKAGE} ${CONDA_EXTRAS} --file ${CONDA_REQUIREMENTS}
@@ -38,21 +39,7 @@ jobs:
         # Useful for debugging
         - micromamba list
       script:
-        - |
-          if command -v coverage; then
-              if [ -f "run_tests.py" ]; then
-                  coverage run --concurrency=thread --parallel-mode run_tests.py
-              else
-                  coverage run --concurrency=thread --parallel-mode -m pytest
-              fi
-              (coverage combine && coverage report | grep -v -e ' 0%') || true
-          else
-              if [ -f "run_tests.py" ]; then
-                  python run_tests.py
-              else
-                  python -m pytest
-              fi
-          fi
+        - python -m pytest --cov=.
       after_failure:
         - LOGFILE="${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}"
         - |

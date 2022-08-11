@@ -37,13 +37,12 @@ jobs:
         # Useful for debugging
         - micromamba list
       script:
-        - >
-          python -m pytest --
-            --cov=.
-            --log-file="${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}"
-            --log-file-format='%(asctime)s.%(msecs)03d %(module)-15s %(levelname)-8s %(threadName)-10s %(message)s'
-            --log-file-date-format='%H:%M:%S'
-            --log-level=DEBUG
+        - PYTEST_ARGS="--cov ."
+        - PYTEST_ARGS="$PYTEST_ARGS --log-file='${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}'"
+        - PYTEST_ARGS="$PYTEST_ARGS --log-file-format='%(asctime)s.%(msecs)03d %(module)-15s %(levelname)-8s %(threadName)-10s %(message)s'"
+        - PYTEST_ARGS="$PYTEST_ARGS --log-file-date-format='%H:%M:%S'"
+        - PYTEST_ARGS="$PYTEST_ARGS --log-level=DEBUG"
+        - python -m pytest ${PYTEST_ARGS}
       after_failure:
         - LOGFILE="${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}"
         - |

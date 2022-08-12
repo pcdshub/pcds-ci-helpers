@@ -4,6 +4,8 @@ jobs:
   include:
       - stage: build
         name: "Anaconda Build"
+        env:
+          - PYTHON_VERSION: 3.9
         workspaces:
           create:
             name: conda
@@ -34,4 +36,4 @@ jobs:
           - echo "Conda Recipe Folder':' ${CONDA_RECIPE_FOLDER}"
           - echo "DEBUG RECIPE:"
           - cat ${CONDA_RECIPE_FOLDER}/meta.yaml
-          - conda mambabuild -q $CONDA_RECIPE_FOLDER --output-folder bld-dir --no-anaconda-upload
+          - conda mambabuild -q $CONDA_RECIPE_FOLDER --output-folder bld-dir --no-anaconda-upload --python ${PYTHON_VERSION}

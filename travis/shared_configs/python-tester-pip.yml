@@ -38,12 +38,13 @@ jobs:
               pip install ${PIP_CI_PACKAGES}
           fi
       script:
-        - PYTEST_ARGS=("-v")
-        - PYTEST_ARGS+=("--cov=.")
-        - PYTEST_ARGS+=("--log-file='${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}'")
-        - PYTEST_ARGS+=("--log-format='%(asctime)s.%(msecs)03d %(module)-15s %(levelname)-8s %(threadName)-10s %(message)s'")
-        - PYTEST_ARGS+=("--log-file-date-format='%H:%M:%S'")
-        - PYTEST_ARGS+=("--log-level=DEBUG")
+        - |
+          PYTEST_ARGS=("-v")
+          PYTEST_ARGS+=("--cov=.")
+          PYTEST_ARGS+=("--log-file='${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}'")
+          PYTEST_ARGS+=("--log-format='%(asctime)s.%(msecs)03d %(module)-15s %(levelname)-8s %(threadName)-10s %(message)s'")
+          PYTEST_ARGS+=("--log-file-date-format='%H:%M:%S'")
+          PYTEST_ARGS+=("--log-level=DEBUG")
         - pytest "${PYTEST_ARGS[@]}"
       after_failure:
         - LOGFILE="${AFTER_FAILURE_LOGFILE:-logs/run_tests_log.txt}"

@@ -30,7 +30,6 @@ jobs:
           - micromamba info
           - micromamba config list
           # boa is the mamba equivalent of conda-build and provides the conda mambabuild command
-          # Constrain ourselves to ${PYTHON_VERSION} in case this package is version-dependent
           - micromamba install boa
 
         script:

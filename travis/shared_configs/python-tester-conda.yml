@@ -7,6 +7,7 @@ jobs:
       name: "Python 3.8"
       env:
         - PYTHON_VERSION: 3.8
+        - QT_QPA_PLATFORM: offscreen
       workspaces:
         use: conda
       install: skip

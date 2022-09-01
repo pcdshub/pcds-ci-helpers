@@ -6,6 +6,7 @@ jobs:
       name: "Python 3.9"
       env:
         - PYTHON_VERSION: 3.9
+        - QT_QPA_PLATFORM: offscreen
       workspaces:
         use: conda
       install: skip

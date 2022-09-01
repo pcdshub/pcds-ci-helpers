@@ -3,7 +3,9 @@ jobs:
     - stage: build
       name: "Python - PIP"
       python: 3.9
-      env: MPLBACKEND=agg
+      env:
+        - MPLBACKEND: agg
+        - QT_QPA_PLATFORM: offscreen
       install:
         - pip install --upgrade pip
         - echo "Req File':' ${REQUIREMENTS:=requirements.txt}"

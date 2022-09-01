@@ -32,7 +32,7 @@ jobs:
               pip install ${PIP_EXTRAS}
           fi
         - |
-          # Install Extras such as PyQt5
+          # Install packages required for continuous integration
           if [[ ! -z "${PIP_CI_PACKAGES}" ]]; then
               echo "Installing pip dependencies for CI."
               pip install ${PIP_CI_PACKAGES}

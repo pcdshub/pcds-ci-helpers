@@ -59,3 +59,7 @@ jobs:
       name: "Python 3.9"
       env:
         - PYTHON_VERSION: 3.9
+    - <<: *testpythonconda
+      name: "Python 3.10"
+      env:
+        - PYTHON_VERSION: 3.10

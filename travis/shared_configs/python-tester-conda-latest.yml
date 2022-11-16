@@ -2,7 +2,8 @@ version: ~> 1.0
 # Run conda tests on the prod pcds python version and later
 jobs:
   include:
-    - stage: test
+    - &testpythonconda
+      stage: test
       name: "Python 3.9"
       env:
         - PYTHON_VERSION: 3.9
@@ -54,3 +55,7 @@ jobs:
           else
             echo "Logfile ${LOGFILE} not found"
           fi
+    - <<: *testpythonconda
+      name: "Python 3.10"
+      env:
+        - PYTHON_VERSION: 3.10

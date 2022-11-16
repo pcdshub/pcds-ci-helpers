@@ -63,3 +63,5 @@ jobs:
       name: "Python 3.10"
       env:
         - PYTHON_VERSION: 3.10
+  allow_failures:
+    - name: "Python 3.10"

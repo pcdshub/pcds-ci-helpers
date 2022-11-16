@@ -6,7 +6,7 @@ jobs:
       stage: test
       name: "Python 3.8"
       env:
-        - PYTHON_VERSION: 3.8
+        - PYTHON_VERSION: "3.8"
         - QT_QPA_PLATFORM: offscreen
       workspaces:
         use: conda
@@ -58,4 +58,10 @@ jobs:
     - <<: *testpythonconda
       name: "Python 3.9"
       env:
-        - PYTHON_VERSION: 3.9
+        - PYTHON_VERSION: "3.9"
+    - <<: *testpythonconda
+      name: "Python 3.10"
+      env:
+        - PYTHON_VERSION: "3.10"
+  allow_failures:
+    - name: "Python 3.10"

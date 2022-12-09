@@ -26,6 +26,9 @@ jobs:
           - pip install --upgrade pip
           - pip install git+https://github.com/pcdshub/ads-deploy/
           - pip install doctr sphinx recommonmark doctr-versions-menu pre-commit
+          # packaging 22.0 breaks some builds by removing LegacyVersion.
+          # this will need to be resolved in a better way later.
+          - pip install packaging==21.3
 
           # Useful for debugging
           - conda info -a

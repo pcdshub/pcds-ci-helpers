@@ -28,7 +28,7 @@ jobs:
           - pip install doctr sphinx recommonmark doctr-versions-menu pre-commit
           # packaging 22.0 breaks some builds by removing LegacyVersion.
           # this will need to be resolved in a better way later.
-          - pip install packaging=21.3
+          - pip install packaging==21.3
 
           # Useful for debugging
           - conda info -a

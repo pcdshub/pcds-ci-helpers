@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass, field
-from typing import Any, Union
+from typing import Any, Union, Optional
 
 import apischema
 import yaml
@@ -38,16 +38,33 @@ def env_to_exports(env_list: Union[list[dict[str, str]], dict[str, str]]) -> lis
 
 
 @dataclass
+class Workspace:
+    create: dict[str, Any] = field(default_factory=dict)
+    use: Union[str, list[str]] = ""
+
+
+@dataclass
 class Job:
     stage: str = ""
     name: str = ""
     python: Union[float, str] = ""
-    env: list[dict[str, str]] = field(default_factory=list)
-    workspaces: dict[str, str] = field(default_factory=dict)
-    before_script: Script = field(default_factory=_empty_script)
+    env: list[dict[str, Union[str, int, float]]] = field(default_factory=list)
+    workspaces: Optional[Workspace] = None
+    before_install: Script = field(default_factory=_empty_script)
     install: Script = field(default_factory=_empty_script)
+    before_script: Script = field(default_factory=_empty_script)
     script: Script = field(default_factory=_empty_script)
+
+    before_deploy: Script = field(default_factory=_empty_script)
+    # TODO: apischema bug? 
+    # on: tags: true becomes -> True: {'tags': True}}
+    deploy: Optional[dict] = None
+    after_deploy: Script = field(default_factory=_empty_script)
+
+    after_script: Script = field(default_factory=_empty_script)
+    after_success: Script = field(default_factory=_empty_script)
     after_failure: Script = field(default_factory=_empty_script)
+    if_: str = field(default="", metadata=apischema.metadata.alias(arg="if"))
 
     def to_script(self) -> str:
         result = [
@@ -60,14 +77,28 @@ class Job:
             if result:
                 result.append("")
             result.append(f"# {desc}")
-            result.extend(lines.splitlines())
+            if lines in ("skip", ):
+                result.append("# (Skipped)")
+            else:
+                result.extend(lines.splitlines())
 
         if self.env:
             add_if_set("Environment settings:", "\n".join(env_to_exports(self.env)))
 
-        add_if_set("Before script:", self.before_script)
+        # Ref: https://docs.travis-ci.com/user/job-lifecycle/
+        add_if_set("Before install:", self.before_install)
         add_if_set("Install:", self.install)
+
+        add_if_set("Before script:", self.before_script)
         add_if_set("Script:", self.script)
+
+        add_if_set("Before deploy:", self.before_deploy)
+        if self.deploy is not None:
+            add_if_set("Deploy:", str(self.deploy))
+        add_if_set("After deploy:", self.after_deploy)
+
+        add_if_set("After script:", self.after_script)
+        add_if_set("After success:", self.after_success)
         add_if_set("After failure:", self.after_failure)
         return "\n".join(result)
 
@@ -87,8 +118,10 @@ class Jobs:
 
 def detravisify(contents: str) -> str:
     conf = yaml.load(contents, Loader=yaml.Loader)
-    import pprint
-    pprint.pprint(conf["jobs"])
+    if "jobs" not in conf:
+        print("No jobs in Travis configuration", file=sys.stderr)
+        return ""
+
     jobs = apischema.deserialize(Jobs, conf["jobs"])
 
     result = []

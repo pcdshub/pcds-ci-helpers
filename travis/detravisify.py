@@ -27,12 +27,16 @@ def _(value: Union[str, list[str]]) -> Script:
 
     return Script(value)
 
-def env_to_exports(env_list: Union[list[dict[str, str]], dict[str, str]]) -> list[str]:
+
+def env_to_exports(env_list: EnvironmentVariables) -> list[str]:
     res = []
     if isinstance(env_list, dict):
         env_list = [env_list]
     for env in env_list:
+        if isinstance(env, str):
+            env = dict([env.split("=", 1)])
         for var, value in env.items():
+            value = str(value).removeprefix('"').removesuffix('"')
             res.append(f'export {var}="{value}"')
     return res
 
@@ -43,12 +47,30 @@ class Workspace:
     use: Union[str, list[str]] = ""
 
 
+EnvironmentVariable = Union[
+    str,
+    dict[str, Union[str, int, float]],
+]
+EnvironmentVariables = list[EnvironmentVariable]
+
+@dataclass
+class Environment:
+    global_: EnvironmentVariables = field(
+        default_factory=list, metadata=apischema.metadata.alias(arg="global")
+    )
+
+    def to_script(self) -> str:
+        if not self.global_:
+            return ""
+        return "\n".join(env_to_exports(self.global_))
+    
+
 @dataclass
 class Job:
     stage: str = ""
     name: str = ""
     python: Union[float, str] = ""
-    env: list[dict[str, Union[str, int, float]]] = field(default_factory=list)
+    env: EnvironmentVariables = field(default_factory=list)
     workspaces: Optional[Workspace] = None
     before_install: Script = field(default_factory=_empty_script)
     install: Script = field(default_factory=_empty_script)
@@ -123,8 +145,13 @@ def detravisify(contents: str) -> str:
         return ""
 
     jobs = apischema.deserialize(Jobs, conf["jobs"])
+    env = apischema.deserialize(Environment, conf.get("env", {}))
 
+    env_script = env.to_script()
     result = []
+
+    if env_script:
+        result.append(env_script)
     for job in jobs.include:
         result.append(job.to_script())
 

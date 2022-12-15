@@ -140,11 +140,7 @@ class Jobs:
 
 def detravisify(contents: str) -> str:
     conf = yaml.load(contents, Loader=yaml.Loader)
-    if "jobs" not in conf:
-        print("No jobs in Travis configuration", file=sys.stderr)
-        return ""
-
-    jobs = apischema.deserialize(Jobs, conf["jobs"])
+    jobs = apischema.deserialize(Jobs, conf.get("jobs", {}))
     env = apischema.deserialize(Environment, conf.get("env", {}))
 
     env_script = env.to_script()

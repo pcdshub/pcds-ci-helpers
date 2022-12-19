@@ -48,7 +48,7 @@ env:
     always_yes: true
     changeps1: false
 
-     
+
 # Shell settings notes:
 # The following allows for each run step to utilize ~/.bash_profile
 # for setting up the per-step initial state.
@@ -111,12 +111,12 @@ runs:
     run: |
       micromamba install boa conda-verify "python=${{ inputs.python-version }}"
       micromamba info
-  
+
   - name: Check condarc
     shell: bash --login -eo pipefail {0}
     run: |
       cat ~/.condarc
-  
+
   - name: Check the conda recipe
     shell: bash --login -eo pipefail {0}
     run: |
@@ -177,12 +177,12 @@ runs:
         --log-file-date-format='%H:%M:%S' \
         --log-level=DEBUG \
         2>&1 | tee "$HOME/logs/pytest_log.txt"
-  
+
   - name: After failure
     shell: bash --login -eo pipefail {0}
     if: ${{ failure() }}
     run: |
-      # On failure: 
+      # On failure:
       # * Include the conda environment details
       # * Include the pytest log in the step summary (but not in the step output as it's available in the previous step)
       # * Include the debug log in the step output (but not the step summary as it's too verbose)

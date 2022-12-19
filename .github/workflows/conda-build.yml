@@ -137,11 +137,11 @@ jobs:
       run: |
         micromamba install boa conda-verify "python=${{ inputs.python-version }}"
         micromamba info
-    
+
     - name: Check condarc
       run: |
         cat ~/.condarc
-    
+
     - name: Check the conda recipe
       run: |
         echo "Conda Recipe Folder':' ${{ inputs.recipe-folder }}"
@@ -187,7 +187,7 @@ jobs:
       run: |
         quoted_args() (
           # Ref: https://unix.stackexchange.com/questions/267677
-          sed 's/ /" "/g;s/.*/"&"/' 
+          sed 's/ /" "/g;s/.*/"&"/'
         )
         testing_extras=$( echo '${{ inputs.testing-extras }}' | quoted_args )
         ci_extras=$( echo '${{ inputs.ci-extras }}' | quoted_args )
@@ -205,11 +205,11 @@ jobs:
           --log-file-date-format='%H:%M:%S' \
           --log-level=DEBUG \
           2>&1 | tee "$HOME/logs/pytest_log.txt"
-    
+
     - name: After failure
       if: ${{ failure() }}
       run: |
-        # On failure: 
+        # On failure:
         # * Include the conda environment details
         # * Include the pytest log in the step summary (but not in the step output as it's available in the previous step)
         # * Include the debug log in the step output (but not the step summary as it's too verbose)
@@ -235,4 +235,3 @@ jobs:
         name: Python ${{ inputs.python-version }} - conda - testing log
         path: "~/logs"
         retention-days: 30
-

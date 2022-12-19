@@ -63,7 +63,7 @@ class Environment:
         if not self.global_:
             return ""
         return "\n".join(env_to_exports(self.global_))
-    
+
 
 @dataclass
 class Job:
@@ -78,7 +78,7 @@ class Job:
     script: Script = field(default_factory=_empty_script)
 
     before_deploy: Script = field(default_factory=_empty_script)
-    # TODO: apischema bug? 
+    # TODO: apischema bug?
     # on: tags: true becomes -> True: {'tags': True}}
     deploy: Optional[dict] = None
     after_deploy: Script = field(default_factory=_empty_script)
@@ -92,7 +92,7 @@ class Job:
         result = [
             f"# Job: {self.name} (stage: {self.stage})",
         ]
-        
+
         def add_if_set(desc: str, lines: str):
             if not lines:
                 return

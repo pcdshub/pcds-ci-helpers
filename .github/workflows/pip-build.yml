@@ -157,11 +157,11 @@ jobs:
           --log-file-date-format='%H:%M:%S' \
           --log-level=DEBUG \
           2>&1 | tee "$HOME/logs/pytest_log.txt"
-    
+
     - name: After failure
       if: ${{ failure() }}
       run: |
-        # On failure: 
+        # On failure:
         # * Include the pip package details
         # * Include the pytest log in the step summary (but not in the step output as it's available in the previous step)
         # * Include the debug log in the step output (but not the step summary as it's too verbose)

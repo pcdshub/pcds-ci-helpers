@@ -32,19 +32,9 @@ on:
         required: false
         default: false
         type: boolean
-      # upload-artifact:
-      #   description: "Upload built documentation as an artifact"
-      #   required: false
-      #   default: false
-      #   type: boolean
       docs-extras:
-        default: ""
-        description: "Extra packages to be installed for testing"
-        required: false
-        type: string
-      ci-extras:
         default: "docs-versions-menu packaging==21.3"
-        description: "CI-specific packages to be installed"
+        description: "Extra packages to be installed for documentation"
         required: false
         type: string
       requirements-files:
@@ -59,19 +49,10 @@ env:
   QT_QPA_PLATFORM: "offscreen"
 
 jobs:
-  build-and-deploy:
-    name: "Documentation building with Python ${{ inputs.python-version }}"
+  build:
+    name: "Python ${{ inputs.python-version }}: documentation building"
     runs-on: ubuntu-20.04
     continue-on-error: ${{ inputs.experimental }}
-
-    permissions:
-      # to deploy to Pages
-      pages: write
-      # push to repo gh-pages branch (*gasp*; is there a better way?)
-      contents: write
-      # deployments: write
-      # to verify the deployment originates from an appropriate source
-      id-token: write
 
     defaults:
       run:
@@ -85,10 +66,6 @@ jobs:
     outputs:
       deploy_version: ${{ steps.version.outputs.built_docs_version }}
 
-    environment:
-      name: gh-pages
-      # url: ${{ steps.build-and-deploy.outputs.page_url }}
-
     steps:
     - uses: actions/checkout@v3
       with:
@@ -101,24 +78,6 @@ jobs:
             | tee "$GITHUB_STEP_SUMMARY"
           exit 1
         fi
-
-    - name: Determine package name if unset
-      run: |
-        if [[ -n "${{ inputs.package-name }}" ]]; then
-          package_name="${{ inputs.package-name }}"
-          echo "Package name specified as a workflow input"
-        else
-          if [[ -n "${{ github.base_ref }}" ]]; then
-            repo="${{ github.base_ref }}"
-          else
-            repo="${{ github.repository }}"
-          fi
-          owner=$(dirname "$repo")
-          package_name=$(basename "$repo")
-        fi
-
-        set -xe
-        echo "package_name=${package_name}" >> "$GITHUB_ENV"
 
     - name: Check version tag for deployment
       id: version
@@ -140,7 +99,7 @@ jobs:
       run: |
         echo "* Package to be built: ${{ inputs.package-name }}"
         echo "* Pip 'extras' for documentation: ${{ inputs.docs-extras }}"
-        echo "* General pip packages required for documentation: ${{ inputs.ci-extras }}"
+        echo "* General pip packages required for documentation: ${{ inputs.docs-extras }}"
 
         if [ -z "${{ steps.version.outputs.built_docs_version }}" ]; then
           echo "Built docs version unset? See previous step"
@@ -163,7 +122,7 @@ jobs:
       run: |
         pip install .
 
-    - name: Installing CI extras and testing extras
+    - name: Installing documentation extras
       run: |
         # 1. escape '<' so the user doesn't have to
         # 2. escape '>' so the user doesn't have to
@@ -171,23 +130,21 @@ jobs:
         # conda expects pkg=ver but pip expects pkg==ver; using a basic
         # (not =)=(not =) to avoid incompatibility with macOS sed not supporting
         # '=\+'
-        input_requirements=$(
-          echo "${{ inputs.ci-extras }} ${{ inputs.docs-extras }}" |
-          sed -e "s/</\</g" |
-          sed -e "s/>/\>/g" |
-          sed -e 's/\([^=]\)=\([^=]\)/\1==\2/g'
-        )
+        #
+        if [ -n "${{ inputs.docs-extras }}" ]; then
+          input_requirements=$(
+            echo "${{ inputs.docs-extras }}" |
+            sed -e "s/</\</g" |
+            sed -e "s/>/\>/g" |
+            sed -e 's/\([^=]\)=\([^=]\)/\1==\2/g'
+          )
 
-        declare -a test_requirements=()
-        for req in $input_requirements; do
-          test_requirements+=( "$req" )
-        done
-
-        if [[ ${#test_requirements[@]} -gt 0 ]]; then
-          echo "CI extras: ${{ inputs.ci-extras }}"
-          echo "Testing extras: ${{ inputs.docs-extras }}"
+          declare -a docs_requirements=()
+          for req in $input_requirements; do
+            docs_requirements+=( "$req" )
+          done
           set -x
-          pip install "${test_requirements[@]}"
+          pip install "${docs_requirements[@]}"
         else
           echo "No extras to install."
         fi
@@ -211,73 +168,7 @@ jobs:
         cd "${{ inputs.docs-directory }}"
         make html 2>&1 | tee $HOME/logs/docs-build.txt
 
-    - name: Configure git for docs deployment
-      run: |
-        git config --global user.name github-actions
-        git config --global user.email github-actions@github.com
-        git config --global init.defaultBranch gh-pages
-
-    - name: Update documentation with docs-versions-menu
-      run: |
-        cd "${{ inputs.docs-directory }}/${{ inputs.docs-build-directory }}"
-
-        # Adapted from docs-version-menu workflow and my old caproto attempt:
-        # - https://github.com/goerz/docs_versions_menu/blob/master/.github/workflows/docs.yml
-        # - https://github.com/caproto/caproto/blob/master/.github/workflows/docs.yml
-        set -x
-        git clone --branch gh-pages https://github.com/${{ github.repository }} "$HOME/gh-pages" || (
-          mkdir "$HOME/gh-pages"
-          cd "$HOME/gh-pages"
-          git init
-        )
-        rsync -av --delete "./html/" "$HOME/gh-pages/${{ steps.version.outputs.built_docs_version }}/"
-
-        # Run docs-versions-menu
-        cd "$HOME/gh-pages"
-        docs-versions-menu
-
-    - name: Commit updated documentation to gh-pages
-      run: |
-        cd "$HOME/gh-pages"
-
-        git add -A --verbose
-        git status
-
-        if ! git rev-parse HEAD &>/dev/null ; then
-          git commit --verbose \
-            -m "Initial commit of documentation" \
-            -m "Deployed from commit ${GITHUB_SHA} (${GITHUB_REF})"
-        else
-          commit_message_file="$HOME/logs/documentation_commit_message.txt"
-          git log --format=%B -n 1 | tee "${commit_message_file}"
-          last_log_line=$(cat "${commit_message_file}" | grep -v '^$' | tail -n1)
-          last_author=$(git log --format=%an -n 1)
-          if [[ "$last_author" == "github-actions"* && "$last_log_line" == *"${{ github.ref }}"* ]]; then
-            # Amend if the previous commit was done by Actions and was based on the same branch/tag name
-            echo "Amending previous commit"
-            echo "Deployed from commit ${GITHUB_SHA} (${GITHUB_REF})" >> "${commit_message_file}"
-            git commit --verbose --amend --file="${commit_message_file}"
-          else
-            echo "Making new commit"
-            git commit --verbose \
-              -m "Auto-update from Github Actions Workflow" \
-              -m "Deployed from commit ${GITHUB_SHA} (${GITHUB_REF})"
-          fi
-        fi
-        git log -n 2 --stat
-
-    - name: Pushing documentation
-      if: ${{ inputs.deploy }}
-      run: |
-        cd "$HOME/gh-pages"
-        # --force-with-lease=gh-pages
-        git push --verbose \
-          --force \
-          "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" \
-          gh-pages
-
     - name: Upload documentation as artifact
-      if: ${{ always() }}
       uses: actions/upload-artifact@v3
       with:
         name: Python ${{ inputs.python-version }} - documentation
@@ -291,3 +182,153 @@ jobs:
         name: Python ${{ inputs.python-version }} - documentation - logs
         path: "~/logs"
         retention-days: 30
+
+  deploy:
+    name: "Documentation deployment"
+    runs-on: ubuntu-20.04
+    needs: build
+    if: ${{ inputs.deploy }}
+
+    permissions:
+      # to deploy to Pages
+      pages: write
+      # push to repo gh-pages branch (*gasp*; is there a better way?)
+      contents: write
+      # deployments: write
+      # to verify the deployment originates from an appropriate source
+      id-token: write
+
+    defaults:
+      run:
+        # The following allows for each run step to utilize ~/.bash_profile
+        # for setting up the per-step initial state.
+        # --login: a login shell. Source ~/.bash_profile
+        # -e: exit on first error
+        # -o pipefail: piped processes are important; fail if they fail
+        shell: bash --login -eo pipefail {0}
+
+    environment:
+      name: gh-pages
+      # url: ${{ steps.build-and-deploy.outputs.page_url }}
+
+    steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '${{ inputs.python-version }}'
+
+    - name: Upgrade pip
+      run: |
+        pip install --upgrade pip
+
+    - name: Installing documentation extras
+      run: |
+        # 1. escape '<' so the user doesn't have to
+        # 2. escape '>' so the user doesn't have to
+        # 3. allow conda/pip to use the same requirements spec;
+        # conda expects pkg=ver but pip expects pkg==ver; using a basic
+        # (not =)=(not =) to avoid incompatibility with macOS sed not supporting
+        # '=\+'
+        if [ -n "${{ inputs.docs-extras }}" ]; then
+          input_requirements=$(
+            echo "${{ inputs.docs-extras }}" |
+            sed -e "s/</\</g" |
+            sed -e "s/>/\>/g" |
+            sed -e 's/\([^=]\)=\([^=]\)/\1==\2/g'
+          )
+
+          declare -a docs_requirements=()
+          for req in $input_requirements; do
+            docs_requirements+=( "$req" )
+          done
+          set -x
+          pip install "${docs_requirements[@]}"
+        else
+          echo "No extras to install."
+        fi
+
+    - name: Installing requirements from files
+      run: |
+        for filename in ${{ inputs.requirements-files }}; do
+          if [[ -f "${filename}" ]]; then
+              pip install --requirement "${filename}"
+          fi
+        done
+
+    - name: Download documentation artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: Python ${{ inputs.python-version }} - documentation
+
+    - name: Configure git for docs deployment
+      run: |
+        git config --global user.name github-actions
+        git config --global user.email github-actions@github.com
+        git config --global init.defaultBranch gh-pages
+
+    - name: List cached documentation
+      run: |
+        ls -lR
+
+    - name: Update documentation with docs-versions-menu
+      run: |
+        # Adapted from docs-versions-menu workflow and my old caproto attempt:
+        # - https://github.com/goerz/docs_versions_menu/blob/master/.github/workflows/docs.yml
+        # - https://github.com/caproto/caproto/blob/master/.github/workflows/docs.yml
+        set -x
+        git clone --branch gh-pages https://github.com/${{ github.repository }} "$HOME/gh-pages" || (
+          mkdir "$HOME/gh-pages"
+          cd "$HOME/gh-pages"
+          git init
+        )
+        rsync -av --delete "./html/" "$HOME/gh-pages/${{ needs.build.outputs.deploy_version }}/"
+
+        # Run docs-versions-menu
+        cd "$HOME/gh-pages"
+        docs-versions-menu
+
+    - name: Commit updated documentation to gh-pages
+      run: |
+        cd "$HOME/gh-pages"
+
+        git add --all --verbose
+        git status
+
+        if ! git rev-parse HEAD &>/dev/null ; then
+          git commit --verbose \
+            -m "Initial commit of documentation" \
+            -m "Deployed from commit ${GITHUB_SHA} (${GITHUB_REF})"
+        else
+          commit_message_file="$HOME/documentation_commit_message.txt"
+          echo "The commit message will be:"
+          echo "---------------------------"
+          git log --format=%B -n 1 | tee "${commit_message_file}"
+          echo "---------------------------"
+          last_log_line=$(cat "${commit_message_file}" | grep -v '^$' | tail -n1)
+          last_author=$(git log --format=%an -n 1)
+          echo "Last log line: ${last_log_line}"
+          echo "Last author: ${last_author}"
+          echo "Current ref: ${{ github.ref }}"
+          if [[ "$last_author" == "github-actions"* && "$last_log_line" == *"${{ github.ref }}"* ]]; then
+            # Amend if the previous commit was done by Actions and was based on the same branch/tag name
+            echo "Amending previous commit"
+            echo "Deployed from commit ${GITHUB_SHA} (${GITHUB_REF})" >> "${commit_message_file}"
+            git commit --verbose --amend --file="${commit_message_file}"
+          else
+            echo "Making new commit"
+            git commit --verbose \
+              -m "Auto-update from Github Actions Workflow" \
+              -m "Deployed from commit ${GITHUB_SHA} (${GITHUB_REF})" ||
+                echo "Documentation unchanged"
+          fi
+        fi
+        git log -n 2 --stat
+
+    - name: Pushing documentation
+      if: ${{ inputs.deploy }}
+      run: |
+        cd "$HOME/gh-pages"
+        # --force-with-lease=gh-pages
+        git push --verbose \
+          --force \
+          "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" \
+          gh-pages

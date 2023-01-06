@@ -17,6 +17,11 @@ on:
         required: false
         default: false
         type: boolean
+      deploy-on-success:
+        description: "Deploy to PyPI on success (and when appropriate)"
+        required: false
+        default: false
+        type: boolean
       testing-extras:
         default: ""
         description: "Extra packages to be installed for testing"
@@ -39,8 +44,8 @@ env:
   QT_QPA_PLATFORM: "offscreen"
 
 jobs:
-  build-and-test:
-    name: "Pip test with Python ${{ inputs.python-version }}"
+  test:
+    name: "Python ${{ inputs.python-version }}: pip"
     runs-on: ubuntu-20.04
     continue-on-error: ${{ inputs.experimental }}
 
@@ -66,27 +71,9 @@ jobs:
         (echo "Package version: $(git describe --tags)" | tee "$GITHUB_STEP_SUMMARY") || \
           echo "::warning::Git tags not found in repository. Build may fail!"
 
-    - name: Determine package name if unset
-      run: |
-        if [[ -n "${{ inputs.package-name }}" ]]; then
-          package_name="${{ inputs.package-name }}"
-          echo "Package name specified as a workflow input"
-        else
-          if [[ -n "${{ github.base_ref }}" ]]; then
-            repo="${{ github.base_ref }}"
-          else
-            repo="${{ github.repository }}"
-          fi
-          owner=$(dirname "$repo")
-          package_name=$(basename "$repo")
-        fi
-
-        set -xe
-        echo "package_name=${package_name}" >> "$GITHUB_ENV"
-
     - name: Check environment variables for issues
       run: |
-        echo "* Package to be built: ${package_name}"
+        echo "* Package to be built: ${{ inputs.package-name }}"
         echo "* Pip 'extras' for CI testing: ${{ inputs.testing-extras }}"
         echo "* General pip packages required for CI testing: ${{ inputs.ci-extras }}"
 
@@ -102,9 +89,28 @@ jobs:
       run: |
         pip install --upgrade pip
 
-    - name: Installing package
+    - name: Build wheel and source distribution
       run: |
-        pip install .
+        python -m pip install twine build
+        export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+        echo "Source date epoch set to ${SOURCE_DATE_EPOCH} for reproducible build"
+        # See: https://github.com/python/cpython/pull/5200
+        # And: https://reproducible-builds.org/docs/source-date-epoch/
+        # (I learned about this from DLS)
+        python -m build --sdist --wheel --outdir ./dist
+
+    - name: Check the source distribution
+      run: |
+        python -m venv test-source-env
+        source test-source-env/bin/activate
+
+        python -m pip install ./dist/*.gz
+        python -c "import ${{ inputs.package-name }}; print('Imported ${{ inputs.package-name }} successfully')"
+
+    - name: Use the wheel for testing
+      run: |
+        python -m pip install ./dist/*.whl
+        python -c "import ${{ inputs.package-name }}; print('Imported ${{ inputs.package-name }} successfully')"
 
     - name: Installing CI extras and testing extras
       run: |
@@ -166,16 +172,19 @@ jobs:
         # * Include the pytest log in the step summary (but not in the step output as it's available in the previous step)
         # * Include the debug log in the step output (but not the step summary as it's too verbose)
         (
-          echo "## Failure debugging"
           echo "### Pip list"
-          echo "```"
+          echo "<details>"
+          echo ""
+          echo '```'
           pip list | egrep -v -e "^#"
-          echo "```"
+          echo '```'
+          echo "</details>"
 
+          echo ""
           echo "### Pytest log"
-          echo "```python"
+          echo '```python'
           cat "$HOME/logs/pytest_log.txt" || echo "# Pytest log not found?"
-          echo "```"
+          echo '```'
         ) >> "$GITHUB_STEP_SUMMARY"
 
         echo "## Debug log"
@@ -188,3 +197,18 @@ jobs:
         name: Python ${{ inputs.python-version }} - pip - testing log
         path: "~/logs"
         retention-days: 30
+
+    - name: Upload the package as an artifact
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: Python ${{ inputs.python-version }} - pip - package
+        path: dist
+        retention-days: 30
+
+    - name: PyPI deployment
+      if: inputs.deploy-on-success && github.ref_type == 'tag'
+      env:
+        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      run: |
+        twine upload "dist/*.gz" "dist/*.whl"

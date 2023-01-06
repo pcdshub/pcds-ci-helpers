@@ -17,6 +17,11 @@ on:
         required: false
         default: false
         type: boolean
+      deploy-on-success:
+        description: "Deploy to pcds-tag/pcds-dev on success and when appropriate"
+        required: false
+        default: false
+        type: boolean
       recipe-folder:
         default: "conda-recipe/"
         description: "The conda recipe folder"
@@ -32,6 +37,11 @@ on:
         description: "CI-specific packages to be installed"
         required: false
         type: string
+      use-setuptools-scm:
+        description: "Install and configure setuptools-scm prior to conda-build"
+        required: false
+        default: false
+        type: boolean
       requirements-file:
         default: "dev-requirements.txt"
         description: "Development requirements filename"
@@ -60,7 +70,7 @@ env:
 
 jobs:
   build-and-test:
-    name: "Conda test with Python ${{ inputs.python-version }}"
+    name: "Python ${{ inputs.python-version }}: conda"
     runs-on: ubuntu-20.04
     continue-on-error: ${{ inputs.experimental }}
 
@@ -78,24 +88,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Determine package name if unset
-      run: |
-        if [[ -n "${{ inputs.package-name }}" ]]; then
-          package_name="${{ inputs.package-name }}"
-          echo "Package name specified as a workflow input"
-        else
-          if [[ -n "${{ github.base_ref }}" ]]; then
-            repo="${{ github.base_ref }}"
-          else
-            repo="${{ github.repository }}"
-          fi
-          owner=$(dirname "$repo")
-          package_name=$(basename "$repo")
-        fi
-
-        set -xe
-        echo "package_name=${package_name}" >> "$GITHUB_ENV"
-
     - name: Check version to be built
       run: |
         # NOTE: If you run CI on your own fork, you may not have the right version
@@ -106,7 +98,7 @@ jobs:
 
     - name: Check environment variables for issues
       run: |
-        echo "* Conda package to be built: ${package_name}"
+        echo "* Conda package to be built: ${{ inputs.package-name }}"
         echo "* Conda 'extras' for CI testing: ${{ inputs.testing-extras }}"
         echo "* General conda packages required for CI testing: ${{ inputs.ci-extras }}"
         echo "* Conda recipe folder: ${{ inputs.recipe-folder }}"
@@ -148,6 +140,12 @@ jobs:
         echo "The recipe to be built is as follows:"
         cat "${{ inputs.recipe-folder }}/meta.yaml"
 
+    - name: Configure setuptools-scm
+      if: ${{ inputs.use-setuptools-scm }}
+      run: |
+        micromamba install setuptools-scm
+        python -m setuptools_scm
+
     - name: Build the conda package and create the test environment
       run: |
         conda mambabuild "${{ inputs.recipe-folder }}" \
@@ -185,16 +183,29 @@ jobs:
 
     - name: Install additional test dependencies
       run: |
-        quoted_args() (
-          # Ref: https://unix.stackexchange.com/questions/267677
-          sed 's/ /" "/g;s/.*/"&"/'
+        # 1. escape '<' so the user doesn't have to
+        # 2. escape '>' so the user doesn't have to
+        input_requirements=$(
+          echo "${{ inputs.ci-extras }} ${{ inputs.testing-extras }}" |
+          sed -e "s/</\</g" |
+          sed -e "s/>/\>/g"
         )
-        testing_extras=$( echo '${{ inputs.testing-extras }}' | quoted_args )
-        ci_extras=$( echo '${{ inputs.ci-extras }}' | quoted_args )
-        echo "CI extras: ${{ inputs.ci-extras }} -> ${ci_extras}"
-        echo "Testing extras: ${{ inputs.testing-extras }} -> ${testing_extras}"
-        echo "Requirements file: ${{ inputs.requirements-file }}"
-        mamba install ${testing_extras} ${ci_extras} --file="${{ inputs.requirements-file }}"
+
+        declare -a test_requirements=()
+        for req in $input_requirements; do
+          test_requirements+=( "$req" )
+        done
+
+        if [[ ${#test_requirements[@]} -gt 0 ]]; then
+          echo "CI extras: ${{ inputs.ci-extras }}"
+          echo "Testing extras: ${{ inputs.testing-extras }}"
+          echo "In summary: ${test_requirements[@]}"
+          echo "Requirements file: ${{ inputs.requirements-file }}"
+          set -x
+          mamba install "${test_requirements[@]}" --file="${{ inputs.requirements-file }}"
+        else
+          mamba install --file="${{ inputs.requirements-file }}"
+        fi
 
     - name: Run tests
       run: |
@@ -206,6 +217,22 @@ jobs:
           --log-level=DEBUG \
           2>&1 | tee "$HOME/logs/pytest_log.txt"
 
+    - name: pcds-dev deployment
+      if: inputs.deploy-on-success && github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_DEV }}
+      run: |
+        micromamba install anaconda-client
+        anaconda upload "$HOME/conda-bld/noarch/*.tar.bz2"
+
+    - name: pcds-tag deployment
+      if: inputs.deploy-on-success && github.ref_type == 'tag'
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_TAG }}
+      run: |
+        micromamba install anaconda-client
+        anaconda upload "$HOME/conda-bld/noarch/*.tar.bz2"
+
     - name: After failure
       if: ${{ failure() }}
       run: |
@@ -214,17 +241,20 @@ jobs:
         # * Include the pytest log in the step summary (but not in the step output as it's available in the previous step)
         # * Include the debug log in the step output (but not the step summary as it's too verbose)
         (
-          echo "## Failure debugging"
           echo "### Conda environment"
-          echo "```"
-          conda list | egrep -v -e "^#"
-          echo "```"
+          echo "<details>"
+          echo ""
+          echo '```'
+          conda list | grep -v -e "^#"
+          echo '```'
+          echo "</details>"
 
+          echo ""
           echo "### Pytest log"
-          echo "```python"
+          echo '```python'
           cat "$HOME/logs/pytest_log.txt" || echo "# Pytest log not found?"
-          echo "```"
-        ) >> "$GITHUB_STEP_SUMMARY"
+          echo '```'
+        ) | tee -a "$GITHUB_STEP_SUMMARY"
 
         echo "## Debug log"
         cat "$HOME/logs/debug_log.txt" || echo "Debug logfile not found?"

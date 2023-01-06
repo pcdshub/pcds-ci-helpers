@@ -1,0 +1,48 @@
+name: pre-commit check
+
+# Based on our old pre-commit check and the official action:
+# https://github.com/pre-commit/action
+
+on:
+  workflow_call:
+    inputs:
+      args:
+        default: "--all-files --show-diff-on-failure"
+        description: "Additional flags for pre-commit"
+        required: false
+        type: string
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install pre-commit
+      run: |
+        python -m pip install pre-commit
+
+    - name: List Python package versions
+      run: |
+        python -m pip freeze --local
+
+    - name: Check for pre-commit configuration
+      run: |
+        if [ ! -f ".pre-commit-config.yaml" ]; then
+          echo "::error::No pre-commit configuration found!"
+          exit 1
+        fi
+
+    - name: Switch to temporary branch
+      run: |
+        # This is to avoid no-commit-to-branch from failing us when this is run
+        # on master.
+        git checkout -b _pre_commit_check_branch
+
+    - name: Check pre-commit usage
+      run: |
+        pre-commit run \
+          --show-diff-on-failure \
+          --color=always \
+          ${{ inputs.args }}

@@ -1,0 +1,143 @@
+name: Pragma Linting
+
+on:
+  workflow_call:
+    inputs:
+      project-root:
+        required: false
+        type: string
+        default: "."
+        description: "The root directory of the TwinCAT project"
+      python-version:
+        required: false
+        type: string
+        default: "3.9"
+        description: "The Python version in which to install pytmc"
+      pytmc-version:
+        required: false
+        type: string
+        default: ""
+        description: "The pytmc version to install (default: latest)"
+      ads-ioc-dbd:
+        required: false
+        type: string
+        default: "https://raw.githubusercontent.com/pcdshub/pcds-ci-helpers/master/travis/tc3_style/adsIoc.dbd"
+        description: "The location of adsIoc.dbd"
+
+jobs:
+  style:
+    name: "Pragma Linting"
+    continue-on-error: true
+    runs-on: ubuntu-20.04
+
+    defaults:
+      run:
+        # The following allows for each run step to utilize ~/.bash_profile
+        # for setting up the per-step initial state.
+        # --login: a login shell. Source ~/.bash_profile
+        # -o pipefail: piped processes are important; fail if they fail
+        shell: bash --login -o pipefail {0}
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '${{ inputs.python-version }}'
+
+    - name: Configure the matcher to annotate the diff
+      run: |
+        # Ref: https://github.com/actions/toolkit/blob/main/docs/problem-matchers.md
+        cat > "$HOME/pragmalint_matcher.json" <<'EOF'
+        {
+            "problemMatcher": [
+                {
+                    "owner": "pytmc-pragmalint",
+                    "pattern": [
+                        {
+                            "regexp": "^ERROR:pytmc.bin.pragmalint:(Linter error:.+)$",
+                            "message": 1
+                        },
+                        {
+                            "regexp": "^(.+):line (\\d+):(.+)$",
+                            "file": 1,
+                            "line": 2,
+                            "code": 3
+                        }
+                    ]
+                }
+            ]
+        }
+        EOF
+        # ERROR:pytmc.bin.pragmalint:Linter error: Invalid i/o direction for STATS:DATA: linty
+        # POUs/Data/FB_BasicStats.TcPOU:line 12:     {attribute 'pytmc' := '
+        echo "::add-matcher::$HOME/pragmalint_matcher.json"
+
+    - name: Install pytmc
+      run: |
+        if [[ -z "${{ inputs.pytmc-version }}" ]]; then
+          python -m pip install pytmc
+        else
+          python -m pip install 'pytmc<=${{ inputs.pytmc-version }}'
+        fi
+
+    - name: Lint source code pragmas
+      run: |
+        set +e
+        EXIT_CODE=0
+
+        (
+          echo "## Pragma lint results"
+          echo ""
+        ) | tee -a "$GITHUB_STEP_SUMMARY"
+
+        while IFS= read -r -d '' source_filename; do
+          # Show details in the GitHub Actions output
+          echo "Checking ${source_filename}"
+          pytmc pragmalint --verbose "$source_filename"
+          # And the issues in the step summary
+          LINT_OUTPUT=$(pytmc pragmalint --markdown "$source_filename" 2>&1)
+          if [ $? -ne 0 ]; then
+            (
+              echo "### ${source_filename}"
+              echo ""
+              echo "${LINT_OUTPUT}"
+            ) >> "$GITHUB_STEP_SUMMARY"
+            echo "Pragma lint failed. Setting error code." >/dev/stderr
+            EXIT_CODE=1
+          fi
+        done < <(find "${{ inputs.project-root }}" -type f -iname '*.TcDUT' -or -iname '*.TcGVL' -or -iname '*.TcPOU' -print0)
+
+        echo "Exiting with $EXIT_CODE." >/dev/stderr
+        exit $EXIT_CODE
+
+    - name: Download adsIoc.dbd
+      if: ${{ always() }}
+      run: |
+        wget -O "$HOME/adsIoc.dbd" ${{ inputs.ads-ioc-dbd }}
+
+    - name: Lint generated database with adsIoc.dbd
+      if: ${{ always() }}
+      run: |
+        set +e
+        EXIT_CODE=0
+
+        while IFS= read -r -d '' tmc; do
+          (
+            echo ""
+            echo "DBD lint results"
+            echo "----------------"
+            echo ""
+            pytmc db "$tmc" --dbd "$HOME/adsIoc.dbd" --allow-errors 2>&1 1>/dev/null
+            if [ $? -ne 0 ]; then
+              echo "Pragma lint failed. Setting error code." >/dev/stderr
+              EXIT_CODE=1
+            fi
+            echo ""
+          ) | tee -a "$GITHUB_STEP_SUMMARY"
+        done < <(find "${{ inputs.project-root }}" -iname '*.tmc' -type f -print0)
+
+        echo "Exiting with $EXIT_CODE." >/dev/stderr
+        exit $EXIT_CODE

@@ -1,0 +1,72 @@
+name: TwinCAT Project Summary
+
+on:
+  workflow_call:
+    inputs:
+      project-root:
+        required: false
+        type: string
+        default: "."
+        description: "The root directory of the TwinCAT project"
+      python-version:
+        required: false
+        type: string
+        default: "3.9"
+        description: "The Python version in which to install pytmc"
+      pytmc-version:
+        required: false
+        type: string
+        default: ""
+        description: "The pytmc version to install (default: latest)"
+
+jobs:
+  style:
+    name: "Project Summary"
+    continue-on-error: true
+    runs-on: ubuntu-20.04
+
+    defaults:
+      run:
+        # The following allows for each run step to utilize ~/.bash_profile
+        # for setting up the per-step initial state.
+        # --login: a login shell. Source ~/.bash_profile
+        # -o pipefail: piped processes are important; fail if they fail
+        shell: bash --login -o pipefail {0}
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '${{ inputs.python-version }}'
+
+    - name: Install pytmc
+      run: |
+        if [[ -z "${{ inputs.pytmc-version }}" ]]; then
+          python -m pip install pytmc
+        else
+          python -m pip install 'pytmc<=${{ inputs.pytmc-version }}'
+        fi
+
+    - name: Generate project summaries
+      run: |
+        set +e
+        while IFS= read -r -d '' tsproj; do
+            (
+              echo ""
+              echo "## $tsproj"
+              echo ""
+              echo "<details>"
+              echo ""
+              pytmc summary --all --code --markdown "$tsproj"
+              EXIT_CODE=$?
+              echo ""
+              echo "</details>"
+              echo ""
+              if [ "$EXIT_CODE" -gt 0 ]; then
+                echo "pytmc summary exited with code $EXIT_CODE"
+              fi
+            ) >> "$GITHUB_STEP_SUMMARY"
+        done < <(find "${{ inputs.project-root }}" -iname '*.tsproj' -type f -print0)

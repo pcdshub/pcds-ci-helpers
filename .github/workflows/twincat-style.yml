@@ -1,0 +1,124 @@
+name: TwinCAT Style Check
+
+on:
+  workflow_call:
+    inputs:
+      project-root:
+        required: false
+        type: string
+        default: "."
+        description: "The root directory of the TwinCAT project"
+      style-exclude:
+        required: false
+        type: string
+        default: ""
+        description: "Pattern (grep) of files to exclude from style checks"
+
+jobs:
+  style:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - description: "Leading tabs"
+          grep_for: '^\s*\t'
+          severity: "warning"
+          fatal: false
+          grep_flags: ""
+        - description: "Trailing whitespace"
+          grep_for: '\s\s+$'
+          severity: "warning"
+          fatal: false
+          grep_flags: ""
+        - description: "Line IDs (TwinCAT misconfiguration)"
+          grep_for: 'LineId'
+          severity: "error"
+          fatal: true
+          grep_flags: "-w"
+
+    name: "${{ matrix.description }}"
+    continue-on-error: ${{ matrix.fatal }}
+    runs-on: ubuntu-20.04
+
+    defaults:
+      run:
+        # The following allows for each run step to utilize ~/.bash_profile
+        # for setting up the per-step initial state.
+        # --login: a login shell. Source ~/.bash_profile
+        # -o pipefail: piped processes are important; fail if they fail
+        shell: bash --login -o pipefail {0}
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Find all changed files
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        # Fancy method of saying:
+        # * What files changed from this PR (the current checked out HEAD)
+        # * To the base that we're merging into (e.g., origin/master)
+        # Note that ACMRT = added/copied/modified/renamed/type change
+        # See more in `man git-diff-tree` under `--diff-filter`
+        git diff-tree --no-commit-id --name-only --diff-filter=ACM -r -z HEAD origin/${{ github.base_ref }} \
+          | tee "$HOME/project_files.txt"
+
+    - name: Find project files
+      if: ${{ github.event_name != 'pull_request' }}
+      run: |
+        find "${{ inputs.project-root }}" -print0 -type f \
+          > "$HOME/project_files.txt"
+
+    - name: Filter source code files
+      env:
+        STYLE_EXCLUDE: ${{ inputs.style-exclude }}
+      run: |
+          cat "$HOME/project_files.txt" \
+            | egrep --null-data --null --ignore-case -e $"\.TcPOU$" -e $"\.TcDUT$" -e $"\.TcGVL$" \
+            | egrep --null-data --null --invert-match -e "${STYLE_EXCLUDE:=__unset__}" \
+            > "$HOME/files_to_check.txt"
+
+    - name: Configure the matcher to annotate the diff
+      run: |
+        # Ref: https://github.com/actions/toolkit/blob/main/docs/problem-matchers.md
+        cat > "$HOME/grep_problem_matcher.json" <<'EOF'
+        {
+            "problemMatcher": [
+                {
+                    "owner": "style-grep",
+                    "pattern": [
+                        {
+                            "regexp": "^(.+):(.+):(.+):(\\d+):(.+)$",
+                            "message": 1,
+                            "severity": 2,
+                            "file": 3,
+                            "line": 4,
+                            "code": 5
+                        }
+                    ]
+                }
+            ]
+        }
+        EOF
+        echo "::add-matcher::$HOME/grep_problem_matcher.json"
+
+    - name: List the project files
+      run: |
+        cat $HOME/files.sh
+        echo "Project files are as follows:"
+        echo "-----------------------------"
+        cat "$HOME/files_to_check.txt" | xargs -0 -n1 echo
+        echo "-----------------------------"
+
+    - name: Checking for ${{ matrix.description }}
+      run: |
+        match_lines=$(cat "$HOME/files_to_check.txt" | xargs -0 egrep -H --line-number ${{ matrix.grep_flags }} $'${{ matrix.grep_for }}' | sed -e $"s/^/${{ matrix.description }}:${{ matrix.severity }}:/")
+        if [ -n "${match_lines}" ]; then
+          tab_count=$(echo "${match_lines}" | wc -l)
+          echo "::warning::Found ${tab_count} lines with ${{ matrix.description }}"
+          echo "${match_lines}"
+          exit 1
+        fi
+
+        echo "Success"

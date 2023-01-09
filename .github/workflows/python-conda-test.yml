@@ -162,7 +162,6 @@ jobs:
       with:
         name: Python ${{ inputs.python-version }} - conda - package
         path: ~/conda-bld
-        retention-days: 1
 
     - name: Use the pre-built test environment
       run: |
@@ -226,7 +225,7 @@ jobs:
         anaconda upload "$HOME/conda-bld/noarch/*.tar.bz2"
 
     - name: pcds-tag deployment
-      if: inputs.deploy-on-success && github.ref_type == 'tag'
+      if: inputs.deploy-on-success && github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
       env:
         ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_TAG }}
       run: |
@@ -264,4 +263,3 @@ jobs:
       with:
         name: Python ${{ inputs.python-version }} - conda - testing log
         path: "~/logs"
-        retention-days: 30

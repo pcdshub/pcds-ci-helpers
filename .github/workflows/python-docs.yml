@@ -5,11 +5,27 @@ on:
     inputs:
       python-version:
         description: "The Python version to build and test with"
-        required: true
+        default: "3.9"
+        required: false
         type: string
       package-name:
         default: ""
         description: "The package name to be built"
+        required: false
+        type: string
+      install-package:
+        description: "Install the Python package prior to building documentation"
+        required: false
+        default: true
+        type: boolean
+      docs-template-repo:
+        description: "Optional external repository holding the documentation template"
+        required: false
+        default: ""
+        type: string
+      docs-template-ref:
+        description: "The ref to checkout for the template repo"
+        default: "master"
         required: false
         type: string
       docs-directory:
@@ -71,6 +87,13 @@ jobs:
       with:
         fetch-depth: 0
 
+    - uses: actions/checkout@v3
+      if: inputs.docs-template-repo != ''
+      with:
+        repository: ${{ inputs.docs-template-repo }}
+        ref: ${{ inputs.docs-template-ref }}
+        path: ${{ inputs.docs-directory }}
+
     - name: Check that the documentation directory exists
       run: |
         if [ ! -d "${{ inputs.docs-directory}}" ]; then
@@ -119,6 +142,7 @@ jobs:
         pip install --upgrade pip
 
     - name: Installing package
+      if: ${{ inputs.install-package }}
       run: |
         pip install .
 
@@ -152,10 +176,15 @@ jobs:
     - name: Installing requirements from files
       run: |
         for filename in ${{ inputs.requirements-files }}; do
-          if [[ ! -f "${filename}" ]]; then
-              echo "::warning::Requirements file not found: ${filename}"
+          if [[ ! -f "${filename}" && ! -f "${{ inputs.docs-directory }}/${filename}" ]]; then
+            echo "::warning::Requirements file not found: ${filename}"
           else
+            if [[ -f "${filename}" ]]; then
               pip install --requirement "${filename}"
+            fi
+            if [[ -f "${{ inputs.docs-directory }}/${filename}" ]]; then
+              pip install --requirement "${{ inputs.docs-directory }}/${filename}"
+            fi
           fi
         done
 
@@ -173,7 +202,6 @@ jobs:
       with:
         name: Python ${{ inputs.python-version }} - documentation
         path: "${{ inputs.docs-directory }}/${{ inputs.docs-build-directory }}"
-        retention-days: 30
 
     - name: Upload log file artifacts
       if: ${{ always() }}
@@ -181,7 +209,6 @@ jobs:
       with:
         name: Python ${{ inputs.python-version }} - documentation - logs
         path: "~/logs"
-        retention-days: 30
 
   deploy:
     name: "Documentation deployment"

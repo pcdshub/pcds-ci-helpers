@@ -196,7 +196,6 @@ jobs:
       with:
         name: Python ${{ inputs.python-version }} - pip - testing log
         path: "~/logs"
-        retention-days: 30
 
     - name: Upload the package as an artifact
       if: ${{ always() }}
@@ -204,11 +203,10 @@ jobs:
       with:
         name: Python ${{ inputs.python-version }} - pip - package
         path: dist
-        retention-days: 30
 
     - name: PyPI deployment
-      if: inputs.deploy-on-success && github.ref_type == 'tag'
+      if: inputs.deploy-on-success && github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
       env:
-        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-      run: |
-        twine upload "dist/*.gz" "dist/*.whl"
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      run: twine upload dist/*

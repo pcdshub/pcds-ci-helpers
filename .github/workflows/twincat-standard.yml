@@ -13,11 +13,6 @@ on:
         type: string
         default: ""
         description: "Pattern (grep) of files to exclude from style checks"
-      python-version-docs:
-        required: false
-        type: string
-        default: "3.9"
-        description: "Python version for docs building"
       docs-organization:
         required: false
         type: string
@@ -49,6 +44,12 @@ jobs:
     with:
       project-root: ${{ inputs.project-root }}
       style-exclude: ${{ inputs.style-exclude }}
+
+  syntax:
+    name: "Syntax check"
+    uses: ./.github/workflows/twincat-syntax.yml
+    with:
+      project-root: ${{ inputs.project-root }}
 
   docs:
     name: "Documentation"

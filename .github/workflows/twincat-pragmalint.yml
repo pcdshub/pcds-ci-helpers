@@ -124,19 +124,25 @@ jobs:
         set +e
         EXIT_CODE=0
 
+        (
+          echo ""
+          echo "DBD lint results"
+          echo "----------------"
+          echo ""
+        ) | tee -a "$GITHUB_STEP_SUMMARY"
+
         while IFS= read -r -d '' tmc; do
-          (
-            echo ""
-            echo "DBD lint results"
-            echo "----------------"
-            echo ""
-            pytmc db "$tmc" --dbd "$HOME/adsIoc.dbd" --allow-errors 2>&1 1>/dev/null
-            if [ $? -ne 0 ]; then
-              echo "Pragma lint failed. Setting error code." >/dev/stderr
-              EXIT_CODE=1
-            fi
-            echo ""
-          ) | tee -a "$GITHUB_STEP_SUMMARY"
+          LINT_OUTPUT=$(pytmc db "$tmc" --dbd "$HOME/adsIoc.dbd" --allow-errors 2>&1 1>/dev/null)
+          if [ $? -ne 0 ]; then
+            (
+              echo ""
+              echo "### ${tmc}"
+              echo ""
+              echo "${LINT_OUTPUT}"
+            ) >> "$GITHUB_STEP_SUMMARY"
+            echo "Pragma lint failed. Setting error code." >/dev/stderr
+            EXIT_CODE=1
+          fi
         done < <(find "${{ inputs.project-root }}" -iname '*.tmc' -type f -print0)
 
         echo "Exiting with $EXIT_CODE." >/dev/stderr

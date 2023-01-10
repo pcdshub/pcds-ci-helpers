@@ -1,0 +1,62 @@
+name: PCDS TwinCAT Standard Tests
+
+on:
+  workflow_call:
+    inputs:
+      project-root:
+        required: false
+        type: string
+        default: "."
+        description: "The root directory of the TwinCAT project"
+      style-exclude:
+        required: false
+        type: string
+        default: ""
+        description: "Pattern (grep) of files to exclude from style checks"
+      docs-organization:
+        required: false
+        type: string
+        default: "pcdshub"
+        description: "Organization for documentation deployment"
+
+jobs:
+  pre-commit:
+    name: "pre-commit checks"
+    uses: ./.github/workflows/pre-commit.yml
+    with:
+      args: "--all-files"
+
+  summary:
+    name: "pytmc summary"
+    uses: ./.github/workflows/twincat-summary.yml
+    with:
+      project-root: ${{ inputs.project-root }}
+
+  pragmalint:
+    name: "pragma linting"
+    uses: ./.github/workflows/twincat-pragmalint.yml
+    with:
+      project-root: ${{ inputs.project-root }}
+
+  style:
+    name: "Style check"
+    uses: ./.github/workflows/twincat-style.yml
+    with:
+      project-root: ${{ inputs.project-root }}
+      style-exclude: ${{ inputs.style-exclude }}
+
+  syntax:
+    name: "Syntax check"
+    uses: ./.github/workflows/twincat-syntax.yml
+    with:
+      project-root: ${{ inputs.project-root }}
+
+  docs:
+    name: "Documentation"
+    uses: ./.github/workflows/python-docs.yml
+    with:
+      deploy: ${{ github.repository_owner == inputs.docs-organization && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')) }}
+      install-package: false
+      docs-template-repo: "klauer/twincat-docs-template"
+      docs-template-ref: "enh_update"
+      requirements-files: "requirements.txt"

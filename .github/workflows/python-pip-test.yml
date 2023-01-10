@@ -1,0 +1,211 @@
+name: Pip Build
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        description: "The Python-importable package name to be tested"
+        required: true
+        type: string
+      python-version:
+        description: "The Python version to build and test with"
+        required: true
+        type: string
+      experimental:
+        description: "Mark this version as experimental and not required to pass"
+        required: false
+        default: false
+        type: boolean
+      deploy-on-success:
+        description: "Deploy to PyPI on success (and when appropriate)"
+        required: false
+        default: false
+        type: boolean
+      testing-extras:
+        default: ""
+        description: "Extra packages to be installed for testing"
+        required: false
+        type: string
+      ci-extras:
+        default: "pytest-cov"
+        description: "CI-specific packages to be installed"
+        required: false
+        type: string
+      requirements-file:
+        default: "dev-requirements.txt"
+        description: "Development requirements filename"
+        required: false
+        type: string
+    outputs: {}
+
+env:
+  MPLBACKEND: "agg"
+  QT_QPA_PLATFORM: "offscreen"
+
+jobs:
+  test:
+    name: "Python ${{ inputs.python-version }}: pip"
+    runs-on: ubuntu-20.04
+    continue-on-error: ${{ inputs.experimental }}
+
+    defaults:
+      run:
+        # The following allows for each run step to utilize ~/.bash_profile
+        # for setting up the per-step initial state.
+        # --login: a login shell. Source ~/.bash_profile
+        # -e: exit on first error
+        # -o pipefail: piped processes are important; fail if they fail
+        shell: bash --login -eo pipefail {0}
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Check version to be built
+      run: |
+        # NOTE: If you run CI on your own fork, you may not have the right version
+        # number for the package. Synchronize your tags with the upstream,
+        # otherwise cross-dependencies may result in confusing build failure.
+        (echo "Package version: $(git describe --tags)" | tee "$GITHUB_STEP_SUMMARY") || \
+          echo "::warning::Git tags not found in repository. Build may fail!"
+
+    - name: Check environment variables for issues
+      run: |
+        echo "* Package to be built: ${{ inputs.package-name }}"
+        echo "* Pip 'extras' for CI testing: ${{ inputs.testing-extras }}"
+        echo "* General pip packages required for CI testing: ${{ inputs.ci-extras }}"
+
+    - name: Prepare for log files
+      run: |
+        mkdir $HOME/logs
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '${{ inputs.python-version }}'
+
+    - name: Upgrade pip
+      run: |
+        pip install --upgrade pip
+
+    - name: Build wheel and source distribution
+      run: |
+        python -m pip install twine build
+        export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+        echo "Source date epoch set to ${SOURCE_DATE_EPOCH} for reproducible build"
+        # See: https://github.com/python/cpython/pull/5200
+        # And: https://reproducible-builds.org/docs/source-date-epoch/
+        # (I learned about this from DLS)
+        python -m build --sdist --wheel --outdir ./dist
+
+    - name: Check the source distribution
+      run: |
+        python -m venv test-source-env
+        source test-source-env/bin/activate
+
+        python -m pip install ./dist/*.gz
+        python -c "import ${{ inputs.package-name }}; print('Imported ${{ inputs.package-name }} successfully')"
+
+    - name: Use the wheel for testing
+      run: |
+        python -m pip install ./dist/*.whl
+        python -c "import ${{ inputs.package-name }}; print('Imported ${{ inputs.package-name }} successfully')"
+
+    - name: Installing CI extras and testing extras
+      run: |
+        # 1. escape '<' so the user doesn't have to
+        # 2. escape '>' so the user doesn't have to
+        # 3. allow conda/pip to use the same requirements spec;
+        # conda expects pkg=ver but pip expects pkg==ver; using a basic
+        # (not =<>)=(not =) to avoid incompatibility with macOS sed not supporting
+        # '=\+'
+        input_requirements=$(
+          echo "${{ inputs.ci-extras }} ${{ inputs.testing-extras }}" |
+          sed -e "s/</\</g" |
+          sed -e "s/>/\>/g" |
+          sed -e 's/\([^=<>]\)=\([^=]\)/\1==\2/g'
+        )
+
+        declare -a test_requirements=()
+        for req in $input_requirements; do
+          test_requirements+=( "$req" )
+        done
+
+        if [[ ${#test_requirements[@]} -gt 0 ]]; then
+          echo "CI extras: ${{ inputs.ci-extras }}"
+          echo "Testing extras: ${{ inputs.testing-extras }}"
+          set -x
+          pip install "${test_requirements[@]}"
+        else
+          echo "No extras to install."
+        fi
+
+    - name: Installing development requirements
+      run: |
+        if [ -n "${{ inputs.requirements-file }}" ]; then
+          echo "Requirements file: ${{ inputs.requirements-file }}"
+          pip install --requirement "${{ inputs.requirements-file }}"
+        else
+          echo "No requirements file configured."
+        fi
+
+    - name: Check the pip packages in the test env
+      run: |
+        pip list
+
+    - name: Run tests
+      run: |
+        pytest -v \
+          --cov=. \
+          --log-file="$HOME/logs/debug_log.txt" \
+          --log-format='%(asctime)s.%(msecs)03d %(module)-15s %(levelname)-8s %(threadName)-10s %(message)s' \
+          --log-file-date-format='%H:%M:%S' \
+          --log-level=DEBUG \
+          2>&1 | tee "$HOME/logs/pytest_log.txt"
+
+    - name: After failure
+      if: ${{ failure() }}
+      run: |
+        # On failure:
+        # * Include the pip package details
+        # * Include the pytest log in the step summary (but not in the step output as it's available in the previous step)
+        # * Include the debug log in the step output (but not the step summary as it's too verbose)
+        (
+          echo "### Pip list"
+          echo "<details>"
+          echo ""
+          echo '```'
+          pip list | egrep -v -e "^#"
+          echo '```'
+          echo "</details>"
+
+          echo ""
+          echo "### Pytest log"
+          echo '```python'
+          cat "$HOME/logs/pytest_log.txt" || echo "# Pytest log not found?"
+          echo '```'
+        ) >> "$GITHUB_STEP_SUMMARY"
+
+        echo "## Debug log"
+        cat "$HOME/logs/debug_log.txt" || echo "Debug logfile not found?"
+
+    - name: Upload log file artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: Python ${{ inputs.python-version }} - pip - testing log
+        path: "~/logs"
+
+    - name: Upload the package as an artifact
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: Python ${{ inputs.python-version }} - pip - package
+        path: dist
+
+    - name: PyPI deployment
+      if: inputs.deploy-on-success && github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      run: twine upload dist/*

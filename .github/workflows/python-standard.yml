@@ -1,0 +1,93 @@
+name: PCDS Python Standard Tests
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        description: "The package name to be built"
+        required: true
+        type: string
+      python-version-docs:
+        required: false
+        type: string
+        default: "3.9"
+        description: "Python version for docs building"
+      testing-extras:
+        required: false
+        type: string
+        default: ""
+        description: "Extras for both conda / pip testing"
+      conda-testing-extras:
+        required: false
+        type: string
+        default: ""
+        description: "Extras only for conda testing"
+      pip-testing-extras:
+        required: false
+        type: string
+        default: ""
+        description: "Extras only for pip-based testing"
+      docs-organization:
+        required: false
+        type: string
+        default: "pcdshub"
+        description: "Organization for documentation deployment"
+      use-setuptools-scm:
+        description: "Install and configure setuptools-scm prior to conda-build"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  pre-commit:
+    name: "pre-commit checks"
+    uses: ./.github/workflows/pre-commit.yml
+    with:
+      args: "--all-files"
+
+  conda-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - python-version: "3.9"
+          deploy-on-success: true
+        - python-version: "3.10"
+        - python-version: "3.11"
+          experimental: true
+
+    name: "Conda"
+    uses: ./.github/workflows/python-conda-test.yml
+    with:
+      package-name: ${{ inputs.package-name }}
+      python-version: ${{ matrix.python-version }}
+      experimental: ${{ matrix.experimental || false }}
+      testing-extras: ${{ inputs.testing-extras }} ${{ inputs.conda-testing-extras }}
+      use-setuptools-scm: ${{ inputs.use-setuptools-scm }}
+
+  pip-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - python-version: "3.9"
+          deploy-on-success: true
+        - python-version: "3.10"
+        - python-version: "3.11"
+          experimental: true
+
+    name: "Pip"
+    uses: ./.github/workflows/python-pip-test.yml
+    with:
+      package-name: ${{ inputs.package-name }}
+      python-version: ${{ matrix.python-version }}
+      experimental: ${{ matrix.experimental || false }}
+      testing-extras: ${{ inputs.testing-extras }} ${{ inputs.pip-testing-extras }}
+
+  pip-docs:
+    name: "Documentation"
+    uses: ./.github/workflows/python-docs.yml
+    with:
+      package-name: ${{ inputs.package-name }}
+      python-version: ${{ inputs.python-version-docs }}
+      deploy: ${{ github.repository_owner == inputs.docs-organization && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')) }}

@@ -1,0 +1,113 @@
+name: Experimental Syntax Check
+
+on:
+  workflow_call:
+    inputs:
+      project-root:
+        required: false
+        type: string
+        default: "."
+        description: "The root directory of the TwinCAT project"
+      python-version:
+        required: false
+        type: string
+        default: "3.9"
+        description: "The Python version in which to install blark"
+      blark-version:
+        required: false
+        type: string
+        default: ""
+        description: "The blark version to install (default: latest)"
+      parse-exclude:
+        required: false
+        type: string
+        default: ""
+        description: "Grep pattern of files to exclude from syntax checks"
+
+jobs:
+  syntax:
+    name: "Experimental Syntax Check"
+    continue-on-error: true
+    runs-on: ubuntu-20.04
+
+    defaults:
+      run:
+        # The following allows for each run step to utilize ~/.bash_profile
+        # for setting up the per-step initial state.
+        # --login: a login shell. Source ~/.bash_profile
+        # -o pipefail: piped processes are important; fail if they fail
+        shell: bash --login -o pipefail {0}
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '${{ inputs.python-version }}'
+
+    - name: Install blark
+      run: |
+        if [[ -z "${{ inputs.blark-version }}" ]]; then
+          python -m pip install blark
+        else
+          python -m pip install 'blark<=${{ inputs.blark-version }}'
+        fi
+
+    - name: Find all changed files
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        # Fancy method of saying:
+        # * What files changed from this PR (the current checked out HEAD)
+        # * To the base that we're merging into (e.g., origin/master)
+        # Note that ACMRT = added/copied/modified/renamed/type change
+        # See more in `man git-diff-tree` under `--diff-filter`
+        git diff-tree --no-commit-id --name-only --diff-filter=ACM -r -z HEAD origin/${{ github.base_ref }} \
+          | tee "$HOME/project_files.txt"
+
+    - name: Find project files
+      if: ${{ github.event_name != 'pull_request' }}
+      run: |
+        find "${{ inputs.project-root }}" -print0 -type f \
+          > "$HOME/project_files.txt"
+
+    - name: Filter source code files
+      env:
+        PARSE_EXCLUDE: ${{ inputs.parse-exclude }}
+      run: |
+          cat "$HOME/project_files.txt" \
+            | egrep --null-data --null --ignore-case -e $"\.TcPOU$" -e $"\.TcDUT$" -e $"\.TcGVL$" \
+            | egrep --null-data --null --invert-match -e "${PARSE_EXCLUDE:=__unset__}" \
+            > "$HOME/files_to_check.txt"
+
+    - name: Parse changed source code
+      run: |
+        set +e
+        EXIT_CODE=0
+
+        (
+          echo "## Blark parse results"
+          echo ""
+        ) | tee -a "$GITHUB_STEP_SUMMARY"
+
+        while IFS= read -d '' source_file; do
+          LINT_OUTPUT=$(blark parse --verbose "${source_file}" 2>&1)
+          if [ $? -ne 0 ]; then
+            (
+              echo ""
+              echo "### ${source_file}"
+              echo ""
+              echo '```'
+              echo "${LINT_OUTPUT}"
+              echo '```'
+            ) | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Parsing failed. Setting error code." >/dev/stderr
+            EXIT_CODE=1
+          else
+            echo "Parsed ${source_file} successfully"
+          fi
+        done < <(cat "$HOME/files_to_check.txt")
+
+        echo "Exiting with $EXIT_CODE."
+        exit $EXIT_CODE

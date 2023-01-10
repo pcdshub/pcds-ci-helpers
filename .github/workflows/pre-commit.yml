@@ -11,6 +11,11 @@ on:
         description: "Additional flags for pre-commit"
         required: false
         type: string
+      annotate:
+        default: true
+        description: "Use the problem matcher to annotate the PR diff"
+        required: false
+        type: boolean
 
 jobs:
   pre-commit:
@@ -18,6 +23,46 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Configure the matcher to annotate the diff
+      if: ${{ inputs.annotate }}
+      run: |
+        # Ref: https://github.com/actions/toolkit/blob/main/docs/problem-matchers.md
+        cat > "$HOME/flake8_problem_matcher.json" <<'EOF'
+        {
+            "problemMatcher": [
+                {
+                    "owner": "flake8_error",
+                    "severity": "error",
+                    "pattern": [
+                        {
+                            "regexp": "^(.+):(\\d+):(\\d+): (E\\d+) (.+)$",
+                            "file": 1,
+                            "line": 2,
+                            "column": 3,
+                            "code": 4,
+                            "message": 5
+                        }
+                    ]
+                },
+                {
+                    "owner": "flake8_warning",
+                    "severity": "warning",
+                    "pattern": [
+                        {
+                            "regexp": "^(.+):(\\d+):(\\d+): (W\\d+) (.+)$",
+                            "file": 1,
+                            "line": 2,
+                            "column": 3,
+                            "code": 4,
+                            "message": 5
+                        }
+                    ]
+                }
+            ]
+        }
+        EOF
+        echo "::add-matcher::$HOME/flake8_problem_matcher.json"
 
     - name: Install pre-commit
       run: |

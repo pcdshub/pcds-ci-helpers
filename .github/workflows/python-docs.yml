@@ -151,7 +151,7 @@ jobs:
         # 2. escape '>' so the user doesn't have to
         # 3. allow conda/pip to use the same requirements spec;
         # conda expects pkg=ver but pip expects pkg==ver; using a basic
-        # (not =)=(not =) to avoid incompatibility with macOS sed not supporting
+        # (not =<>)=(not =) to avoid incompatibility with macOS sed not supporting
         # '=\+'
         #
         if [ -n "${{ inputs.docs-extras }}" ]; then
@@ -159,7 +159,7 @@ jobs:
             echo "${{ inputs.docs-extras }}" |
             sed -e "s/</\</g" |
             sed -e "s/>/\>/g" |
-            sed -e 's/\([^=]\)=\([^=]\)/\1==\2/g'
+            sed -e 's/\([^=<>]\)=\([^=]\)/\1==\2/g'
           )
 
           declare -a docs_requirements=()
@@ -252,14 +252,14 @@ jobs:
         # 2. escape '>' so the user doesn't have to
         # 3. allow conda/pip to use the same requirements spec;
         # conda expects pkg=ver but pip expects pkg==ver; using a basic
-        # (not =)=(not =) to avoid incompatibility with macOS sed not supporting
+        # (not =<>)=(not =) to avoid incompatibility with macOS sed not supporting
         # '=\+'
         if [ -n "${{ inputs.docs-extras }}" ]; then
           input_requirements=$(
             echo "${{ inputs.docs-extras }}" |
             sed -e "s/</\</g" |
             sed -e "s/>/\>/g" |
-            sed -e 's/\([^=]\)=\([^=]\)/\1==\2/g'
+            sed -e 's/\([^=<>]\)=\([^=]\)/\1==\2/g'
           )
 
           declare -a docs_requirements=()

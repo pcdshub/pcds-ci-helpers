@@ -117,13 +117,13 @@ jobs:
         # 2. escape '>' so the user doesn't have to
         # 3. allow conda/pip to use the same requirements spec;
         # conda expects pkg=ver but pip expects pkg==ver; using a basic
-        # (not =)=(not =) to avoid incompatibility with macOS sed not supporting
+        # (not =<>)=(not =) to avoid incompatibility with macOS sed not supporting
         # '=\+'
         input_requirements=$(
           echo "${{ inputs.ci-extras }} ${{ inputs.testing-extras }}" |
           sed -e "s/</\</g" |
           sed -e "s/>/\>/g" |
-          sed -e 's/\([^=]\)=\([^=]\)/\1==\2/g'
+          sed -e 's/\([^=<>]\)=\([^=]\)/\1==\2/g'
         )
 
         declare -a test_requirements=()

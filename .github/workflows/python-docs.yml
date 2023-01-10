@@ -3,14 +3,13 @@ name: Pip Build
 on:
   workflow_call:
     inputs:
+      package-name:
+        description: "The Python-importable package name for which docs are being built"
+        required: true
+        type: string
       python-version:
         description: "The Python version to build and test with"
         default: "3.9"
-        required: false
-        type: string
-      package-name:
-        default: ""
-        description: "The package name to be built"
         required: false
         type: string
       install-package:

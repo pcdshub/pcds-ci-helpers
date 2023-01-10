@@ -4,9 +4,8 @@ on:
   workflow_call:
     inputs:
       package-name:
-        default: ""
-        description: "The package name"
-        required: false
+        description: "The Python-importable package name to be tested"
+        required: true
         type: string
       python-version:
         description: "The Python version to build and test with"

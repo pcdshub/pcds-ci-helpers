@@ -9,7 +9,7 @@ on:
 
 jobs:
   standard:
-    uses: pcdshub/pcds-ci-helpers/.github/workflows/twincat-standard.yml
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/twincat-standard.yml@master
     with:
       # The workflow can be configured to look at a specific project directory, if
       # desirable.  This defaults to the root of the repository (".").

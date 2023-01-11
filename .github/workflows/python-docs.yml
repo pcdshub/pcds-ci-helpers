@@ -33,7 +33,7 @@ on:
         required: false
         type: string
       docs-build-directory:
-        default: "build"
+        default: "build/html"
         description: "The directory where built documentation will be, relative to docs-directory"
         required: false
         type: string

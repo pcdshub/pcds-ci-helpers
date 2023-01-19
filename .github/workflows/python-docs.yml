@@ -306,7 +306,7 @@ jobs:
           cd "$HOME/gh-pages"
           git init
         )
-        rsync -av --delete "./html/" "$HOME/gh-pages/${{ needs.build.outputs.deploy_version }}/"
+        rsync -av --delete ./ "$HOME/gh-pages/${{ needs.build.outputs.deploy_version }}/"
 
         # Run docs-versions-menu
         cd "$HOME/gh-pages"

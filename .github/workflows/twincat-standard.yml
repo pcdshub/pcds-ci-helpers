@@ -58,6 +58,6 @@ jobs:
       deploy: ${{ github.repository_owner == inputs.docs-organization && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')) }}
       package-name: ""
       install-package: false
-      docs-template-repo: "klauer/twincat-docs-template"
-      docs-template-ref: "enh_update"
+      docs-template-repo: "pcdshub/twincat-docs-template"
+      docs-template-ref: "master"
       requirements-files: "requirements.txt"

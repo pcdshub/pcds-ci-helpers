@@ -1,0 +1,15 @@
+name: PCDS CI Helpers Tests
+
+on:
+  push:
+  pull_request:
+  release:
+    types:
+      - created
+
+jobs:
+  pre-commit:
+    name: "pre-commit checks"
+    uses: ./.github/workflows/pre-commit.yml
+    with:
+      args: "--all-files"

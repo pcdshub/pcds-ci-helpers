@@ -42,7 +42,7 @@ on:
         default: false
         type: boolean
       requirements-file:
-        default: "dev-requirements.txt"
+        default: ""
         description: "Development requirements filename"
         required: false
         type: string
@@ -198,10 +198,13 @@ jobs:
           echo "CI extras: ${{ inputs.ci-extras }}"
           echo "Testing extras: ${{ inputs.testing-extras }}"
           echo "In summary: ${test_requirements[@]}"
-          echo "Requirements file: ${{ inputs.requirements-file }}"
           set -x
-          mamba install "${test_requirements[@]}" --file="${{ inputs.requirements-file }}"
-        else
+          mamba install "${test_requirements[@]}"
+        fi
+
+        if [ -n "${{ inputs.requirements-file }}" ]; then
+          echo "Installing from requirements file: ${{ inputs.requirements-file }}"
+          set -x
           mamba install --file="${{ inputs.requirements-file }}"
         fi
 

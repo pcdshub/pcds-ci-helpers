@@ -57,6 +57,11 @@ on:
         description: "Development requirements filenames"
         required: false
         type: string
+      system-packages:
+        default: ""
+        description: "CI-specific system packages required for docs building"
+        required: false
+        type: string
     outputs: {}
 
 env:
@@ -127,6 +132,11 @@ jobs:
           echo "Built docs version unset? See previous step"
           exit 1
         fi
+
+    - name: Install required system packages
+      if: inputs.system-packages != ''
+      run: |
+        sudo apt-get -y install ${{ inputs.system-packages }}
 
     - name: Prepare for log files
       run: |

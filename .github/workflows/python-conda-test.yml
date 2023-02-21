@@ -46,6 +46,11 @@ on:
         description: "Development requirements filename"
         required: false
         type: string
+      system-packages:
+        default: ""
+        description: "CI-specific system packages required for installation"
+        required: false
+        type: string
     outputs: {}
 
 env:
@@ -103,6 +108,11 @@ jobs:
         echo "* Conda recipe folder: ${{ inputs.recipe-folder }}"
         echo "* Conda requirements file for development: ${{ inputs.requirements-file }}"
         echo "* Micromamba environment root: ${MAMBA_ROOT_PREFIX}"
+
+    - name: Install required system packages
+      if: inputs.system-packages != ''
+      run: |
+        sudo apt-get -y install ${{ inputs.system-packages }}
 
     - name: Set up micromamba and environment
       run: |

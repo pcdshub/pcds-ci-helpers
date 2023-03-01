@@ -98,6 +98,7 @@ jobs:
         repository: ${{ inputs.docs-template-repo }}
         ref: ${{ inputs.docs-template-ref }}
         path: ${{ inputs.docs-directory }}
+        submodules: 'recursive'
 
     - name: Check that the documentation directory exists
       run: |

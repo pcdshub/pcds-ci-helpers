@@ -65,6 +65,12 @@ jobs:
         git diff-tree --no-commit-id --name-only --diff-filter=ACM -r -z HEAD origin/${{ github.base_ref }} \
           | tee "$HOME/project_files.txt"
 
+        if [ ! -s "$HOME/project_files.txt" ]; then
+          echo "No source code files changed in this PR.  Checking the entire repository."
+          find "${{ inputs.project-root }}" -print0 -type f \
+            > "$HOME/project_files.txt"
+        fi
+
     - name: Find project files
       if: ${{ github.event_name != 'pull_request' }}
       run: |

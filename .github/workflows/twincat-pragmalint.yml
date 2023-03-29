@@ -94,12 +94,6 @@ jobs:
           echo ""
         ) | tee -a "$GITHUB_STEP_SUMMARY"
 
-        find_source_code_files() {
-          find "${{ inputs.project-root }}" -type f -iname '*.TcDUT' -print0
-          find "${{ inputs.project-root }}" -type f -iname '*.TcGVL' -print0
-          find "${{ inputs.project-root }}" -type f -iname '*.TcPOU' -print0
-        }
-
         while IFS= read -r -d '' source_filename; do
           # Show details in the GitHub Actions output
           echo "Checking ${source_filename}"
@@ -115,7 +109,7 @@ jobs:
             echo "Pragma lint failed. Setting error code." >/dev/stderr
             EXIT_CODE=1
           fi
-        done < <(find_source_code_files)
+        done < <(find "${{ inputs.project-root }}" -type f \( -iname '*.TcDUT' -or -iname '*.TcGVL' -or -iname '*.TcPOU' \) -print0)
 
         echo "Exiting with $EXIT_CODE." >/dev/stderr
         exit $EXIT_CODE

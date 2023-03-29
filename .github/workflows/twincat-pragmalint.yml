@@ -109,7 +109,7 @@ jobs:
             echo "Pragma lint failed. Setting error code." >/dev/stderr
             EXIT_CODE=1
           fi
-        done < <(find "${{ inputs.project-root }}" -type f -iname '*.TcDUT' -or -iname '*.TcGVL' -or -iname '*.TcPOU' -print0)
+        done < <(find "${{ inputs.project-root }}" -type f \( -iname '*.TcDUT' -or -iname '*.TcGVL' -or -iname '*.TcPOU' \) -print0)
 
         echo "Exiting with $EXIT_CODE." >/dev/stderr
         exit $EXIT_CODE

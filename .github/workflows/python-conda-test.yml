@@ -234,7 +234,8 @@ jobs:
       env:
         ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_DEV }}
       run: |
-        micromamba install anaconda-client
+        micromamba create --name upload anaconda-client
+        micromamba activate upload
         anaconda upload "$HOME/conda-bld/noarch/*.tar.bz2"
 
     - name: pcds-tag deployment
@@ -242,7 +243,8 @@ jobs:
       env:
         ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_TAG }}
       run: |
-        micromamba install anaconda-client
+        micromamba create --name upload anaconda-client
+        micromamba activate upload
         anaconda upload "$HOME/conda-bld/noarch/*.tar.bz2"
 
     - name: After failure

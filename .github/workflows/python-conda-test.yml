@@ -235,6 +235,7 @@ jobs:
         ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_DEV }}
       run: |
         micromamba install anaconda-client
+        export CONDA_ROOT="$HOME/micromamba"
         anaconda upload "$HOME/conda-bld/noarch/*.tar.bz2"
 
     - name: pcds-tag deployment
@@ -243,6 +244,7 @@ jobs:
         ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_TAG }}
       run: |
         micromamba install anaconda-client
+        export CONDA_ROOT="$HOME/micromamba"
         anaconda upload "$HOME/conda-bld/noarch/*.tar.bz2"
 
     - name: After failure

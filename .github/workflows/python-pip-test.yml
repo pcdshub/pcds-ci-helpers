@@ -219,4 +219,9 @@ jobs:
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-      run: twine upload dist/*
+      run: |
+        if [ -z "$TWINE_PASSWORD" ]; then
+           echo "# No PYPI_TOKEN secret in job!" | tee -a "$GITHUB_STEP_SUMMARY"
+           exit 1
+        fi
+        twine upload dist/*

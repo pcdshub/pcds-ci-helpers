@@ -73,6 +73,7 @@ jobs:
 
     name: "Conda"
     uses: ./.github/workflows/python-conda-test.yml
+    secrets: inherit
     with:
       package-name: ${{ inputs.package-name }}
       python-version: ${{ matrix.python-version }}
@@ -95,6 +96,7 @@ jobs:
 
     name: "Pip"
     uses: ./.github/workflows/python-pip-test.yml
+    secrets: inherit
     with:
       package-name: ${{ inputs.package-name }}
       python-version: ${{ matrix.python-version }}

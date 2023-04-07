@@ -224,4 +224,4 @@ jobs:
            echo "# No PYPI_TOKEN secret in job!" | tee -a "$GITHUB_STEP_SUMMARY"
            exit 1
         fi
-        twine upload dist/*
+        twine upload --verbose dist/*

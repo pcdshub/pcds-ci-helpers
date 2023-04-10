@@ -236,7 +236,7 @@ jobs:
       run: |
         micromamba create --name upload anaconda-client
         micromamba activate upload
-        anaconda upload $HOME/conda-bld/noarch/*.tar.bz2
+        anaconda upload "${HOME}"/conda-bld/noarch/*.tar.bz2
 
     - name: pcds-tag deployment
       if: inputs.deploy-on-success && github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
@@ -245,7 +245,7 @@ jobs:
       run: |
         micromamba create --name upload anaconda-client
         micromamba activate upload
-        anaconda upload $HOME/conda-bld/noarch/*.tar.bz2
+        anaconda upload "${HOME}"/conda-bld/noarch/*.tar.bz2
 
     - name: After failure
       if: ${{ failure() }}

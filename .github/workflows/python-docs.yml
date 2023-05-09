@@ -112,9 +112,15 @@ jobs:
       id: version
       shell: bash -l {0}
       run: |
-        if [[ $GITHUB_EVENT_NAME == "pull_request" || $GITHUB_EVENT_NAME == "push" ]]; then
+        if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+          # It may be a PR against a non-master branch, but that doesn't matter here.
           version="master"
+        elif [[ "$GITHUB_EVENT_NAME" == "push" && "${{ github.ref }}" = refs/heads/* ]]; then
+          # If this is a push to a branch, then use that branch name.
+          # `basename refs/heads/a` -> "a"
+          version="$(basename "${{ github.ref }}")"
         else
+          # For refs/tags and anything else, use the version from git.
           version="$(git describe --tags)"
         fi
         (

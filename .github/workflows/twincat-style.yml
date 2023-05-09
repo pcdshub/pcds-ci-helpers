@@ -84,7 +84,9 @@ jobs:
           cat "$HOME/project_files.txt" \
             | egrep --null-data --null --ignore-case -e $"\.TcPOU$" -e $"\.TcDUT$" -e $"\.TcGVL$" \
             | egrep --null-data --null --invert-match -e "${STYLE_EXCLUDE:=__unset__}" \
-            > "$HOME/files_to_check.txt"
+            > "$HOME/files_to_check.txt" || (
+            echo "No source code files found to check."
+          )
 
     - name: Configure the matcher to annotate the diff
       run: |
@@ -112,7 +114,6 @@ jobs:
 
     - name: List the project files
       run: |
-        cat $HOME/files.sh
         echo "Project files are as follows:"
         echo "-----------------------------"
         cat "$HOME/files_to_check.txt" | xargs -0 -n1 echo

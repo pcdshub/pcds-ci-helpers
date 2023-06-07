@@ -230,7 +230,7 @@ jobs:
           2>&1 | tee "$HOME/logs/pytest_log.txt"
 
     - name: pcds-dev deployment
-      if: inputs.deploy-on-success && github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
+      if: inputs.deploy-on-success && github.event_name == 'push' && github.ref == 'refs/heads/master'
       env:
         ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_DEV }}
       run: |

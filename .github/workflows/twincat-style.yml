@@ -62,7 +62,7 @@ jobs:
         # * To the base that we're merging into (e.g., origin/master)
         # Note that ACMRT = added/copied/modified/renamed/type change
         # See more in `man git-diff-tree` under `--diff-filter`
-        git diff-tree --no-commit-id --name-only --diff-filter=ACM -r -z HEAD origin/${{ github.base_ref }} \
+        git diff-tree --no-commit-id --name-only --diff-filter=ACM -r -z origin/${{ github.base_ref }} HEAD \
           | tee "$HOME/project_files.txt"
 
         if [ ! -s "$HOME/project_files.txt" ]; then

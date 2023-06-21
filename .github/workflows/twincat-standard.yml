@@ -60,4 +60,3 @@ jobs:
       install-package: false
       docs-template-repo: "pcdshub/twincat-docs-template"
       docs-template-ref: "master"
-      requirements-files: "requirements.txt"

@@ -161,7 +161,7 @@ jobs:
     - name: Installing package
       if: ${{ inputs.install-package }}
       run: |
-        pip install .
+        pip install .[test,doc]
 
     - name: Installing documentation extras
       run: |

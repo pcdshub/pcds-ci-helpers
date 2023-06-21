@@ -53,7 +53,7 @@ on:
         required: false
         type: string
       requirements-files:
-        default: "dev-requirements.txt docs-requirements.txt"
+        default: ""
         description: "Development requirements filenames"
         required: false
         type: string

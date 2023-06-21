@@ -48,7 +48,7 @@ on:
         default: false
         type: boolean
       docs-extras:
-        default: "docs-versions-menu packaging==21.3"
+        default: ""
         description: "Extra packages to be installed for documentation"
         required: false
         type: string

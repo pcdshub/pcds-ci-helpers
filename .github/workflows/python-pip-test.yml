@@ -27,13 +27,8 @@ on:
         required: false
         type: string
       ci-extras:
-        default: "pytest-cov"
+        default: ""
         description: "CI-specific packages to be installed"
-        required: false
-        type: string
-      requirements-file:
-        default: "dev-requirements.txt"
-        description: "Development requirements filename"
         required: false
         type: string
       system-packages:
@@ -142,22 +137,14 @@ jobs:
           test_requirements+=( "$req" )
         done
 
+        set -x
         if [[ ${#test_requirements[@]} -gt 0 ]]; then
           echo "CI extras: ${{ inputs.ci-extras }}"
           echo "Testing extras: ${{ inputs.testing-extras }}"
-          set -x
-          pip install "${test_requirements[@]}"
+          pip install "${test_requirements[@]}" .[test]
         else
           echo "No extras to install."
-        fi
-
-    - name: Installing development requirements
-      run: |
-        if [ -n "${{ inputs.requirements-file }}" ]; then
-          echo "Requirements file: ${{ inputs.requirements-file }}"
-          pip install --requirement "${{ inputs.requirements-file }}"
-        else
-          echo "No requirements file configured."
+          pip install .[test]
         fi
 
     - name: Check the pip packages in the test env
@@ -167,7 +154,6 @@ jobs:
     - name: Run tests
       run: |
         pytest -v \
-          --cov=. \
           --log-file="$HOME/logs/debug_log.txt" \
           --log-format='%(asctime)s.%(msecs)03d %(module)-15s %(levelname)-8s %(threadName)-10s %(message)s' \
           --log-file-date-format='%H:%M:%S' \

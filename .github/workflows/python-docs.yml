@@ -48,13 +48,8 @@ on:
         default: false
         type: boolean
       docs-extras:
-        default: "docs-versions-menu packaging==21.3"
+        default: ""
         description: "Extra packages to be installed for documentation"
-        required: false
-        type: string
-      requirements-files:
-        default: "dev-requirements.txt docs-requirements.txt"
-        description: "Development requirements filenames"
         required: false
         type: string
       system-packages:
@@ -161,7 +156,7 @@ jobs:
     - name: Installing package
       if: ${{ inputs.install-package }}
       run: |
-        pip install .
+        pip install .[test,doc]
 
     - name: Installing documentation extras
       run: |
@@ -189,21 +184,6 @@ jobs:
         else
           echo "No extras to install."
         fi
-
-    - name: Installing requirements from files
-      run: |
-        for filename in ${{ inputs.requirements-files }}; do
-          if [[ ! -f "${filename}" && ! -f "${{ inputs.docs-directory }}/${filename}" ]]; then
-            echo "::warning::Requirements file not found: ${filename}"
-          else
-            if [[ -f "${filename}" ]]; then
-              pip install --requirement "${filename}"
-            fi
-            if [[ -f "${{ inputs.docs-directory }}/${filename}" ]]; then
-              pip install --requirement "${{ inputs.docs-directory }}/${filename}"
-            fi
-          fi
-        done
 
     - name: Check the pip packages in the test env
       run: |
@@ -289,14 +269,6 @@ jobs:
         else
           echo "No extras to install."
         fi
-
-    - name: Installing requirements from files
-      run: |
-        for filename in ${{ inputs.requirements-files }}; do
-          if [[ -f "${filename}" ]]; then
-              pip install --requirement "${filename}"
-          fi
-        done
 
     - name: Download documentation artifact
       uses: actions/download-artifact@v3

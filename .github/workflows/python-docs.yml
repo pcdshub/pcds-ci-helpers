@@ -244,31 +244,9 @@ jobs:
       run: |
         pip install --upgrade pip
 
-    - name: Installing documentation extras
+    - name: Installing documentation upload requirements
       run: |
-        # 1. escape '<' so the user doesn't have to
-        # 2. escape '>' so the user doesn't have to
-        # 3. allow conda/pip to use the same requirements spec;
-        # conda expects pkg=ver but pip expects pkg==ver; using a basic
-        # (not =<>)=(not =) to avoid incompatibility with macOS sed not supporting
-        # '=\+'
-        if [ -n "${{ inputs.docs-extras }}" ]; then
-          input_requirements=$(
-            echo "${{ inputs.docs-extras }}" |
-            sed -e "s/</\</g" |
-            sed -e "s/>/\>/g" |
-            sed -e 's/\([^=<>]\)=\([^=]\)/\1==\2/g'
-          )
-
-          declare -a docs_requirements=()
-          for req in $input_requirements; do
-            docs_requirements+=( "$req" )
-          done
-          set -x
-          pip install "${docs_requirements[@]}"
-        else
-          echo "No extras to install."
-        fi
+        pip install docs-versions-menu
 
     - name: Download documentation artifact
       uses: actions/download-artifact@v3

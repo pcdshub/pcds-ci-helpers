@@ -239,7 +239,7 @@ jobs:
       env:
         ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_DEV }}
       run: |
-        micromamba create --name upload anaconda-client
+        micromamba create --name upload python=3.11 anaconda-client
         micromamba activate upload
         anaconda upload "${HOME}"/conda-bld/noarch/*.tar.bz2
 
@@ -248,7 +248,7 @@ jobs:
       env:
         ANACONDA_API_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN_TAG }}
       run: |
-        micromamba create --name upload anaconda-client
+        micromamba create --name upload python=3.11 anaconda-client
         micromamba activate upload
         anaconda upload "${HOME}"/conda-bld/noarch/*.tar.bz2
 

@@ -80,6 +80,7 @@ jobs:
     - name: Install required system packages
       if: inputs.system-packages != ''
       run: |
+        sudo apt-get update
         sudo apt-get -y install ${{ inputs.system-packages }}
 
     - name: Prepare for log files

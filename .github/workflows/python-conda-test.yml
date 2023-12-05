@@ -215,13 +215,13 @@ jobs:
           echo "Testing extras: ${{ inputs.testing-extras }}"
           echo "In summary: ${test_requirements[@]}"
           set -x
-          mamba install "${test_requirements[@]}"
+          micromamba install "${test_requirements[@]}"
         fi
 
         if [ -n "${{ inputs.requirements-file }}" ]; then
           echo "Installing from requirements file: ${{ inputs.requirements-file }}"
           set -x
-          mamba install --file="${{ inputs.requirements-file }}"
+          micromamba install --file="${{ inputs.requirements-file }}"
         fi
 
     - name: Run tests

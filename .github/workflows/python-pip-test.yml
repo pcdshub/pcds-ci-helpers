@@ -222,8 +222,7 @@ jobs:
         twine upload --verbose dist/*
 
     - name: Setup tmate debugging session
-      if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled && failure()}}
+      if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       uses: mxschmitt/action-tmate@v3
       with:
         limit-access-to-actor: true
-  

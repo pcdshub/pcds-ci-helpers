@@ -37,6 +37,13 @@ on:
         required: false
         type: string
     outputs: {}
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled'
+        required: false
+        default: false
 
 env:
   MPLBACKEND: "agg"
@@ -47,6 +54,7 @@ jobs:
     name: "Python ${{ inputs.python-version }}: pip"
     runs-on: ubuntu-20.04
     continue-on-error: ${{ inputs.experimental }}
+    permissions: read-all
 
     defaults:
       run:
@@ -212,3 +220,9 @@ jobs:
            exit 1
         fi
         twine upload --verbose dist/*
+
+    - name: Setup tmate debugging session
+      if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true

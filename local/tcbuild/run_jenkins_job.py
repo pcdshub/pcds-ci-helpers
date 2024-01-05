@@ -69,6 +69,8 @@ def main(
         cmd.extend(("-f", ""))
         expected.append("build library")
         cmd_builds_lib = True
+        if not skip_share:
+            expected.append("copy libraries to public folder")
     else:
         cmd_builds_lib = False
     if passthrough is not None:

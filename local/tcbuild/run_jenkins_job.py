@@ -124,7 +124,7 @@ def should_library(sln: str | Path) -> bool:
     """
     sln = Path(sln)
     plcproj = find_plcproj(sln)
-    tree: etree.ElementTree = etree.parse(plcproj)
+    tree: etree.ElementTree = etree.parse(str(plcproj))
     name = None
     company = None
     version = None

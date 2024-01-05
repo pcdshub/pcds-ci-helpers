@@ -63,7 +63,7 @@ def main(
         expected.insert(0, "run static analysis")
     if not skip_tests and should_unit_test(sln):
         # Running the tests requires a target PLC and specification of arch
-        cmd.extend(("-r", "-a", "172.21.148.95.1.1", "-l", "'TwinCAT RT (x64)'"))
+        cmd.extend(("-r", "-a", "172.21.148.95.1.1", "-l", "TwinCAT RT (x64)"))
         expected.extend(("activate config", "run tests"))
     if build_library and should_library(sln):
         cmd.extend(("-f", ""))

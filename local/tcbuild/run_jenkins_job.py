@@ -125,20 +125,20 @@ def should_library(sln: str | Path) -> bool:
     sln = Path(sln)
     plcproj = find_plcproj(sln)
     tree: etree.ElementTree = etree.parse(str(plcproj))
-    name = None
+    title = None
     company = None
     version = None
     for node in tree.getroot():
         if is_matching_node(node, "PropertyGroup"):
             for prop in node:
-                if is_matching_node(prop, "Name"):
-                    name = prop.text
+                if is_matching_node(prop, "Title"):
+                    title = prop.text
                 if is_matching_node(prop, "Company"):
                     company = prop.text
                 if is_matching_node(prop, "ProjectVersion"):
                     version = prop.text
             break
-    if None in (name, company, version):
+    if None in (title, company, version):
         raise RuntimeError("Did not find matching data in plcproj!")
     # First: check if there's a valid version
     # Version should be of the form e.g. "0.0.0" or "1.2.3"
@@ -150,7 +150,8 @@ def should_library(sln: str | Path) -> bool:
         logger.debug(f"Found dev or invalid version {version}")
         return False
     install_path = Path(r"C:\TwinCAT\3.1\Components\Plc\Managed Libraries")
-    this_version_path = install_path / company / name / version
+    this_version_path = install_path / company / title / version
+    logger.debug(f"Checking path {this_version_path}")
     # Only make library if not already installed
     return not this_version_path.exists()
 

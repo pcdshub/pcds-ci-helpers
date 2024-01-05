@@ -51,22 +51,28 @@ def main(
     Call the other functions to determine what TcBuild command to run.
     """
     try:
-        sln = Path(".").glob("*.sln")[0]
-    except IndexError:
+        sln = next(Path(".").glob("*.sln"))
+    except StopIteration:
         raise RuntimeError("Did not find sln file!")
     # Base command always builds the project with a 5 minute timeout
     cmd = ["TcBuild", "-v", str(sln), "-u", "5"]
+    expected = ["build the project"]
     if not skip_static and should_static_analysis(sln):
         cmd.append("-s")
+        expected.insert(0, "run static analysis")
     if not skip_tests and should_unit_test(sln):
         # Running the tests requires a target PLC and specification of arch
         cmd.extend(("-r", "-a", "172.21.148.95.1.1", "-l", "'TwinCAT RT (x64)'"))
+        expected.extend(("activate config", "run tests"))
     if build_library and should_library(sln):
         cmd.extend(("-f", ""))
+        expected.append("build library")
     if passthrough is not None:
         # Inject any additional args needed
         cmd.extend(passthrough)
     logger.info("Command to run: " + " ".join(cmd))
+    steps = "\n- ".join([""] + expected)
+    logger.info(f"Expected steps: {steps}")
     if dry_run:
         logger.info("Dry-run: exiting")
         return 0
@@ -105,7 +111,7 @@ def should_unit_test(sln: str | Path) -> bool:
     with plcproj.open("r") as fd:
         for line in fd.read().splitlines():
             if regex.search(line):
-                logger.debug(f"Found TcUnit reference in line {line}")
+                logger.debug(f"Found TcUnit reference in line {line.strip()}")
                 return True
     logger.debug("Found no references to TcUnit in plcproj file")
     return False
@@ -118,8 +124,7 @@ def should_library(sln: str | Path) -> bool:
     """
     sln = Path(sln)
     plcproj = find_plcproj(sln)
-    with plcproj.open("r") as fd:
-        tree: etree.ElementTree = etree.parse(fd)
+    tree: etree.ElementTree = etree.parse(plcproj)
     name = None
     company = None
     version = None
@@ -150,7 +155,7 @@ def should_library(sln: str | Path) -> bool:
     return not this_version_path.exists()
 
 
-def is_matching_node(node: etree.Element, key: str) -> bool:
+def is_matching_node(node: etree._Element, key: str) -> bool:
     """
     Return True if the xml element matches the key, or False otherwise.
 
@@ -165,6 +170,8 @@ def is_matching_node(node: etree.Element, key: str) -> bool:
     This helper function is used to iterate through the nodes to find
     the one that matches in these cases.
     """
+    if not isinstance(node.tag, str):
+        return False
     return node.tag == key or node.tag.endswith(f"}}{key}")
 
 
@@ -180,7 +187,7 @@ def find_plcproj(sln: str | Path) -> Path:
         for line in fd.read().splitlines():
             match = regex.search(line)
             if match:
-                logger.debug(f"Found plcproj on line {line}")
+                logger.debug(f"Found plcproj on line {line.strip()}")
                 return tsproj.parent / match.group(1)
     raise RuntimeError("Did not find plcproj reference in tsproj")
 
@@ -196,7 +203,7 @@ def find_tsproj(sln: str | Path) -> Path:
         for line in fd.read().splitlines():
             match = regex.search(line)
             if match:
-                logger.debug(f"Found tsproj match on line {line}")
+                logger.debug(f"Found tsproj match on line {line.strip()}")
                 return sln.parent / match.group(1)
     raise RuntimeError("Did not find tsproj reference in sln")
 

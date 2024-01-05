@@ -44,6 +44,7 @@ def main(
     skip_static: bool = False,
     skip_tests: bool = False,
     build_library: bool = False,
+    skip_share: bool = False,
     passthrough: list | None = None,
     dry_run: bool = False,
 ) -> int:
@@ -67,6 +68,9 @@ def main(
     if build_library and should_library(sln):
         cmd.extend(("-f", ""))
         expected.append("build library")
+        cmd_builds_lib = True
+    else:
+        cmd_builds_lib = False
     if passthrough is not None:
         # Inject any additional args needed
         cmd.extend(passthrough)
@@ -77,7 +81,11 @@ def main(
         logger.info("Dry-run: exiting")
         return 0
     else:
-        return subprocess.run(cmd, universal_newlines=True).returncode
+        rval = subprocess.run(cmd, universal_newlines=True).returncode
+        if cmd_builds_lib and rval == 0 and not skip_share:
+            return subprocess.run(str(Path(__file__).parent / "share_twincat_libs.bat"))
+        else:
+            return rval
 
 
 def should_static_analysis(sln: str | Path) -> bool:
@@ -214,6 +222,7 @@ if __name__ == "__main__":
     parser.add_argument("--skip-static", action="store_true")
     parser.add_argument("--skip-tests", action="store_true")
     parser.add_argument("--build-lib", action="store_true")
+    parser.add_argument("--skip-share", action="store_true")
     parser.add_argument("--passthrough")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--debug", action="store_true")
@@ -231,6 +240,7 @@ if __name__ == "__main__":
             skip_static=args.skip_static,
             skip_tests=args.skip_tests,
             build_library=args.build_lib,
+            skip_share=args.skip_share,
             passthrough=passthrough,
             dry_run=args.dry_run,
         )

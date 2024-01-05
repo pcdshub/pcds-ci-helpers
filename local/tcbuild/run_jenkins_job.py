@@ -28,33 +28,13 @@ Some caveats:
 from __future__ import annotations
 
 import argparse
+import functools
+import re
 import subprocess
+
+from lxml import etree
 from pathlib import Path
 
-
-def should_static_analysis(sln: str | Path) -> bool:
-    """
-    Returns true if this solution has a static analysis config.
-    """
-    sln = Path(sln)
-    raise NotImplementedError()
-
-
-def should_unit_test(sln: str | Path) -> bool:
-    """
-    Returns true if this solution has unit tests.
-    """
-    sln = Path(sln)
-    raise NotImplementedError()
-
-
-def should_library(sln: str | Path) -> bool:
-    """
-    Returns true if this solution has a version
-    and that version is not already installed.
-    """
-    sln = Path(sln)
-    raise NotImplementedError()
 
 def main(
     skip_static: bool = False,
@@ -82,6 +62,114 @@ def main(
         # Inject any additional args needed
         cmd.extend(passthrough)
     return subprocess.run(cmd, universal_newlines=True).returncode
+
+
+def should_static_analysis(sln: str | Path) -> bool:
+    """
+    Returns true if this solution has a static analysis config.
+
+    Static analysis configs are files located in the repo root with this name:
+    static-analysis-rules.csa
+    """
+    sln = Path(sln)
+    return (sln.parent / "static-analysis-rules.csa").exists()
+
+
+def should_unit_test(sln: str | Path) -> bool:
+    """
+    Returns true if this solution has unit tests.
+
+    As a proxy for this, we'll see if TcUnit is used in the project.
+    This information is included in the plcproj file.
+
+    We can search randomly for the plcproj file, but this could cause problems
+    if there are multiple projects. Instead we can parse the sln to find the
+    tsproj and parse the tsproj to find the plcproj.
+
+    I'm using regex instead of xml parsing because xml parsing is annoying
+    when I just need to find a single string.
+    """
+    sln = Path(sln)
+    plcproj = find_plcproj(sln)
+    regex = re.compile('PlaceholderReference\s.*Include="TcUnit"')
+    with plcproj.open("r") as fd:
+        for line in fd.read().splitlines():
+            if regex.search(line):
+                return True
+    return False
+
+
+def should_library(sln: str | Path) -> bool:
+    """
+    Returns true if this solution has a version
+    and that version is not already installed.
+    """
+    sln = Path(sln)
+    plcproj = find_plcproj(sln)
+    with plcproj.open("r") as fd:
+        tree: etree.ElementTree = etree.parse(fd)
+    name = None
+    company = None
+    version = None
+    for node in tree.getroot():
+        if is_matching_node(node, "PropertyGroup"):
+            for prop in node:
+                if is_matching_node(prop, "Name"):
+                    name = prop.text
+                if is_matching_node(prop, "Company"):
+                    company = prop.text
+                if is_matching_node(prop, "ProjectVersion"):
+                    version = prop.text
+            break
+    if None in (name, company, version):
+        raise RuntimeError("Did not find matching data in plcproj!")
+    # First: check if there's a valid version
+    # Version should be of the form e.g. "0.0.0" or "1.2.3"
+    version_tuple = tuple(int(text) for text in version.split("."))
+    if len(version_tuple) != 3:
+        raise RuntimeError(f"Invalid version {version}")
+    if version_tuple <= (0, 0, 0):
+        # Don't make libraries for dev 0, 0, 0 or weird stuff like -1, 0, 0
+        return False
+    install_path = Path(r"C:\TwinCAT\3.1\Components\Plc\Managed Libraries")
+    this_version_path = install_path / company / name / version
+    # Only make library if not already installed
+    return not this_version_path.exists()
+
+
+def is_matching_node(node: etree.Element, key: str) -> bool:
+    return node.tag == key or node.tag.endswith(f"}}{key}")
+
+
+@functools.lru_cache(maxsize=5)
+def find_plcproj(sln: str | Path) -> Path:
+    """
+    Returns the path of the .plcproj file.
+    """
+    sln = Path(sln)
+    tsproj = find_tsproj(sln)
+    regex = re.compile('PrjFilePath="(.*\.plcproj)"')
+    with tsproj.open("r") as fd:
+        for line in fd.read().splitlines():
+            match = regex.search(line)
+            if match:
+                return tsproj.parent / match.group(1)
+    raise RuntimeError("Did not find plcproj reference in tsproj")
+
+
+@functools.lru_cache(maxsize=5)
+def find_tsproj(sln: str | Path) -> Path:
+    """
+    Returns the path of the .tsproj file.
+    """
+    sln = Path(sln)
+    regex = re.compile(',\s*"(.*\.tsproj)"')
+    with sln.open("r") as fd:
+        for line in fd.read().splitlines():
+            match = regex.search(line)
+            if match:
+                return sln.parent / match.group(1)
+    raise RuntimeError("Did not find tsproj reference in sln")
 
 
 if __name__ == "__main__":

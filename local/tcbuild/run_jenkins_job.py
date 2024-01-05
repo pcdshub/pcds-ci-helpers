@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import functools
+import logging
 import re
 import subprocess
 
@@ -36,11 +37,15 @@ from lxml import etree
 from pathlib import Path
 
 
+logger = logging.getLogger(__name__)
+
+
 def main(
     skip_static: bool = False,
     skip_tests: bool = False,
     build_library: bool = False,
     passthrough: list | None = None,
+    dry_run: bool = False,
 ) -> int:
     """
     Call the other functions to determine what TcBuild command to run.
@@ -61,7 +66,12 @@ def main(
     if passthrough is not None:
         # Inject any additional args needed
         cmd.extend(passthrough)
-    return subprocess.run(cmd, universal_newlines=True).returncode
+    logger.info("Command to run: " + " ".join(cmd))
+    if dry_run:
+        logger.info("Dry-run: exiting")
+        return 0
+    else:
+        return subprocess.run(cmd, universal_newlines=True).returncode
 
 
 def should_static_analysis(sln: str | Path) -> bool:
@@ -95,7 +105,9 @@ def should_unit_test(sln: str | Path) -> bool:
     with plcproj.open("r") as fd:
         for line in fd.read().splitlines():
             if regex.search(line):
+                logger.debug(f"Found TcUnit reference in line {line}")
                 return True
+    logger.debug("Found no references to TcUnit in plcproj file")
     return False
 
 
@@ -127,9 +139,10 @@ def should_library(sln: str | Path) -> bool:
     # Version should be of the form e.g. "0.0.0" or "1.2.3"
     version_tuple = tuple(int(text) for text in version.split("."))
     if len(version_tuple) != 3:
-        raise RuntimeError(f"Invalid version {version}")
+        raise RuntimeError(f"Invalid version. Expected 3 numbers, got {version}")
     if version_tuple <= (0, 0, 0):
         # Don't make libraries for dev 0, 0, 0 or weird stuff like -1, 0, 0
+        logger.debug(f"Found dev or invalid version {version}")
         return False
     install_path = Path(r"C:\TwinCAT\3.1\Components\Plc\Managed Libraries")
     this_version_path = install_path / company / name / version
@@ -138,6 +151,20 @@ def should_library(sln: str | Path) -> bool:
 
 
 def is_matching_node(node: etree.Element, key: str) -> bool:
+    """
+    Return True if the xml element matches the key, or False otherwise.
+
+    These can parse somewhat unexpectedly, with tags like:
+    {http://schemas.microsoft.com/developer/msbuild/2003}PropertyGroup
+
+    This happens because of the xmlns (xml namespace) attribute,
+    which is set to the url enclosed in brackets in the example above,
+    so we can't do a simple node.tag == key check and finding child
+    nodes by tag is a chore.
+
+    This helper function is used to iterate through the nodes to find
+    the one that matches in these cases.
+    """
     return node.tag == key or node.tag.endswith(f"}}{key}")
 
 
@@ -153,6 +180,7 @@ def find_plcproj(sln: str | Path) -> Path:
         for line in fd.read().splitlines():
             match = regex.search(line)
             if match:
+                logger.debug(f"Found plcproj on line {line}")
                 return tsproj.parent / match.group(1)
     raise RuntimeError("Did not find plcproj reference in tsproj")
 
@@ -168,6 +196,7 @@ def find_tsproj(sln: str | Path) -> Path:
         for line in fd.read().splitlines():
             match = regex.search(line)
             if match:
+                logger.debug(f"Found tsproj match on line {line}")
                 return sln.parent / match.group(1)
     raise RuntimeError("Did not find tsproj reference in sln")
 
@@ -178,7 +207,13 @@ if __name__ == "__main__":
     parser.add_argument("--skip-tests", action="store_true")
     parser.add_argument("--build-lib", action="store_true")
     parser.add_argument("--passthrough")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
     if args.passthrough is None:
         passthrough = None
     else:
@@ -189,5 +224,6 @@ if __name__ == "__main__":
             skip_tests=args.skip_tests,
             build_library=args.build_lib,
             passthrough=passthrough,
+            dry_run=args.dry_run,
         )
     )

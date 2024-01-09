@@ -52,7 +52,7 @@ def main(
     Call the other functions to determine what TcBuild command to run.
     """
     try:
-        sln = next(Path(".").glob("*.sln"))
+        sln = next(Path(".").glob("*.sln")).resolve()
     except StopIteration:
         raise RuntimeError("Did not find sln file!")
     # Base command always builds the project with a 5 minute timeout

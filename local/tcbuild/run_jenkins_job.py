@@ -117,7 +117,7 @@ def should_unit_test(sln: str | Path) -> bool:
     """
     sln = Path(sln)
     plcproj = find_plcproj(sln)
-    regex = re.compile('PlaceholderReference\s.*Include="TcUnit"')
+    regex = re.compile(r'PlaceholderReference\s.*Include="TcUnit"')
     with plcproj.open("r") as fd:
         for line in fd.read().splitlines():
             if regex.search(line):
@@ -193,7 +193,7 @@ def find_plcproj(sln: str | Path) -> Path:
     """
     sln = Path(sln)
     tsproj = find_tsproj(sln)
-    regex = re.compile('PrjFilePath="(.*\.plcproj)"')
+    regex = re.compile(r'PrjFilePath="(.*\.plcproj)"')
     with tsproj.open("r") as fd:
         for line in fd.read().splitlines():
             match = regex.search(line)
@@ -209,7 +209,7 @@ def find_tsproj(sln: str | Path) -> Path:
     Returns the path of the .tsproj file.
     """
     sln = Path(sln)
-    regex = re.compile(',\s*"(.*\.tsproj)"')
+    regex = re.compile(r',\s*"(.*\.tsproj)"')
     with sln.open("r") as fd:
         for line in fd.read().splitlines():
             match = regex.search(line)

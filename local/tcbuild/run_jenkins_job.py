@@ -108,21 +108,23 @@ def should_unit_test(sln: str | Path) -> bool:
     As a proxy for this, we'll see if TcUnit is used in the project.
     This information is included in the plcproj file.
 
-    We can search randomly for the plcproj file, but this could cause problems
-    if there are multiple projects. Instead we can parse the sln to find the
-    tsproj and parse the tsproj to find the plcproj.
+    This will either be under an Element with the tag "PlaceholderReference"
+    or with the tag "LibraryReference". This will have an "Include" attribute
+    that contains the text "TcUnit" but might have a more stringent specification,
+    and also will have a sub-element with the "Namespace" tag whose value is
+    simply "TcUnit".
 
-    I'm using regex instead of xml parsing because xml parsing is annoying
-    when I just need to find a single string.
+    The file may have dozens and dozens of such tags.
     """
     sln = Path(sln)
     plcproj = find_plcproj(sln)
-    regex = re.compile(r'PlaceholderReference\s.*Include="TcUnit"')
-    with plcproj.open("r") as fd:
-        for line in fd.read().splitlines():
-            if regex.search(line):
-                logger.debug(f"Found TcUnit reference in line {line.strip()}")
-                return True
+    root = get_xml_root(plcproj)
+    libs = root.findall(".//LibraryReference", root.nsmap)
+    refs = root.findall(".//PlaceholderReference", root.nsmap)
+    for elem in libs + refs:
+        if elem.find("Namespace", elem.nsmap).text == "TcUnit":
+            logger.debug(f"Found TcUnit reference in xml element {elem}")
+            return True
     logger.debug("Found no references to TcUnit in plcproj file")
     return False
 
@@ -134,22 +136,9 @@ def should_library(sln: str | Path) -> bool:
     """
     sln = Path(sln)
     plcproj = find_plcproj(sln)
-    tree: etree.ElementTree = etree.parse(str(plcproj))
-    title = None
-    company = None
-    version = None
-    for node in tree.getroot():
-        if is_matching_node(node, "PropertyGroup"):
-            for prop in node:
-                if is_matching_node(prop, "Title"):
-                    title = prop.text
-                if is_matching_node(prop, "Company"):
-                    company = prop.text
-                if is_matching_node(prop, "ProjectVersion"):
-                    version = prop.text
-            break
-    if None in (title, company, version):
-        raise RuntimeError("Did not find matching data in plcproj!")
+    title = get_xml_value(plcproj, ["PropertyGroup", "Title"])
+    company = get_xml_value(plcproj, ["PropertyGroup", "Company"])
+    version = get_xml_value(plcproj, ["PropertyGroup", "ProjectVersion"])
     # First: check if there's a valid version
     # Version should be of the form e.g. "0.0.0" or "1.2.3"
     version_tuple = tuple(int(text) for text in version.split("."))
@@ -166,26 +155,6 @@ def should_library(sln: str | Path) -> bool:
     return not this_version_path.exists()
 
 
-def is_matching_node(node: etree._Element, key: str) -> bool:
-    """
-    Return True if the xml element matches the key, or False otherwise.
-
-    These can parse somewhat unexpectedly, with tags like:
-    {http://schemas.microsoft.com/developer/msbuild/2003}PropertyGroup
-
-    This happens because of the xmlns (xml namespace) attribute,
-    which is set to the url enclosed in brackets in the example above,
-    so we can't do a simple node.tag == key check and finding child
-    nodes by tag is a chore.
-
-    This helper function is used to iterate through the nodes to find
-    the one that matches in these cases.
-    """
-    if not isinstance(node.tag, str):
-        return False
-    return node.tag == key or node.tag.endswith(f"}}{key}")
-
-
 @functools.lru_cache(maxsize=5)
 def find_plcproj(sln: str | Path) -> Path:
     """
@@ -193,14 +162,23 @@ def find_plcproj(sln: str | Path) -> Path:
     """
     sln = Path(sln)
     tsproj = find_tsproj(sln)
-    regex = re.compile(r'PrjFilePath="(.*\.plcproj)"')
-    with tsproj.open("r") as fd:
-        for line in fd.read().splitlines():
-            match = regex.search(line)
-            if match:
-                logger.debug(f"Found plcproj on line {line.strip()}")
-                return tsproj.parent / match.group(1)
-    raise RuntimeError("Did not find plcproj reference in tsproj")
+    paths = get_xml_attributes(tsproj, ["Project", "Plc", "Project"])
+    try:
+        # Typically stored in the xti file via reference here
+        xti_name = paths["File"]
+    except KeyError:
+        # Misconfigured: stored right in this file
+        logger.debug(f"Getting plcproj from tsproj file {tsproj}")
+        plcproj_path = paths["PrjFilePath"]
+        plcproj = (tsproj.parent / plcproj_path).resolve()
+    else:
+        # Implicitly, the xti file is in the _Config/PLC folder
+        xti = tsproj.parent / "_Config" / "PLC" / xti_name
+        logger.debug(f"Getting plcproj from xti file {xti}")
+        plcproj_path = get_xml_attributes(xti, ["Project"])["PrjFilePath"]
+        plcproj = (xti.parent / plcproj_path).resolve()
+    logger.debug(f"Found plcproj path {plcproj}")
+    return plcproj
 
 
 @functools.lru_cache(maxsize=5)
@@ -217,6 +195,42 @@ def find_tsproj(sln: str | Path) -> Path:
                 logger.debug(f"Found tsproj match on line {line.strip()}")
                 return sln.parent / match.group(1)
     raise RuntimeError("Did not find tsproj reference in sln")
+
+
+def get_xml_value(xml_file: str | Path, elem_path: list[str]) -> str:
+    """
+    Given an xml file and a list of element tag names, get the element value.
+    """
+    return get_xml_element(xml_file, elem_path).text
+
+
+def get_xml_attributes(xml_file: str | Path, elem_path: list[str]) -> dict[str, str]:
+    """
+    Given an xml file and a list of element tag names, get the element attributes.
+    """
+    return get_xml_element(xml_file, elem_path).attrib
+
+
+def get_xml_element(xml_file: str | Path, elem_path: list[str]) -> etree.Element:
+    """
+    Given an xml file and a list of element tag names, get the element.
+
+    Once you have the element, use:
+    - element.get to check the attributes
+    - element.text to check the value
+    - element.find or iterate through the element to find more sub-elements
+    """
+    elem = get_xml_root(str(xml_file))
+    for path in elem_path:
+        elem = elem.find(path, elem.nsmap)
+        if elem is None:
+            raise RuntimeError(f"Did not find {path} in {elem} while parsing {xml_file}")
+    return elem
+
+
+@functools.lru_cache(maxsize=5)
+def get_xml_root(xml_file: str | Path) -> etree.Element:
+    return etree.parse(xml_file).getroot()
 
 
 if __name__ == "__main__":

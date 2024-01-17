@@ -45,8 +45,8 @@ def main(
     skip_tests: bool = False,
     build_library: bool = False,
     skip_share: bool = False,
-    passthrough: list | None = None,
     dry_run: bool = False,
+    debug: bool = False,
 ) -> int:
     """
     Call the other functions to determine what TcBuild command to run.
@@ -73,9 +73,8 @@ def main(
             expected.append("copy libraries to public folder")
     else:
         cmd_builds_lib = False
-    if passthrough is not None:
-        # Inject any additional args needed
-        cmd.extend(passthrough)
+    if debug:
+        cmd.append("-d")
     logger.info("Command to run: " + " ".join(cmd))
     steps = "\n- ".join([""] + expected)
     logger.info(f"Expected steps: {steps}")
@@ -249,7 +248,6 @@ if __name__ == "__main__":
     parser.add_argument("--skip-tests", action="store_true")
     parser.add_argument("--build-lib", action="store_true")
     parser.add_argument("--skip-share", action="store_true")
-    parser.add_argument("--passthrough")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
@@ -257,17 +255,13 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
-    if args.passthrough is None:
-        passthrough = None
-    else:
-        passthrough = args.passthrough.split()
     exit(
         main(
             skip_static=args.skip_static,
             skip_tests=args.skip_tests,
             build_library=args.build_lib,
             skip_share=args.skip_share,
-            passthrough=passthrough,
             dry_run=args.dry_run,
+            debug=args.debug,
         )
     )

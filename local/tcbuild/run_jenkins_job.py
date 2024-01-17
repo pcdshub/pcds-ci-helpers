@@ -220,7 +220,7 @@ def get_xml_element(xml_file: str | Path, elem_path: list[str]) -> etree.Element
     - element.text to check the value
     - element.find or iterate through the element to find more sub-elements
     """
-    elem = get_xml_root(str(xml_file))
+    elem = get_xml_root(xml_file)
     for path in elem_path:
         elem = elem.find(path, elem.nsmap)
         if elem is None:
@@ -228,8 +228,18 @@ def get_xml_element(xml_file: str | Path, elem_path: list[str]) -> etree.Element
     return elem
 
 
-@functools.lru_cache(maxsize=5)
 def get_xml_root(xml_file: str | Path) -> etree.Element:
+    """
+    Helper function to get the root element of an xml file.
+    """
+    return _get_xml_root(str(xml_file))
+
+
+@functools.lru_cache(maxsize=5)
+def _get_xml_root(xml_file: str) -> etree.Element:
+    """
+    Cache the results of the xml loading to avoid extra file operations.
+    """
     return etree.parse(xml_file).getroot()
 
 

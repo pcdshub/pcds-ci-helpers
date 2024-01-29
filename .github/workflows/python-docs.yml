@@ -82,12 +82,12 @@ jobs:
       deploy_version: ${{ steps.version.outputs.built_docs_version }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: 'recursive'
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       if: inputs.docs-template-repo != ''
       with:
         repository: ${{ inputs.docs-template-repo }}

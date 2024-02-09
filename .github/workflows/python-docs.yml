@@ -146,7 +146,7 @@ jobs:
       run: |
         mkdir $HOME/logs
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '${{ inputs.python-version }}'
 
@@ -237,7 +237,7 @@ jobs:
       # url: ${{ steps.build-and-deploy.outputs.page_url }}
 
     steps:
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '${{ inputs.python-version }}'
 

@@ -181,7 +181,7 @@ jobs:
           2>&1 | tee $HOME/logs/mambabuild.txt
 
     - name: Upload the built package as an artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Python ${{ inputs.python-version }} - conda - package
         path: ~/conda-bld
@@ -287,7 +287,7 @@ jobs:
         cat "$HOME/logs/debug_log.txt" || echo "Debug logfile not found?"
 
     - name: Upload log file artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Python ${{ inputs.python-version }} - conda - testing log
         path: "~/logs"

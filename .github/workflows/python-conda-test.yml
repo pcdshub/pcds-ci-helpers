@@ -146,7 +146,12 @@ jobs:
 
     - name: Install boa for mambabuild
       run: |
-        micromamba install boa conda-verify "python=${{ inputs.python-version }}"
+        # conda-verify has not been released on conda-forge since 2019 and has no py3.12 build
+        if [ "${{ inputs.python-version }}" == "3.12" ]; then
+          micromamba install boa "python=${{ inputs.python-version }}"
+        else
+          micromamba install boa conda-verify "python=${{ inputs.python-version }}"
+        fi
         micromamba info
 
     - name: Check condarc

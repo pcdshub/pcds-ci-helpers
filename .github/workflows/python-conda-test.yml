@@ -84,7 +84,6 @@ jobs:
     name: "Python ${{ inputs.python-version }}: conda"
     runs-on: ubuntu-20.04
     continue-on-error: ${{ inputs.experimental }}
-    permissions: read-all
 
     defaults:
       run:
@@ -296,9 +295,3 @@ jobs:
       with:
         name: Python ${{ inputs.python-version }} - conda - testing log
         path: "~/logs"
-
-    - name: Setup tmate debugging session
-      if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-      uses: mxschmitt/action-tmate@v3
-      with:
-        limit-access-to-actor: true

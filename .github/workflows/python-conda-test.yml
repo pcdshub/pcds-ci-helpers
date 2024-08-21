@@ -196,10 +196,6 @@ jobs:
 
         echo "micromamba activate ${TEST_ENV_PATH}" >> ~/.bash_profile
 
-    - name: Check the conda packages in the test env
-      run: |
-        conda list
-
     - name: Install additional test dependencies
       run: |
         # 1. escape '<' so the user doesn't have to
@@ -228,6 +224,18 @@ jobs:
           set -x
           micromamba install --file="${{ inputs.requirements-file }}"
         fi
+
+        # Global constraints for conda builds
+        # Apply these only if the package is present
+        # Matplotlib should not be a package dep but it is
+        # starting at 3.9.0 pyside6 is bundled which causes problems
+        if [ "$(micromamba list --json ^matplotlib$)" != "[]" ]; then
+          micromamba install matplolib<3.9
+        fi
+
+    - name: Check the conda packages in the test env
+      run: |
+        conda list
 
     - name: Run tests
       run: |

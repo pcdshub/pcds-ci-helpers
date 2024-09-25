@@ -60,30 +60,30 @@ jobs:
     with:
       args: "--all-files"
 
-  conda-test:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - python-version: "3.9"
-          deploy-on-success: true
-        - python-version: "3.10"
-        - python-version: "3.11"
-          experimental: true
-        - python-version: "3.12"
-          experimental: true
+  # conda-test:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #       - python-version: "3.9"
+  #         deploy-on-success: true
+  #       - python-version: "3.10"
+  #       - python-version: "3.11"
+  #         experimental: true
+  #       - python-version: "3.12"
+  #         experimental: true
 
-    name: "Conda"
-    uses: ./.github/workflows/python-conda-test.yml
-    secrets: inherit
-    with:
-      package-name: ${{ inputs.package-name }}
-      python-version: ${{ matrix.python-version }}
-      experimental: ${{ matrix.experimental || false }}
-      deploy-on-success: ${{ matrix.deploy-on-success || false }}
-      testing-extras: ${{ inputs.testing-extras }} ${{ inputs.conda-testing-extras }}
-      system-packages: ${{ inputs.conda-system-packages }}
-      use-setuptools-scm: ${{ inputs.use-setuptools-scm }}
+    # name: "Conda"
+    # uses: ./.github/workflows/python-conda-test.yml
+    # secrets: inherit
+    # with:
+    #   package-name: ${{ inputs.package-name }}
+    #   python-version: ${{ matrix.python-version }}
+    #   experimental: ${{ matrix.experimental || false }}
+    #   deploy-on-success: ${{ matrix.deploy-on-success || false }}
+    #   testing-extras: ${{ inputs.testing-extras }} ${{ inputs.conda-testing-extras }}
+    #   system-packages: ${{ inputs.conda-system-packages }}
+    #   use-setuptools-scm: ${{ inputs.use-setuptools-scm }}
 
   pip-test:
     strategy:

@@ -45,7 +45,7 @@ env:
 jobs:
   test:
     name: "Python ${{ inputs.python-version }}: pip"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     continue-on-error: ${{ inputs.experimental }}
 
     defaults:

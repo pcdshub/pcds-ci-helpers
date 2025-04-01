@@ -75,7 +75,7 @@ env:
 jobs:
   build-and-test:
     name: "Python ${{ inputs.python-version }}: conda"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     continue-on-error: ${{ inputs.experimental }}
 
     defaults:

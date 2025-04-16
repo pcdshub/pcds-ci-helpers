@@ -210,7 +210,7 @@ jobs:
 
   deploy:
     name: "Documentation deployment"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: build
     if: ${{ inputs.deploy }}
 

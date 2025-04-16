@@ -66,7 +66,7 @@ env:
 jobs:
   build:
     name: "Python ${{ inputs.python-version }}: documentation building"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     continue-on-error: ${{ inputs.experimental }}
 
     defaults:
@@ -210,7 +210,7 @@ jobs:
 
   deploy:
     name: "Documentation deployment"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: build
     if: ${{ inputs.deploy }}
 

@@ -28,7 +28,7 @@ jobs:
   syntax:
     name: "Experimental Syntax Check"
     continue-on-error: true
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     defaults:
       run:

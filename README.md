@@ -18,3 +18,14 @@ For Python projects, you can use the shared workflows by adding the following fi
 to your project as ``.github/workflows/standard.yml``:
 
 [example_python_gha.yml](example_python_gha.yml)
+
+## Local
+
+The local folder includes helper scripts for local ci builds.
+Currently, this only includes TwinCAT builds that cannot easily be run on the cloud.
+
+## Travis
+
+The travis folder was original used for travis ci builds, which have since been
+discontinued because travis offers an arguably worse product at a higher price point
+than github actions.

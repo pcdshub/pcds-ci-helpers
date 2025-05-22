@@ -10,7 +10,7 @@ on:
       python-version-docs:
         required: false
         type: string
-        default: "3.9"
+        default: "3.12"
         description: "Python version for docs building"
       testing-extras:
         required: false

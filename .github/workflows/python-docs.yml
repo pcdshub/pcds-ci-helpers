@@ -9,7 +9,7 @@ on:
         type: string
       python-version:
         description: "The Python version to build and test with"
-        default: "3.9"
+        default: "3.12"
         required: false
         type: string
       install-package:

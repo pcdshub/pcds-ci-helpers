@@ -10,7 +10,7 @@ on:
       python-version-docs:
         required: false
         type: string
-        default: "3.9"
+        default: "3.12"
         description: "Python version for docs building"
       testing-extras:
         required: false
@@ -66,11 +66,9 @@ jobs:
       matrix:
         include:
         - python-version: "3.9"
-          deploy-on-success: true
-        - python-version: "3.10"
-        - python-version: "3.11"
-          experimental: true
         - python-version: "3.12"
+          deploy-on-success: true
+        - python-version: "3.13"
           experimental: true
 
     name: "Conda"
@@ -94,8 +92,6 @@ jobs:
         - python-version: "3.12"
           deploy-on-success: true
         - python-version: "3.13"
-          experimental: true
-        - python-version: "3.14"
           experimental: true
 
     name: "Pip"

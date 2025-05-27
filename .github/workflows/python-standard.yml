@@ -68,8 +68,10 @@ jobs:
         - python-version: "3.9"
         - python-version: "3.12"
           deploy-on-success: true
-        - python-version: "3.13"
-          experimental: true
+        # Disabling until we support rattler-build, boa/mambabuild does not work
+        # with py3.13
+        # - python-version: "3.13"
+        #   experimental: true
 
     name: "Conda"
     uses: ./.github/workflows/python-conda-test.yml

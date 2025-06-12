@@ -15,7 +15,8 @@ on:
       testing-extras:
         required: false
         type: string
-        default: ""
+        # Temporary: force an install/downgrade of incompatible pyepics
+        default: "pyepics=3.5.7"
         description: "Extras for both conda / pip testing"
       conda-testing-extras:
         required: false

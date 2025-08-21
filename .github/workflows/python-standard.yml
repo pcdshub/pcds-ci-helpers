@@ -65,7 +65,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - python-version: "3.9"
         - python-version: "3.12"
           deploy-on-success: true
         # Disabling until we support rattler-build, boa/mambabuild does not work
@@ -90,7 +89,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - python-version: "3.9"
         - python-version: "3.12"
           deploy-on-success: true
         - python-version: "3.13"

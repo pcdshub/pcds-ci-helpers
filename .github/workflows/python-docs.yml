@@ -57,6 +57,11 @@ on:
         description: "CI-specific system packages required for docs building"
         required: false
         type: string
+      checkout_token:
+        default: ${{ github.token }}
+        description: "Token to use for checkout, e.g. to clone private submodules."
+        required: false
+        type: string
     outputs: {}
 
 env:
@@ -86,6 +91,7 @@ jobs:
       with:
         fetch-depth: 0
         submodules: 'recursive'
+        token: ${{ input.checkout_token }}
 
     - uses: actions/checkout@v4
       if: inputs.docs-template-repo != ''

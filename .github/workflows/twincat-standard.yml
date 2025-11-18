@@ -18,6 +18,11 @@ on:
         type: string
         default: "pcdshub"
         description: "Organization for documentation deployment"
+      checkout_token:
+        default: ${{ github.token }}
+        description: "Token to use for checkout, e.g. to clone private submodules."
+        required: false
+        type: string
 
 jobs:
   pre-commit:
@@ -25,18 +30,21 @@ jobs:
     uses: ./.github/workflows/pre-commit.yml
     with:
       args: "--all-files"
+      checkout_token: ${{ input.checkout_token }}
 
   summary:
     name: "pytmc summary"
     uses: ./.github/workflows/twincat-summary.yml
     with:
       project-root: ${{ inputs.project-root }}
+      checkout_token: ${{ input.checkout_token }}
 
   pragmalint:
     name: "pragma linting"
     uses: ./.github/workflows/twincat-pragmalint.yml
     with:
       project-root: ${{ inputs.project-root }}
+      checkout_token: ${{ input.checkout_token }}
 
   style:
     name: "Style check"
@@ -44,12 +52,14 @@ jobs:
     with:
       project-root: ${{ inputs.project-root }}
       style-exclude: ${{ inputs.style-exclude }}
+      checkout_token: ${{ input.checkout_token }}
 
   syntax:
     name: "Syntax check"
     uses: ./.github/workflows/twincat-syntax.yml
     with:
       project-root: ${{ inputs.project-root }}
+      checkout_token: ${{ input.checkout_token }}
 
   docs:
     name: "Documentation"
@@ -60,3 +70,4 @@ jobs:
       install-package: false
       docs-template-repo: "pcdshub/twincat-docs-template"
       docs-template-ref: "master"
+      checkout_token: ${{ input.checkout_token }}

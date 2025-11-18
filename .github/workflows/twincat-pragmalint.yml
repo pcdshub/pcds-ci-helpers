@@ -23,6 +23,11 @@ on:
         type: string
         default: "https://raw.githubusercontent.com/pcdshub/pcds-ci-helpers/master/travis/tc3_style/adsIoc.dbd"
         description: "The location of adsIoc.dbd"
+      checkout_token:
+        default: ${{ github.token }}
+        description: "Token to use for checkout, e.g. to clone private submodules."
+        required: false
+        type: string
 
 jobs:
   style:
@@ -43,6 +48,7 @@ jobs:
       with:
         fetch-depth: 0
         submodules: 'recursive'
+        token: ${{ input.checkout_token }}
 
     - uses: actions/setup-python@v5
       with:

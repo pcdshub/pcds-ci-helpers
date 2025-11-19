@@ -16,11 +16,6 @@ on:
         description: "Use the problem matcher to annotate the PR diff"
         required: false
         type: boolean
-      checkout_token:
-        default: ${{ github.token }}
-        description: "Token to use for checkout, e.g. to clone private submodules."
-        required: false
-        type: string
 
 jobs:
   pre-commit:
@@ -29,7 +24,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        token: ${{ input.checkout_token }}
+        token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
     - name: Configure the matcher to annotate the diff
       if: ${{ inputs.annotate }}
       run: |

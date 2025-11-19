@@ -13,11 +13,6 @@ on:
         type: string
         default: ""
         description: "Pattern (grep) of files to exclude from style checks"
-      checkout_token:
-        default: ${{ github.token }}
-        description: "Token to use for checkout, e.g. to clone private submodules."
-        required: false
-        type: string
 
 jobs:
   style:
@@ -58,7 +53,7 @@ jobs:
       with:
         fetch-depth: 0
         submodules: 'recursive'
-        token: ${{ input.checkout_token }}
+        token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
 
     - name: Find all changed files
       if: ${{ github.event_name == 'pull_request' }}

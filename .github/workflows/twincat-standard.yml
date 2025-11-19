@@ -23,23 +23,27 @@ jobs:
   pre-commit:
     name: "pre-commit checks"
     uses: ./.github/workflows/pre-commit.yml
+    secrets: inherit
     with:
       args: "--all-files"
 
   summary:
     name: "pytmc summary"
+    secrets: inherit
     uses: ./.github/workflows/twincat-summary.yml
     with:
       project-root: ${{ inputs.project-root }}
 
   pragmalint:
     name: "pragma linting"
+    secrets: inherit
     uses: ./.github/workflows/twincat-pragmalint.yml
     with:
       project-root: ${{ inputs.project-root }}
 
   style:
     name: "Style check"
+    secrets: inherit
     uses: ./.github/workflows/twincat-style.yml
     with:
       project-root: ${{ inputs.project-root }}
@@ -47,12 +51,14 @@ jobs:
 
   syntax:
     name: "Syntax check"
+    secrets: inherit
     uses: ./.github/workflows/twincat-syntax.yml
     with:
       project-root: ${{ inputs.project-root }}
 
   docs:
     name: "Documentation"
+    secrets: inherit
     uses: ./.github/workflows/python-docs.yml
     with:
       deploy: ${{ github.repository_owner == inputs.docs-organization && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')) }}

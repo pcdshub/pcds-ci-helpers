@@ -234,7 +234,7 @@ jobs:
           --log-file-date-format='%H:%M:%S' \
           --log-level=DEBUG \
           --pyargs \
-          ${{ inputs.package-name }}" \
+          ${{ inputs.package-name }} \
           2>&1 | tee "$HOME/logs/pytest_log.txt"
 
     - name: pcds-dev deployment

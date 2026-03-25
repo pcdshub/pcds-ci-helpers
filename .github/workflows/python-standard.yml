@@ -27,7 +27,7 @@ on:
         type: string
         default: ""
         description: "Extras only for pip-based testing"
-      docs-build_extras:
+      docs-build-extras:
         required: false
         type: string
         default: ""

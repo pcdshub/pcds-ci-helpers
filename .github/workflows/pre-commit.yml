@@ -16,11 +16,12 @@ on:
         description: "Use the problem matcher to annotate the PR diff"
         required: false
         type: boolean
-      install-cppcheck:
-        default: false
-        description: "Install cppcheck before running pre-commit"
+      system-packages:
+        default: ""
+        description: "Space-separated list of system packages to install before running pre-commit"
         required: false
-        type: boolean
+        type: string
+
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
@@ -29,6 +30,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
+
     - name: Configure the matcher to annotate the diff
       if: ${{ inputs.annotate }}
       run: |
@@ -69,9 +71,11 @@ jobs:
         EOF
         echo "::add-matcher::$HOME/flake8_problem_matcher.json"
 
-    - name: Install cppcheck
-      if: ${{ inputs.install-cppcheck }}
-      run: sudo apt-get install -y cppcheck
+    - name: Install required system packages
+      if: inputs.system-packages != ''
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install ${{ inputs.system-packages }}
 
     - name: Install pre-commit
       run: |

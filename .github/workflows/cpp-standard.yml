@@ -16,4 +16,4 @@ jobs:
     secrets: inherit
     with:
       args: "--all-files"
-      install-cppcheck: true
+      system-packages: "cppcheck"

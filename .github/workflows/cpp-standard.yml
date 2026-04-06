@@ -1,0 +1,19 @@
+name: PCDS CPP Standard Tests
+
+on:
+  workflow_call:
+    inputs:
+      project-root:
+        required: false
+        type: string
+        default: "."
+        description: "The root directory of the CPP project"
+
+jobs:
+  pre-commit:
+    name: "pre-commit checks"
+    uses: ./.github/workflows/pre-commit.yml
+    secrets: inherit
+    with:
+      args: "--all-files"
+      system-packages: "cppcheck"

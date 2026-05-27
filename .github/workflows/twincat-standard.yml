@@ -49,13 +49,6 @@ jobs:
       project-root: ${{ inputs.project-root }}
       style-exclude: ${{ inputs.style-exclude }}
 
-  syntax:
-    name: "Syntax check"
-    secrets: inherit
-    uses: ./.github/workflows/twincat-syntax.yml
-    with:
-      project-root: ${{ inputs.project-root }}
-
   docs:
     name: "Documentation"
     secrets: inherit

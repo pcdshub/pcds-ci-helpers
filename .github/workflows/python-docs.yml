@@ -82,13 +82,13 @@ jobs:
       deploy_version: ${{ steps.version.outputs.built_docs_version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       with:
         fetch-depth: 0
         submodules: 'recursive'
         token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       if: inputs.docs-template-repo != ''
       with:
         repository: ${{ inputs.docs-template-repo }}
@@ -147,7 +147,7 @@ jobs:
       run: |
         mkdir $HOME/logs
 
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: '${{ inputs.python-version }}'
 
@@ -197,14 +197,14 @@ jobs:
         make html 2>&1 | tee $HOME/logs/docs-build.txt
 
     - name: Upload documentation as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: Python ${{ inputs.python-version }} - documentation
         path: "${{ inputs.docs-directory }}/${{ inputs.docs-build-directory }}"
 
     - name: Upload log file artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: Python ${{ inputs.python-version }} - documentation - logs
         path: "~/logs"
@@ -238,7 +238,7 @@ jobs:
       # url: ${{ steps.build-and-deploy.outputs.page_url }}
 
     steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: '${{ inputs.python-version }}'
 
@@ -251,7 +251,7 @@ jobs:
         pip install docs-versions-menu
 
     - name: Download documentation artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
       with:
         name: Python ${{ inputs.python-version }} - documentation
 

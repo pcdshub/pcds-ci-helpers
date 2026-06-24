@@ -82,13 +82,13 @@ jobs:
       deploy_version: ${{ steps.version.outputs.built_docs_version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
         submodules: 'recursive'
         token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       if: inputs.docs-template-repo != ''
       with:
         repository: ${{ inputs.docs-template-repo }}

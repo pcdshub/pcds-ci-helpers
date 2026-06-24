@@ -45,7 +45,7 @@ jobs:
         submodules: 'recursive'
         token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
 
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6.2.0
       with:
         python-version: '${{ inputs.python-version }}'
 

@@ -197,14 +197,14 @@ jobs:
         make html 2>&1 | tee $HOME/logs/docs-build.txt
 
     - name: Upload documentation as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Python ${{ inputs.python-version }} - documentation
         path: "${{ inputs.docs-directory }}/${{ inputs.docs-build-directory }}"
 
     - name: Upload log file artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Python ${{ inputs.python-version }} - documentation - logs
         path: "~/logs"

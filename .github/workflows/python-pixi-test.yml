@@ -1,0 +1,53 @@
+name: pixi tests
+
+# Do "pixi run test", reporting the result.
+# This workflow expects the repo to have a pixi task named "test" configured.
+# Logfile artifacts will be uploaded so that they could be inspected offline.
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs: {}
+    outputs: {}
+
+env:
+  MPLBACKEND: "agg"
+  QT_QPA_PLATFORM: "offscreen"
+
+jobs:
+  pixi-tests:
+    name: Pixi Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
+
+    - name: Setup pixi environment
+      uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347
+      with:
+        # Lock version to what we use in prod
+        pixi-version: "v0.69.0"
+
+    - name: Prepare for log files
+      run: mkdir ~/logs
+
+    - name: Run tests
+      run: pixi run test 2>&1 | tee ~/logs/pytest_log.txt
+
+    - name: Upload log file artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: pixi testing log
+        path: ~/logs

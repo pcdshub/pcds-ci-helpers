@@ -1,7 +1,9 @@
 name: pixi docs build
 
 # Use the Makefile inside the docs folder to build the docs.
-# Uses pixi to install the "docs" environment to ensure we have the necessary dependencies.
+# Assumes that the pixi default environment has the docs dependencies in it.
+# Assumes that the docs folder has a Makefile.
+# Assumes that the docs outputs are in docs/build/html
 
 permissions:
   contents: read
@@ -33,10 +35,9 @@ jobs:
       with:
         # Lock version to what we use in prod
         pixi-version: "v0.69.0"
-        environments: docs
 
     - name: Make docs
-      run: cd docs && pixi run --environment docs --as-is make
+      run: cd docs && pixi run --as-is make
 
     - name: Upload docs artifacts
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

@@ -43,10 +43,10 @@ jobs:
       run: uv build
 
     - name: Check the source distribution import
-      run: uv run --isolated --no-project --with "$(realpath ./dist/*.gz)" --directory /tmp -- python -c "import ${{ inputs.package-name }}; print(${{ inputs.package-name }}.__file)"
+      run: uv run --isolated --no-project --with "$(realpath ./dist/*.gz)" --directory /tmp -- python -c "import ${{ inputs.package-name }}; print(${{ inputs.package-name }}.__file__)"
 
     - name: Check the wheel distribution import
-      run: uv run --isolated --no-project --with "$(realpath ./dist/*.whl)" --directory /tmp -- python -c "import ${{ inputs.package-name }}; print(${{ inputs.package-name }}.__file)"
+      run: uv run --isolated --no-project --with "$(realpath ./dist/*.whl)" --directory /tmp -- python -c "import ${{ inputs.package-name }}; print(${{ inputs.package-name }}.__file__)"
 
     - name: Upload distributions as an artifact
       if: ${{ always() }}

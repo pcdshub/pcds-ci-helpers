@@ -39,15 +39,5 @@ jobs:
         # Lock version to what we use in prod
         pixi-version: "v0.69.0"
 
-    - name: Prepare for log files
-      run: mkdir ~/logs
-
     - name: Run tests
-      run: pixi run test 2>&1 | tee ~/logs/pytest_log.txt
-
-    - name: Upload log file artifacts
-      if: ${{ always() }}
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: pixi testing log
-        path: ~/logs
+      run: pixi run --as-is test

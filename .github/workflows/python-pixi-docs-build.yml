@@ -1,0 +1,45 @@
+name: pixi docs build
+
+# Use the Makefile inside the docs folder to build the docs.
+# Uses pixi to install the "docs" environment to ensure we have the necessary dependencies.
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs: {}
+    outputs: {}
+
+jobs:
+  pixi-docs:
+    name: Pixi Docs Build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
+
+    - name: Setup pixi environment
+      uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347
+      with:
+        # Lock version to what we use in prod
+        pixi-version: "v0.69.0"
+        environments: docs
+
+    - name: Make docs
+      run: cd docs && pixi run --environment docs --as-is make
+
+    - name: Upload docs artifacts
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: docs
+        path: docs/build/html

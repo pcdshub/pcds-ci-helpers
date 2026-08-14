@@ -13,6 +13,10 @@ on:
     inputs: {}
     outputs: {}
 
+env:
+  MPLBACKEND: "agg"
+  QT_QPA_PLATFORM: "offscreen"
+
 jobs:
   pixi-docs:
     name: Pixi Docs Build

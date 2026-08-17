@@ -11,7 +11,7 @@ on:
   workflow_call:
     inputs:
       package-name:
-        description: "The Python-importable package name to be tested"
+        description: "The Python-importable package name to be built"
         required: true
         type: string
     outputs: {}

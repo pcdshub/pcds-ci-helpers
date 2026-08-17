@@ -44,7 +44,6 @@ jobs:
       run: cd docs && pixi run --as-is make html
 
     - name: Upload docs artifacts
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
       with:
-        name: docs
         path: docs/build/html

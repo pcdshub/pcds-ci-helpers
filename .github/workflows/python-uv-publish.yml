@@ -13,7 +13,6 @@ on:
 
 jobs:
   publish-dist:
-    name: Publish Distribution
     runs-on: ubuntu-latest
     environment:
       name: pypi

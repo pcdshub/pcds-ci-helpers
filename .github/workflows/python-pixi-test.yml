@@ -19,7 +19,6 @@ env:
 
 jobs:
   pixi-tests:
-    name: Pixi Tests
     runs-on: ubuntu-latest
 
     defaults:

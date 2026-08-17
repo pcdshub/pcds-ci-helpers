@@ -20,7 +20,6 @@ env:
 
 jobs:
   pixi-docs:
-    name: Pixi Docs Build
     runs-on: ubuntu-latest
 
     defaults:

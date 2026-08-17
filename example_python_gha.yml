@@ -11,7 +11,7 @@ name: ECS Pixi Testing
 #
 # To skip a section, simply remove it from the workflow.
 # When you apply this to a repo for the first time,
-# replace the "sha" in each "uses" line with the actual full SHA of the latest tag. 
+# replace the "sha" in each "uses" line with the actual full SHA of the latest tag.
 
 on:
   push:

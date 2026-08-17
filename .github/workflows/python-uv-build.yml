@@ -1,8 +1,7 @@
 name: uv build
 
 # Use "uv build" to build the sdist and wheels, then ensure that these can be imported when installed.
-# This workflow expects the repo to have a buildable python project present.
-
+# Assumes that the repo has a buildable python project present.
 
 permissions:
   contents: read

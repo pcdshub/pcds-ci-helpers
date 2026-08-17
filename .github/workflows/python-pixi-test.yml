@@ -1,8 +1,8 @@
 name: pixi tests
 
-# Do "pixi run test", reporting the result.
-# This workflow expects the repo to have a pixi task named "test" configured.
-# Logfile artifacts will be uploaded so that they could be inspected offline.
+# Use "pixi run test" to run the unit tests.
+# Assumes that the pixi default environment has the test dependencies in it.
+# Assumes that the pixi "test" task is configuerd to run reasonable tests.
 
 permissions:
   contents: read
@@ -12,6 +12,7 @@ on:
     inputs: {}
     outputs: {}
 
+# Ensure that unit tests that invoke qt don't crash
 env:
   MPLBACKEND: "agg"
   QT_QPA_PLATFORM: "offscreen"

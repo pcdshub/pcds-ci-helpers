@@ -1,8 +1,7 @@
 name: uv publish
 
 # Publish the build outputs from the python-uv-build workflow.
-# This workflow requires the repository to be set up as a trusted publisher with pypi,
-# using a "pypi" environment.
+# Assumes that the repo is a trusted publisher on pypi, using a "pypi" environment.
 
 permissions:
   id-token: write

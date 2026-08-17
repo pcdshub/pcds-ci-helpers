@@ -13,6 +13,7 @@ on:
     inputs: {}
     outputs: {}
 
+# Ensure that docs builds that invoke qt don't crash
 env:
   MPLBACKEND: "agg"
   QT_QPA_PLATFORM: "offscreen"

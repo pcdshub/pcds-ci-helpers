@@ -1,24 +1,48 @@
-name: PCDS Standard Testing
+name: ECS Pixi Testing
 
 on:
   push:
+    branches:
+      - "master"
   pull_request:
   release:
     types:
-      - published
+      - created
 
 jobs:
-  standard:
-    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-standard.yml@8cabad83e655bdc8ad62ead20e1539617b1bf35f
+  pre-commit:
+    permissions:
+      contents: read
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/pre-commit.yml@f74a9345ef8ff8119f76ef087c9222f6000f2610
+
+  unit-tests:
+    permissions:
+      contents: read
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-pixi-test.yml@f74a9345ef8ff8119f76ef087c9222f6000f2610
+
+  packaging-tests:
+    permissions:
+      contents: read
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-uv-build.yml@f74a9345ef8ff8119f76ef087c9222f6000f2610
     with:
-      # The workflow needs to know the package name.  This can be determined
-      # automatically if the repository name is the same as the import name.
       package-name: "import_name_goes_here"
-      # Extras that will be installed for both conda/pip:
-      testing-extras: ""
-      # Extras to be installed only for conda-based testing:
-      conda-testing-extras: ""
-      # Extras to be installed only for pip-based testing:
-      pip-testing-extras: ""
-      # Use setuptools-scm in the conda-build workflow
-      use-setuptools-scm: false
+
+  pypi-upload:
+    permissions:
+      id-token: write
+    needs: packaging-tests
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-uv-publish.yml@f74a9345ef8ff8119f76ef087c9222f6000f2610
+
+  docs-build:
+    permissions:
+      contents: read
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-pixi-docs-build.yml@f74a9345ef8ff8119f76ef087c9222f6000f2610
+
+  docs-upload:
+    permissions:
+      pages: write
+      id-token: write
+    needs: docs-build
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/docs-upload.yml@f74a9345ef8ff8119f76ef087c9222f6000f2610

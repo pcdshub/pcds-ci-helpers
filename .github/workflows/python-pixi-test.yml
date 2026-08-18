@@ -1,0 +1,43 @@
+name: pixi tests
+
+# Use "pixi run test" to run the unit tests.
+# Assumes that the pixi default environment has the test dependencies in it.
+# Assumes that the pixi "test" task is configuerd to run reasonable tests.
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs: {}
+    outputs: {}
+
+# Ensure that unit tests that invoke qt don't crash
+env:
+  MPLBACKEND: "agg"
+  QT_QPA_PLATFORM: "offscreen"
+
+jobs:
+  pixi-tests:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
+
+    - name: Setup pixi environment
+      uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347
+      with:
+        # Lock version to what we use in prod
+        pixi-version: "v0.69.0"
+
+    - name: Run tests
+      run: pixi run --as-is test

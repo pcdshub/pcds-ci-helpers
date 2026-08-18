@@ -1,0 +1,54 @@
+name: uv build
+
+# Use "uv build" to build the sdist and wheels, then ensure that these can be imported when installed.
+# Assumes that the repo has a buildable python project present.
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        description: "The Python-importable package name to be built"
+        required: true
+        type: string
+    outputs: {}
+
+jobs:
+  build-dist:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      with:
+        # Lock version to what we use in prod
+        version: "0.11.18"
+
+    - name: Build package
+      run: uv build
+
+    - name: Check the source distribution import
+      run: uv run --isolated --no-project --with "$(realpath ./dist/*.gz)" --directory /tmp -- python -c "import ${{ inputs.package-name }}; print(${{ inputs.package-name }}.__file__)"
+
+    - name: Check the wheel distribution import
+      run: uv run --isolated --no-project --with "$(realpath ./dist/*.whl)" --directory /tmp -- python -c "import ${{ inputs.package-name }}; print(${{ inputs.package-name }}.__file__)"
+
+    - name: Upload distributions as an artifact
+      if: ${{ always() }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: dist
+        path: dist

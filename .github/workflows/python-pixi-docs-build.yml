@@ -1,0 +1,49 @@
+name: pixi docs build
+
+# Use the Makefile inside the docs folder to build the docs.
+# Assumes that the pixi default environment has the docs dependencies in it.
+# Assumes that the docs folder has a Makefile.
+# Assumes that the docs outputs are in docs/build/html
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs: {}
+    outputs: {}
+
+# Ensure that docs builds that invoke qt don't crash
+env:
+  MPLBACKEND: "agg"
+  QT_QPA_PLATFORM: "offscreen"
+
+jobs:
+  pixi-docs:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
+
+    - name: Setup pixi environment
+      uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347
+      with:
+        # Lock version to what we use in prod
+        pixi-version: "v0.69.0"
+
+    - name: Make docs
+      run: cd docs && pixi run --as-is make html
+
+    - name: Upload docs artifacts
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+      with:
+        path: docs/build/html

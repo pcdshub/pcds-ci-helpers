@@ -1,0 +1,24 @@
+name: docs upload
+
+# Uploads a previously created docs html to the github pages site
+# Avoids pushing to a local branch to avoid cloning inefficiencies
+
+permissions:
+  pages: write
+  id-token: write
+
+on:
+  workflow_call:
+    inputs: {}
+    outputs: {}
+
+jobs:
+  github-pages:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+
+    steps:
+    - name: Deploy page
+      uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128

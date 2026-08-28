@@ -60,17 +60,7 @@ jobs:
         shell: bash
 
     steps:
-    - name: Install uv
-      uses: astral-sh/setup-uv@sha
-      with:
-        # Lock version to what we use in prod
-        version: "0.11.18"
-
-    - name: Download distributions artifact
-      uses: actions/download-artifact@sha
-      with:
-        name: dist
-        path: dist/
+    - uses: pcdshub/pcds-ci-helpers/.github/workflows/python-uv-publish.yml@sha
 
     - name: Publish
       run: uv publish

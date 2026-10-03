@@ -46,6 +46,8 @@ jobs:
       with:
         # Lock version to what we use in prod
         pixi-version: "v0.69.0"
+        # Use the environment from the docs template repo
+        working-directory: ./docs
 
     - name: Make docs
       run: cd docs && pixi run --as-is make html

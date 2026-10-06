@@ -48,8 +48,3 @@ jobs:
     with:
       project-root: ${{ inputs.project-root }}
       style-exclude: ${{ inputs.style-exclude }}
-
-  docs-build:
-    name: "Documentation"
-    secrets: inherit
-    uses: ./.github/workflows/twincat-pixi-docs-build.yml

@@ -35,7 +35,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         repository: pcdshub/twincat-docs-template
-        ref: zlentz/mnt_use_pixi
+        ref: master
         path: docs/
         fetch-depth: 0
         submodules: recursive

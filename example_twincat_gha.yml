@@ -7,7 +7,7 @@ name: PCDS Standard Testing
 # - Lint pragmas
 # - Do some style checks
 # - Build human-readable html docs
-# - Upload the docs (on merge and tag)
+# - Optionally upload the docs (on merge and tag)
 #
 # When you apply this to a repo for the first time,
 # replace the "sha" in each "uses" line with the actual full SHA of the latest tag,
@@ -22,7 +22,7 @@ on:
   pull_request:
 
 jobs:
-  # All linting checks
+  # All linting checks, and possibly a docs build
   standard:
     permissions:
       contents: read
@@ -33,18 +33,20 @@ jobs:
       project-root: "."
       # Pattern (grep-compatible) of filenames to exclude in style checks.
       style-exclude: ""
-
-  # Builds the documentation html files that should be uploaded to github pages.
-  docs-build:
-    permissions:
-      contents: read
-    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-pixi-docs-build.yml@sha
-
-  # Uploads the documentation html files from docs-build. Requires the "github-pages" environment to be set up.
-  docs-upload:
-    permissions:
-      pages: write
-      id-token: write
-    needs: docs-build
-    if: github.repository_owner == 'pcdshub' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags'))
-    uses: pcdshub/pcds-ci-helpers/.github/workflows/docs-upload.yml@sha
+# Uncomment the rest if you want to upload the docs
+#      # Build outside of standard so we can check the build before uploading
+#      build-docs: false
+#  # Builds the documentation html files that should be uploaded to github pages.
+#  docs-build:
+#    permissions:
+#      contents: read
+#    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-pixi-docs-build.yml@sha
+#
+#  # Uploads the documentation html files from docs-build. Requires the "github-pages" environment to be set up.
+#  docs-upload:
+#    permissions:
+#      pages: write
+#      id-token: write
+#    needs: docs-build
+#    if: github.repository_owner == 'pcdshub' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags'))
+#    uses: pcdshub/pcds-ci-helpers/.github/workflows/docs-upload.yml@sha

@@ -18,6 +18,11 @@ on:
         type: string
         default: "pcdshub"
         description: "Organization for documentation deployment"
+      build-docs:
+        required: false
+        type: bool
+        default: true
+        decription: "Build docs as part of standard (without uploading)"
 
 jobs:
   pre-commit:
@@ -48,3 +53,9 @@ jobs:
     with:
       project-root: ${{ inputs.project-root }}
       style-exclude: ${{ inputs.style-exclude }}
+
+  docs:
+    name: "docs"
+    when: ${{ inputs.build-docs }}
+    secrets: inherit
+    uses: ./.github/workflows/twincat-pixi-docs-build.yml

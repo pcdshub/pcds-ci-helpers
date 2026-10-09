@@ -11,7 +11,7 @@ name: PCDS Standard Testing
 #
 # When you apply this to a repo for the first time,
 # replace the "sha" in each "uses" line with the actual full SHA of the latest tag,
-# and name the file "pixi_test.yml"
+# and name the file "standard.yml"
 
 on:
   push:

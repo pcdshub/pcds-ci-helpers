@@ -20,7 +20,7 @@ on:
         description: "Organization for documentation deployment"
       build-docs:
         required: false
-        type: bool
+        type: boolean
         default: true
         decription: "Build docs as part of standard (without uploading)"
 

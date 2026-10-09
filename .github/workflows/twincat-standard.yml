@@ -22,7 +22,7 @@ on:
         required: false
         type: boolean
         default: true
-        decription: "Build docs as part of standard (without uploading)"
+        description: "Build docs as part of standard (without uploading)"
 
 jobs:
   pre-commit:

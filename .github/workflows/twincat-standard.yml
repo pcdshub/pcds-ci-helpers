@@ -56,6 +56,6 @@ jobs:
 
   docs:
     name: "Documentation"
-    when: ${{ inputs.build-docs }}
+    if: ${{ inputs.build-docs }}
     secrets: inherit
     uses: ./.github/workflows/twincat-pixi-docs-build.yml

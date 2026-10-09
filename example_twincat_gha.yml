@@ -1,18 +1,52 @@
 name: PCDS Standard Testing
 
+# The standard build, assuming this is a TwinCAT repo
+# This full template will:
+# - Run pre-commit
+# - Run pytmc summary
+# - Lint pragmas
+# - Do some style checks
+# - Build human-readable html docs
+# - Optionally upload the docs (on merge and tag)
+#
+# When you apply this to a repo for the first time,
+# replace the "sha" in each "uses" line with the actual full SHA of the latest tag,
+# and name the file "standard.yml"
+
 on:
   push:
+    branches:
+      - "master"
+    tags:
+      - "v*"
   pull_request:
-  release:
-    types:
-      - published
 
 jobs:
+  # All linting checks, and possibly a docs build
   standard:
-    uses: pcdshub/pcds-ci-helpers/.github/workflows/twincat-standard.yml@8cabad83e655bdc8ad62ead20e1539617b1bf35f
+    permissions:
+      contents: read
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/twincat-standard.yml@sha
     with:
       # The workflow can be configured to look at a specific project directory, if
       # desirable.  This defaults to the root of the repository (".").
       project-root: "."
       # Pattern (grep-compatible) of filenames to exclude in style checks.
       style-exclude: ""
+# Uncomment the rest if you want to upload the docs
+#      # Build outside of standard so we can check the build before uploading
+#      build-docs: false
+#  # Builds the documentation html files that should be uploaded to github pages.
+#  docs-build:
+#    permissions:
+#      contents: read
+#    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-pixi-docs-build.yml@sha
+#
+#  # Uploads the documentation html files from docs-build. Requires the "github-pages" environment to be set up.
+#  docs-upload:
+#    permissions:
+#      pages: write
+#      id-token: write
+#    needs: docs-build
+#    if: github.repository_owner == 'pcdshub' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags'))
+#    uses: pcdshub/pcds-ci-helpers/.github/workflows/docs-upload.yml@sha

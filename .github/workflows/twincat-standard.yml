@@ -55,7 +55,7 @@ jobs:
       style-exclude: ${{ inputs.style-exclude }}
 
   docs:
-    name: "docs"
+    name: "Documentation"
     when: ${{ inputs.build-docs }}
     secrets: inherit
     uses: ./.github/workflows/twincat-pixi-docs-build.yml

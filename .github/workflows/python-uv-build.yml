@@ -35,7 +35,7 @@ jobs:
       uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
       with:
         # Lock version to what we use in prod
-        version: "0.11.18"
+        version: "0.13.4"
 
     - name: Build package
       run: uv build

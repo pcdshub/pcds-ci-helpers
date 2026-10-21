@@ -32,7 +32,7 @@ jobs:
         token: ${{ secrets.CHECKOUT_TOKEN || github.token }}
 
     - name: Install uv
-      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+      uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884
       with:
         # Lock version to what we use in prod
         version: "0.13.4"
@@ -48,7 +48,7 @@ jobs:
 
     - name: Upload distributions as an artifact
       if: ${{ always() }}
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
       with:
         name: dist
         path: dist

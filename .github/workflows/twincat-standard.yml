@@ -18,6 +18,11 @@ on:
         type: string
         default: "pcdshub"
         description: "Organization for documentation deployment"
+      build-docs:
+        required: false
+        type: boolean
+        default: true
+        description: "Build docs as part of standard (without uploading)"
 
 jobs:
   pre-commit:
@@ -49,13 +54,8 @@ jobs:
       project-root: ${{ inputs.project-root }}
       style-exclude: ${{ inputs.style-exclude }}
 
-#  docs:
-#    name: "Documentation"
-#    secrets: inherit
-#    uses: ./.github/workflows/python-docs.yml
-#    with:
-#      deploy: ${{ github.repository_owner == inputs.docs-organization && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')) }}
-#      package-name: ""
-#      install-package: false
-#      docs-template-repo: "pcdshub/twincat-docs-template"
-#      docs-template-ref: "master"
+  docs:
+    name: "Documentation"
+    if: ${{ inputs.build-docs }}
+    secrets: inherit
+    uses: ./.github/workflows/twincat-pixi-docs-build.yml
